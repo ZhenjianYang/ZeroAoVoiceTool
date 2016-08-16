@@ -69,17 +69,19 @@ ZeroAoVoiceTool
 
 -   **doc** 这里放的是项目相关文档，如工具的使用说明、原理说明等
 
--   **example**
-    这里放置了一个配置文件样例，以及零、碧各一套的语音表文件样例
+-   **example** 这里放置了一个配置文件样例，以及零、碧各一套的语音表文件样例
+
+-   **src** 放置源代码的目录
 
 -   **solution** 用VS2015建立的工程，各项目分述如下
 
 -   -   **ZeroAoVoiceTool** 即为前文提及的外挂语音程序
--   -   **ZaMakeVoiceTableFound**
-        测试程序，用于寻找scena文件文本的特征。已无用。
+   
+-   -   **ZaMakeVoiceTableFound** 测试程序，用于寻找scena文件文本的特征。已无用。
+
 -   -   **ZaMakeVoiceTablePrepare** 导出scena文件的文本，用于建立语音表
+  
 -   -   **ZaMakeVoiceTable** 建立语音表的工具，需要上一工具先导出文本
--   **src** 放置源代码的目录
 
 TODO
 ====
