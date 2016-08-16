@@ -1,0 +1,102 @@
+#ifndef __ZACONST_H__
+#define __ZACONST_H__
+
+#define ZA_VERSION "0.1.0"
+
+#define Z_DFT_WIN_TITLE "英雄传说：零之轨迹"
+
+//1.0版的数据
+/*
+#define Z_ADD_JC_LOADSCENA		0x8ED89B
+#define Z_OLD_JCTO_LOADSCENA	0x659AA4
+
+#define Z_ADD_JC_LOADBLOCK		0x65C2EF
+#define Z_OLD_JCTO_LOADBLOCK	0x8A2920
+
+#define Z_ADD_JC_SHOWTEXT		0x65D1C7
+#define Z_OLD_JCTO_SHOWTEXT		0x89D670
+*/
+
+
+#define Z_ADD_JC_LOADSCENA		0x8EDE0B
+#define Z_OLD_JCTO_LOADSCENA	0x659AA4
+
+#define Z_ADD_JC_LOADSCENA1		0x8EE047
+#define Z_OLD_JCTO_LOADSCENA1	0x659AA4
+
+#define Z_ADD_JC_LOADBLOCK		0x65C2EF
+#define Z_OLD_JCTO_LOADBLOCK	0x8A2E90
+
+#define Z_ADD_JC_SHOWTEXT		0x65D1CC
+#define Z_OLD_JCTO_SHOWTEXT		0x89DBE0
+
+#define Z_LENGTH_VOICE_ID 7
+
+
+#define A_DFT_WIN_TITLE "英雄传说：碧之轨迹"
+
+#define A_ADD_JC_LOADSCENA		0x91779B
+#define A_OLD_JCTO_LOADSCENA	0x67380B
+
+#define A_ADD_JC_LOADSCENA1		0x9179D7
+#define A_OLD_JCTO_LOADSCENA1	0x67380B
+
+#define A_ADD_JC_LOADBLOCK		0x676114
+#define A_OLD_JCTO_LOADBLOCK	0x8BEEC0
+
+#define A_ADD_JC_SHOWTEXT		0x67709B
+#define A_OLD_JCTO_SHOWTEXT		0x8BAAD0
+
+#define A_EMPTYVOICE_HEX		0x39393939 //"9999"
+#define A_EMPTYVOICE_LOOPTIMES	20
+
+#define A_LENGTH_VOICE_ID 9
+
+#define OFF_OFF_SCENANAME		0x34
+#define MAX_SCENA_SIZE			(256 * 1024)
+
+#define MODE_ZERO	2
+#define MODE_AO		1
+#define MODE_AUTO	0
+#define MODE_NONE	4
+
+#define DFT_RMFWDCTRLCH 1
+#define DFT_SLEEP_TIME 10
+
+#define DFT_USELOGFILE 0
+#define DFT_DEBUGLOG 0
+
+#define Z_DFT_VOICE_DIR "zero.voice"
+#define Z_DFT_VOICEFILE_EXT "wav"
+#define Z_DFT_VOICETABLE_DIR "zero.tbl"
+#define Z_DFT_VOICETABLE_EXT "tbl"
+#define Z_DFT_VOICE_NAME "v"
+
+#define A_DFT_VOICE_DIR "ao.voice"
+#define A_DFT_VOICEFILE_EXT "wav"
+#define A_DFT_VOICETABLE_DIR "ao.tbl"
+#define A_DFT_VOICETABLE_EXT "tbl"
+#define A_DFT_VOICE_NAME "v"
+#define A_DFT_DISABLE_ORIVOICE 0
+
+#define INVAILD_VOICE_ID 0
+#define INVALID_OFFSET 0xFFFFFF
+#define FAKE_OFFSET 0x10000000
+
+#define DFT_CONFIG_FILE "ZaVoiceConfig.ini"
+#define DFT_LOG_FILE "ZaLog.txt"
+
+#define MAX_SCENANAME_LENGTH 9
+#define MIN_SCENANAME_LENGTH 4
+
+#define Z_SET_PRE_ONEBYTE { 0x00, 0x01, 0x02, 0x03, 0x05, 0x0b, 0x0c, 0x0d, 0x18 }
+#define Z_SET_NEXT_TWOBYTE { 0x0200, 0x0201, 0x0203, 0x0502, 0x0700 }
+
+#define A_SET_PRE_ONEBYTE { 0x00, 0x01, 0x02, 0x03, 0x05, 0x0a, 0x0b, 0x0c, 0x0d, 0x14, 0x15 }
+#define A_SET_NEXT_TWOBYTE { 0x0200, 0x0201, 0x0203, 0x0502, 0x0700 }
+
+#define NOT_ALLOWED_ASCII { '\\', '^', '|', '{', '}' , 0x7F}
+
+#endif // !__ZACONST_H__
+
+
