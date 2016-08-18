@@ -37,6 +37,10 @@ By now, this tool can only work for:
 -   *The Legend of Heroes: Ao no Kiseki*, Chinese Simplified version,
     version 1.0
 
+See
+[doc/使用说明.md](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/doc/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)
+for details about the usage.
+
 ZeroAoVoiceTool
 ===============
 
@@ -64,23 +68,25 @@ ZeroAoVoiceTool
 
 -   《英雄传说：碧之轨迹》，简体中文版，版本1.0
 
+关于工具的详细使用说明请参考
+[doc/使用说明.md](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/doc/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)
+
 各目录说明
 ==========
 
 -   **doc** 这里放的是项目相关文档，如工具的使用说明、原理说明等
 
--   **example** 这里放置了一个配置文件样例，以及零、碧各一套的语音表文件样例
+-   **example**
+    这里放置了一个配置文件样例，以及零、碧各一套的语音表文件样例
 
 -   **src** 放置源代码的目录
 
 -   **solution** 用VS2015建立的工程，各项目分述如下
 
 -   -   **ZeroAoVoiceTool** 即为前文提及的外挂语音程序
-   
--   -   **ZaMakeVoiceTableFound** 测试程序，用于寻找scena文件文本的特征。已无用。
-
+-   -   **ZaMakeVoiceTableFound**
+        测试程序，用于寻找scena文件文本的特征。已无用。
 -   -   **ZaMakeVoiceTablePrepare** 导出scena文件的文本，用于建立语音表
-  
 -   -   **ZaMakeVoiceTable** 建立语音表的工具，需要上一工具先导出文本
 
 TODO
