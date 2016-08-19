@@ -6,7 +6,9 @@ Zero no Kiseki* & *The Legend of Heroes: Ao no Kiseki*
 
 **NOTE:**This projcet is licensed under the GPLv3. You MUST copy,
 distribute and/or modify any code or binaries from this projcet under
-this license. See [LICENSE](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/LICENSE) for details
+this license. See
+[LICENSE](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/LICENSE)
+for details
 
 **NOTE:**Do NOT upload any offical resources (The entire game or game
 resources like voice files, Chinese or Japesene texts, scena files,
@@ -26,7 +28,7 @@ To let it work, you need three things done before:
 -   first, you need to extact the voice files(\*.at9) from the PS Vita
     games *Zero no Kiseki Evolution* & *Ao no Kiseki Evolution* (no
     mater they are card or downloaded games) and convert them to
-    wave files(\*.wav).
+    supported files(\*.wav, \*.ogg).
 
 -   Second, you need to make voice table files for each scena file(a
     scena file means a file under the folder "scena").This project also
@@ -50,12 +52,9 @@ External libraries used in this project
     found in
     [/extlibs/SFML/license.txt](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/extlibs/SFML/license.txt).
 
+------------------------------------------------------------------------
 
-
---------
-
---------
-
+------------------------------------------------------------------------
 
 ZeroAoVoiceTool
 ===============
@@ -76,7 +75,7 @@ ZeroAoVoiceTool
 为了能让其正常工作，您需要事先：
 
 1.  导出PS Vita游戏《零の軌跡 Evolution》及《碧の軌跡
-    Evolution》（卡带或下载版游戏均可）中的语音文件(\*.at9），并将其转换为wav文件。
+    Evolution》（卡带或下载版游戏均可）中的语音文件(\*.at9），并将其转换为本工具支持的文件格式(\*.wav或\*.ogg)。
 
 2.  为每个scena文件（即在scena文件夹下的文件）制作一个语音表。本项目提供了制作语音表的工具
     （需要解密之后的PC版的scena文件和原始的PS
@@ -95,7 +94,7 @@ ZeroAoVoiceTool
     [/extlibs/SFML/license.txt](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/extlibs/SFML/license.txt).
 
 各目录说明
----------
+----------
 
 -   **doc** 这里放的是项目相关文档，如工具的使用说明、原理说明等
 
