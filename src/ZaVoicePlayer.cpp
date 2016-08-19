@@ -6,6 +6,7 @@
 #include "ZaSound.h"
 #include "ZaVoiceTable.h"
 #include "ZaRemote.h"
+#include "ZaIo.h"
 
 #include <Windows.h>
 #include <string>
@@ -18,7 +19,8 @@ static int length_voiceid;
 static int voiceIdWait;
 
 #define BUFF_TEXT_SIZE 1024
-static ZaVoiceTable zaVoiceTable;
+static ZaVoiceTablesGroup zaVoiceTablesGroup;
+static const ZaVoiceTable *zaVoiceTable;
 static ZAData zaData, zaData_old;
 static char scenaName[MAX_SCENANAME_LENGTH + 1];
 static char scenaName1[MAX_SCENANAME_LENGTH + 1];
@@ -108,11 +110,26 @@ static bool ZaPlayVoice(int voiceID, std::string &filename) {
 	return ZaSoundPlay(vfileFull);
 }
 
-static void ZaLoadNewVoiceTable(const char* scenaName) {
-	std::string pathVtbl = mode == MODE_AO ? 
-		zaConfigData.ao_dir_voiceTable + "\\" + scenaName + "." + zaConfigData.ao_ext_voiceTable :
-		zaConfigData.zero_dir_voiceTable + "\\" + scenaName + "." + zaConfigData.zero_ext_voiceTable;
-	zaVoiceTable.LoadTblFile(pathVtbl.c_str());
+static void ZaLoadNewVoiceTable(const std::string& name) {
+	zaVoiceTable = zaVoiceTablesGroup.GetVoiceTable(name);
+	if (zaVoiceTable == nullptr)
+		zaVoiceTable = &InvalidVoiceTable;
+}
+static void ZaLoadAllVoiceTables() {
+	std::vector<std::string> subs;
+	
+	const std::string& dir = mode == MODE_AO ?
+		zaConfigData.ao_dir_voiceTable : zaConfigData.zero_dir_voiceTable;
+
+	std::string searchName = "*." + (mode == MODE_AO ?
+		zaConfigData.ao_ext_voiceTable : zaConfigData.zero_ext_voiceTable);
+
+	GetSubs(dir, searchName, subs);
+
+	for (auto sub : subs) {
+		std::string scenaName = sub.substr(0, sub.rfind('.'));
+		zaVoiceTablesGroup.AddVoiceTable(scenaName, dir + '\\' + sub);
+	}
 }
 
 static int ZaVoicePlayerLoopMain()
@@ -146,7 +163,7 @@ static int ZaVoicePlayerLoopMain()
 		if (CheckScenaName(scenaName)) {
 			ZALOG_DEBUG("Scena:%s, Loading Voice Table...", scenaName);
 			ZaLoadNewVoiceTable(scenaName);
-			ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable.NumInfo());
+			ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable->Num());
 		}
 		else {
 			scenaName[0] = 0;
@@ -180,7 +197,7 @@ static int ZaVoicePlayerLoopMain()
 				}
 				ZALOG_DEBUG("Scena:%s, Loading Voice Table...", pScenaName);
 				ZaLoadNewVoiceTable(pScenaName);
-				ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable.NumInfo());
+				ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable->Num());
 			}
 		}
 		else if (zaData.aScena1 > 0 && zaData.aScena1 < zaData.aCurBlock) {
@@ -197,7 +214,7 @@ static int ZaVoicePlayerLoopMain()
 				}
 				ZALOG_DEBUG("Scena:%s, Loading Voice Table...", pScenaName);
 				ZaLoadNewVoiceTable(pScenaName);
-				ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable.NumInfo());
+				ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable->Num());
 			}
 		}
 		else {
@@ -208,7 +225,7 @@ static int ZaVoicePlayerLoopMain()
 
 				ZALOG_DEBUG("Scena:%s, Loading Voice Table...", pScenaName);
 				ZaLoadNewVoiceTable(pScenaName);
-				ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable.NumInfo());
+				ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable->Num());
 			}
 		}
 	}
@@ -228,9 +245,9 @@ static int ZaVoicePlayerLoopMain()
 	offset += ZaTextAnalysis(buffText, buffTextSrc);
 
 	if (buffText[0] != 0) {
-		const VoiceInfo* pvinf = zaVoiceTable[offset];
+		const VoiceInfo* pvinf = zaVoiceTable->GetVoiceInfo(offset);
 		if (pvinf == nullptr) {
-			pvinf = zaVoiceTable[offset + FAKE_OFFSET];
+			pvinf = zaVoiceTable->GetVoiceInfo(offset + FAKE_OFFSET);
 			if (pvinf != nullptr) offset += FAKE_OFFSET;
 		}
 		const VoiceInfo& vinf = pvinf == nullptr ? InvaildVoiceInfo : *pvinf;
@@ -289,6 +306,10 @@ int ZaVoicePlayerInit(int mode) {
 	pScenaName = NULL;
 	scenaName[0] = 0;
 	voiceIdWait = InValidVoiceId;
+
+	ZALOG_DEBUG("加载语音表...");
+	ZaLoadAllVoiceTables();
+	ZALOG_DEBUG("已加载的语音表数: %d", zaVoiceTablesGroup.Num());
 
 	return 0;
 }

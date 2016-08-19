@@ -5,6 +5,10 @@
 
 #define MAXCH_ONE_LINE 1024
 
+const VoiceInfo InvaildVoiceInfo = { INVAILD_VOICE_ID, std::string("") };
+const ZaVoiceTable ZaVoiceTablesGroup::_InvalidVoiceTable;
+const ZaVoiceTable & InvalidVoiceTable = ZaVoiceTablesGroup::_InvalidVoiceTable;
+
 static bool GetAndFormat(char* buff, int &offset, int &voiceid, const char* &jpText) {
 	offset = voiceid = 0;
 	jpText = NULL;
@@ -37,7 +41,7 @@ static bool GetAndFormat(char* buff, int &offset, int &voiceid, const char* &jpT
 	return true;
 }
 
-bool ZaVoiceTable::LoadTblFile(const char * vtblFile)
+bool ZaVoiceTable::LoadTblFile(const std::string& vtblFile)
 {
 	destory();
 
@@ -85,4 +89,33 @@ void ZaVoiceTable::destory()
 		delete ovi.second;
 	}
 	map_off_vinf.clear();
+}
+
+const ZaVoiceTable * ZaVoiceTablesGroup::GetVoiceTable(const std::string & name) const
+{
+	auto nvtbl = map_name_vtbl.find(name);
+	if (nvtbl == map_name_vtbl.end()) return nullptr;
+	return nvtbl->second;
+}
+
+const ZaVoiceTable * ZaVoiceTablesGroup::AddVoiceTable(const std::string & name, const std::string & vtblFile)
+{
+	if(map_name_vtbl.find(name) != map_name_vtbl.end())
+		return nullptr;
+
+	ZaVoiceTable *vt = new ZaVoiceTable(vtblFile);
+	if (vt == nullptr || vt->Num() == 0) {
+		delete vt;
+		return nullptr;
+	}
+
+	map_name_vtbl[name] = vt;
+	return vt;
+}
+
+void ZaVoiceTablesGroup::destory()
+{
+	for (auto mnv : map_name_vtbl)
+		delete mnv.second;
+	map_name_vtbl.clear();
 }
