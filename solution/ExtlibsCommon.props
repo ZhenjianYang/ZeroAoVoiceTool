@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <SFMLHomeIncDir>$(SFMLHome)include\</SFMLHomeIncDir>
+    <ExtlibsHome>$(SolutionDir)..\extlibs\</ExtlibsHome>
+    <SFMLHome>$(ExtlibsHome)SFML\</SFMLHome>
+    <SFMLIncDir>$(SFMLHome)include\</SFMLIncDir>
+    <SFMLLibsDir>$(SFMLHome)lib\</SFMLLibsDir>
+    <SFMLBinDir>$(SFMLHome)bin</SFMLBinDir>
+    <ExtIncDirs>$(SFMLIncDir)</ExtIncDirs>
+    <ExtLibsDirs>$(SFMLLibsDir)</ExtLibsDirs>
+    <ExtBinsDirs>$(SFMLBinDir)</ExtBinsDirs>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IncludePath>$(ExtIncDirs);$(IncludePath)</IncludePath>
+    <_PropertySheetDisplayName>ExtlibsCommon</_PropertySheetDisplayName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link />
+    <Link>
+      <AdditionalLibraryDirectories>$(ExtLibsDirs);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(ExtlibsNames);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <PreprocessorDefinitions>$(ExtlibsMacro);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="ExtlibsHome">
+      <Value>$(ExtlibsHome)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SFMLHome">
+      <Value>$(SFMLHome)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SFMLIncDir">
+      <Value>$(SFMLIncDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SFMLLibsDir">
+      <Value>$(SFMLLibsDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SFMLBinDir">
+      <Value>$(SFMLBinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExtIncDirs">
+      <Value>$(ExtIncDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExtLibsDirs">
+      <Value>$(ExtLibsDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExtBinsDirs">
+      <Value>$(ExtBinsDirs)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

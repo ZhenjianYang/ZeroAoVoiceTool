@@ -1,12 +1,48 @@
 #include "ZaSound.h"
 
-#include <Windows.h>
+#include <SFML/Audio/Music.hpp>
 
-#pragma comment(lib, "winmm.lib") 
+static sf::Music music;
 
-bool ZaSoundPlay(const char * soundFile, bool wait /*= false*/)
+int ZaSoundInit(float volumn)
 {
-	DWORD param = SND_FILENAME | SND_ASYNC | SND_NODEFAULT;
-	if (wait) param |= SND_NOSTOP;
-	return PlaySound(soundFile, NULL, param);
+	ZaSoundSetVolumn(volumn);
+	return 0;
+}
+
+void ZaSoundSetVolumn(float volumn)
+{
+	music.setVolume(volumn);
+}
+
+float ZaSoundGetVolumn()
+{
+	return music.getVolume();
+}
+
+int ZaSoundStatus()
+{
+	switch (music.getStatus())
+	{
+	case music.Stopped:
+		return ZASOUND_STATUS_STOP;
+	case music.Playing:
+		return ZASOUND_STATUS_PLAYING;
+	case music.Paused:
+	default:
+		return ZASOUND_STATUS_PAUSE;
+	}
+}
+
+bool ZaSoundPlay(const std::string& soundFile)
+{
+	music.stop();
+	if (!music.openFromFile(soundFile)) return false;
+	music.play();
+	return true;
+}
+
+void ZaSoundStop()
+{
+	music.stop();
 }
