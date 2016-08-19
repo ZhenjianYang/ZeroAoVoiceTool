@@ -9,12 +9,11 @@
 #include <set>
 
 #include "ZaConst.h"
+#include "ZaIo.h"
 
 using namespace std;
 
 const int length_voiceid = Z_LENGTH_VOICE_ID;
-
-static void GetSubs(const string& dir, const char* fileName, vector<string> &subs);
 
 set<int> zpre1 = Z_SET_PRE_ONEBYTE;
 set<int> znext2 = Z_SET_NEXT_TWOBYTE;
@@ -225,19 +224,4 @@ int main(int argc, char* argv[]) {
 	of_rep.close();
 
 	return 0;
-}
-
-static void GetSubs(const string& dir, const char* fileName, vector<string> &subs)
-{
-	WIN32_FIND_DATA wfdp;
-	HANDLE hFindp = FindFirstFile((dir + '\\' + fileName).c_str(), &wfdp);
-	if (hFindp != NULL) {
-		do
-		{
-			if (!(wfdp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			{
-				subs.push_back(wfdp.cFileName);
-			}
-		} while (FindNextFile(hFindp, &wfdp));
-	}
 }

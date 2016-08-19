@@ -119,6 +119,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\main_ZaMakeVoiceTablePrepare.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\ZaIo.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -8,25 +8,12 @@
 #include <Windows.h>
 
 #include "ZaConst.h"
+#include "ZaIo.h"
 
 using namespace std;
 
 int length_voiceid = Z_LENGTH_VOICE_ID;
 
-static void GetSubs(const string& dir, const char* fileName, vector<string> &subs)
-{
-	WIN32_FIND_DATA wfdp;
-	HANDLE hFindp = FindFirstFile((dir + '\\' + fileName).c_str(), &wfdp);
-	if (hFindp != NULL) {
-		do
-		{
-			if (!(wfdp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			{
-				subs.push_back(wfdp.cFileName);
-			}
-		} while (FindNextFile(hFindp, &wfdp));
-	}
-}
 
 bool Check(unsigned char* buf) {
 
