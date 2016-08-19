@@ -67,13 +67,14 @@
 #define DFT_DEBUGLOG 0
 
 #define Z_DFT_VOICE_DIR "zero.voice"
-#define Z_DFT_VOICEFILE_EXT "wav"
+#define Z_DFT_VOICE_EXT {"ogg" , "wav"}
 #define Z_DFT_VOICETABLE_DIR "zero.tbl"
 #define Z_DFT_VOICETABLE_EXT "tbl"
 #define Z_DFT_VOICE_NAME "v"
+#define Z_DFT_DISABLE_ORIVOICE 0
 
 #define A_DFT_VOICE_DIR "ao.voice"
-#define A_DFT_VOICEFILE_EXT "wav"
+#define A_DFT_VOICE_EXT {"ogg" , "wav"}
 #define A_DFT_VOICETABLE_DIR "ao.tbl"
 #define A_DFT_VOICETABLE_EXT "tbl"
 #define A_DFT_VOICE_NAME "v"

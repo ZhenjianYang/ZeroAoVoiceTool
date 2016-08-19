@@ -34,7 +34,27 @@ static bool SetStrVaule(string& value, const char* buff) {
 	value.resize(size);
 	return true;
 }
+static bool SetVStrVaule(vector<string>& value, const char* buff) {
+	while (*buff == 0x20 || *buff == '\t') ++buff;
+	if (*buff != '=') return false;
 
+	++buff;
+	while (*buff == 0x20 || *buff == '\t') ++buff;
+	if (*buff == 0) return true;
+
+	value.clear();
+	while (*buff != 0)
+	{
+		int len = 0;
+		while (buff[len] != 0x20 && buff[len] != '\t' && buff[len] != 0) ++len;
+
+		if(len > 0) value.push_back(string(buff, len));
+		buff += len;
+
+		while (*buff == 0x20 || *buff == '\t') ++buff;
+	}
+	return true;
+}
 static bool SetIntVaule(int& value, const char* buff) {
 	while (*buff == 0x20 || *buff == '\t') ++buff;
 	if (*buff != '=') return false;
@@ -88,29 +108,30 @@ void ZaConfigLoad(const char * configFile)
 		else if (Compare(pb, STR_Ao)) mode = MODE_AO;
 		else if (Compare(pb, STR_Zero)) mode = MODE_ZERO;
 		else if (p = Compare(pb, STR_VoiceFileDirectory)) {
-			if(mode & MODE_AO) failed = !SetStrVaule(_zaConfigData.ao_dir_voice, pb + p);
-			if(mode & MODE_ZERO) failed = !SetStrVaule(_zaConfigData.zero_dir_voice, pb + p);
+			if(mode & MODE_AO) failed = !SetStrVaule(_zaConfigData.Ao.VoiceDir, pb + p);
+			if(mode & MODE_ZERO) failed = !SetStrVaule(_zaConfigData.Zero.VoiceDir, pb + p);
 		}
 		else if (p = Compare(pb, STR_VoiceFileExtension)) {
-			if (mode & MODE_AO) failed = !SetStrVaule(_zaConfigData.ao_ext_voice, pb + p);
-			if (mode & MODE_ZERO) failed = !SetStrVaule(_zaConfigData.zero_ext_voiceFile, pb + p);
+			if (mode & MODE_AO) failed = !SetVStrVaule(_zaConfigData.Ao.VoiceExt, pb + p);
+			if (mode & MODE_ZERO) failed = !SetVStrVaule(_zaConfigData.Zero.VoiceExt, pb + p);
 		}
 		else if (p = Compare(pb, STR_VoiceTableFileDirectory)) {
-			if (mode & MODE_AO) failed = !SetStrVaule(_zaConfigData.ao_dir_voiceTable, pb + p);
-			if (mode & MODE_ZERO) failed = !SetStrVaule(_zaConfigData.zero_dir_voiceTable, pb + p);
+			if (mode & MODE_AO) failed = !SetStrVaule(_zaConfigData.Ao.VtblDir, pb + p);
+			if (mode & MODE_ZERO) failed = !SetStrVaule(_zaConfigData.Zero.VtblDir, pb + p);
 		}
 		else if (p = Compare(pb, STR_VoiceTableFileExtension)) {
-			if (mode & MODE_AO) failed = !SetStrVaule(_zaConfigData.ao_ext_voiceTable, pb + p);
-			if (mode & MODE_ZERO) failed = !SetStrVaule(_zaConfigData.zero_ext_voiceTable, pb + p);
+			if (mode & MODE_AO) failed = !SetStrVaule(_zaConfigData.Ao.VtblExt, pb + p);
+			if (mode & MODE_ZERO) failed = !SetStrVaule(_zaConfigData.Zero.VtblExt, pb + p);
 		}
 		else if (p = Compare(pb, STR_DisableOriginalVoice)) {
-			if (mode & MODE_AO) failed = !SetIntVaule(_zaConfigData.ao_disableOriginalVoice, pb + p);
+			if (mode & MODE_AO) failed = !SetIntVaule(_zaConfigData.Ao.DisableOriginalVoice, pb + p);
+			if (mode & MODE_ZERO) failed = !SetIntVaule(_zaConfigData.Zero.DisableOriginalVoice, pb + p);
 		}
 		else if (p = Compare(pb, STR_OpenDebugLog)) {
-			failed = !SetIntVaule(_zaConfigData.debuglog, pb + p);
+			failed = !SetIntVaule(_zaConfigData.General.OpenDebugLog, pb + p);
 		}
 		else if (p = Compare(pb, STR_UseLogFile)) {
-			failed = !SetIntVaule(_zaConfigData.uselogfile, pb + p);
+			failed = !SetIntVaule(_zaConfigData.General.UseLogFile, pb + p);
 		}
 		else failed = true;
 
@@ -121,28 +142,35 @@ void ZaConfigLoad(const char * configFile)
 }
 
 void ZaConfigSetDefault() {
-	_zaConfigData.debuglog = DFT_DEBUGLOG;
-	_zaConfigData.uselogfile = DFT_USELOGFILE;
+	_zaConfigData.General.OpenDebugLog = DFT_DEBUGLOG;
+	_zaConfigData.General.UseLogFile = DFT_USELOGFILE;
 
-	_zaConfigData.sleepTime = DFT_SLEEP_TIME;
-	_zaConfigData.removeFwdCtrlCh = DFT_RMFWDCTRLCH;
-	_zaConfigData.mode = MODE_AUTO;
+	_zaConfigData.General.SleepTime = DFT_SLEEP_TIME;
+	_zaConfigData.General.RemoveFwdCtrlCh = DFT_RMFWDCTRLCH;
+	_zaConfigData.General.Mode = MODE_AUTO;
 
 
-	_zaConfigData.zero_ext_voiceFile = Z_DFT_VOICEFILE_EXT;
-	_zaConfigData.zero_ext_voiceTable = Z_DFT_VOICETABLE_EXT;
-	_zaConfigData.zero_name_voice = Z_DFT_VOICE_NAME;
+	_zaConfigData.Zero.VoiceDir = Z_DFT_VOICE_DIR;
+	_zaConfigData.Zero.VoiceExt = Z_DFT_VOICE_EXT;
+	_zaConfigData.Zero.VoiceName = Z_DFT_VOICE_NAME;
 
-	_zaConfigData.zero_dir_voice = Z_DFT_VOICE_DIR;
-	_zaConfigData.zero_dir_voiceTable = Z_DFT_VOICETABLE_DIR;
-	
+	_zaConfigData.Zero.VtblExt = Z_DFT_VOICETABLE_EXT;
+	_zaConfigData.Zero.VtblDir = Z_DFT_VOICETABLE_DIR;
 
-	_zaConfigData.ao_ext_voice = A_DFT_VOICEFILE_EXT;
-	_zaConfigData.ao_ext_voiceTable = A_DFT_VOICETABLE_EXT;
-	_zaConfigData.ao_name_voice = A_DFT_VOICE_NAME;
+	_zaConfigData.Zero.DisableOriginalVoice = Z_DFT_DISABLE_ORIVOICE;
 
-	_zaConfigData.ao_dir_voice = A_DFT_VOICE_DIR;
-	_zaConfigData.ao_dir_voiceTable = A_DFT_VOICETABLE_DIR;
+	_zaConfigData.Zero.VoiceIdLength = Z_LENGTH_VOICE_ID;
 
-	_zaConfigData.ao_disableOriginalVoice = A_DFT_DISABLE_ORIVOICE;
+
+
+	_zaConfigData.Ao.VoiceDir = A_DFT_VOICE_DIR;
+	_zaConfigData.Ao.VoiceExt = A_DFT_VOICE_EXT;
+	_zaConfigData.Ao.VoiceName = A_DFT_VOICE_NAME;
+
+	_zaConfigData.Ao.VtblExt = A_DFT_VOICETABLE_EXT;
+	_zaConfigData.Ao.VtblDir = A_DFT_VOICETABLE_DIR;
+
+	_zaConfigData.Ao.DisableOriginalVoice = A_DFT_DISABLE_ORIVOICE;
+
+	_zaConfigData.Ao.VoiceIdLength = A_LENGTH_VOICE_ID;
 }

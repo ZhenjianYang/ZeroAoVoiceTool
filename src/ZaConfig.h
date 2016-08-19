@@ -2,6 +2,7 @@
 #define __ZACONFIG_H__
 
 #include <string>
+#include <vector>
 
 #define STR_general		"[General]"
 #define STR_Ao			"[Ao]"
@@ -18,31 +19,34 @@
 #define STR_OpenDebugLog "OpenDebugLog"
 #define STR_UseLogFile "UseLogFile"
 
+struct ZaConfigDataGame
+{
+	std::string VoiceDir;
+	std::string VoiceName;
+	std::vector<std::string> VoiceExt;
+
+	std::string VtblDir;
+	std::string VtblExt;
+
+	int DisableOriginalVoice;
+	int VoiceIdLength;
+};
+
+struct ZaConfigDataGeneral
+{
+	int OpenDebugLog;
+	int UseLogFile;
+
+	int RemoveFwdCtrlCh;
+	int SleepTime;
+	int Mode;
+};
 
 struct ZaConfigData
 {
-	std::string ao_dir_voice;
-	std::string ao_name_voice;
-	std::string ao_ext_voice;
-
-	std::string ao_dir_voiceTable;
-	std::string ao_ext_voiceTable;
-
-	int ao_disableOriginalVoice;
-
-	std::string zero_dir_voice;
-	std::string zero_name_voice;
-	std::string zero_ext_voiceFile;
-
-	std::string zero_dir_voiceTable;
-	std::string zero_ext_voiceTable;
-
-	int debuglog;
-	int uselogfile;
-
-	int removeFwdCtrlCh;
-	int sleepTime;
-	int mode;
+	ZaConfigDataGeneral General;
+	ZaConfigDataGame Ao;
+	ZaConfigDataGame Zero;
 };
 extern const ZaConfigData &zaConfigData;
 

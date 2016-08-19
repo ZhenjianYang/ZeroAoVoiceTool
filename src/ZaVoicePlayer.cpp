@@ -8,15 +8,17 @@
 #include "ZaRemote.h"
 #include "ZaIo.h"
 
+#include <io.h>
 #include <Windows.h>
 #include <string>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 static int mode;
-static int length_voiceid;
-
 static int voiceIdWait;
+
+static const ZaConfigDataGame* zaConfigGame;
+static const ZaConfigDataGeneral* zaConfigGeneral;
 
 #define BUFF_TEXT_SIZE 1024
 static ZaVoiceTablesGroup zaVoiceTablesGroup;
@@ -47,7 +49,7 @@ static int ZaTextAnalysis(unsigned char *dst, const unsigned char* src) {
 	while (*src < 0x20 || *src > 0xFF) {
 		src++; first++;
 	}
-	if (zaConfigData.removeFwdCtrlCh) {
+	if (zaConfigGeneral->RemoveFwdCtrlCh) {
 		while (*src == '#') {
 			++src;
 			while (*src >= '0' && *src <= '9') ++src;
@@ -71,7 +73,7 @@ static int ZaTextAnalysis(unsigned char *dst, const unsigned char* src) {
 	return first;
 }
 static void ZaTextAnalysisJP(const unsigned char* &buff) {
-	if (zaConfigData.removeFwdCtrlCh) {
+	if (zaConfigGeneral->RemoveFwdCtrlCh) {
 		while (*buff == '#') {
 			++buff;
 			while (*buff >= '0' && *buff <= '9') ++buff;
@@ -80,34 +82,40 @@ static void ZaTextAnalysisJP(const unsigned char* &buff) {
 	}
 }
 
-static char voiceidbuff[MAX(Z_LENGTH_VOICE_ID, A_LENGTH_VOICE_ID) + 1];
-static const char* StrVoiceID(int voiceID) {
+static std::string StrVoiceID(int voiceID) {
+	std::string strVoiceId;
+	strVoiceId.resize(zaConfigGame->VoiceIdLength);
+
 	if (voiceID == InValidVoiceId) {
-		for (int i = 0; i < length_voiceid; ++i)
-			voiceidbuff[i] = '-';
+		for (int i = 0; i < zaConfigGame->VoiceIdLength; ++i)
+			strVoiceId[i] = '-';
 	}
 	else {
-		for (int i = length_voiceid - 1; i >= 0; --i) {
-			voiceidbuff[i] = voiceID % 10 + '0';
+		for (int i = zaConfigGame->VoiceIdLength - 1; i >= 0; --i) {
+			strVoiceId[i] = voiceID % 10 + '0';
 			voiceID /= 10;
 		}
 	}
-	voiceidbuff[length_voiceid] = 0;
-	return voiceidbuff;
+
+	return strVoiceId;
 }
 
 static bool ZaPlayVoice(int voiceID, std::string &filename) {
 	if (voiceID == InValidVoiceId) return false;
 
-	filename = mode == MODE_AO ?
-		zaConfigData.ao_name_voice + StrVoiceID(voiceID) + '.' + zaConfigData.ao_ext_voice
-		: zaConfigData.zero_name_voice + StrVoiceID(voiceID) + '.' + zaConfigData.zero_ext_voiceFile;
+	const std::string& dir = zaConfigGame->VoiceDir;
+	const std::string strVoiceID = StrVoiceID(voiceID);
 
-	std::string vfileFull = mode == MODE_AO ?
-		zaConfigData.ao_dir_voice + '\\' + filename :
-		zaConfigData.zero_dir_voice + '\\' + filename;
-	
-	return ZaSoundPlay(vfileFull);
+	for (auto ext : zaConfigGame->VoiceExt) 
+	{
+		filename = zaConfigGame->VoiceName + strVoiceID + '.' + ext;
+		std::string filePath = dir + '\\' + filename;
+		
+		if (_access(filePath.c_str(), 4) == 0)
+			return ZaSoundPlay(filePath);
+	}
+
+	return false;
 }
 
 static void ZaLoadNewVoiceTable(const std::string& name) {
@@ -118,11 +126,9 @@ static void ZaLoadNewVoiceTable(const std::string& name) {
 static void ZaLoadAllVoiceTables() {
 	std::vector<std::string> subs;
 	
-	const std::string& dir = mode == MODE_AO ?
-		zaConfigData.ao_dir_voiceTable : zaConfigData.zero_dir_voiceTable;
+	const std::string& dir = zaConfigGame->VtblDir;
 
-	std::string searchName = "*." + (mode == MODE_AO ?
-		zaConfigData.ao_ext_voiceTable : zaConfigData.zero_ext_voiceTable);
+	std::string searchName = "*." + zaConfigGame->VtblExt;
 
 	GetSubs(dir, searchName, subs);
 
@@ -262,7 +268,7 @@ static int ZaVoicePlayerLoopMain()
 				"------------------------------------\n"
 				"%s\n"
 				"------------------------------------",
-				pScenaName, offset, StrVoiceID(vinf.voiceID),
+				pScenaName, offset, StrVoiceID(vinf.voiceID).c_str(),
 				buffText, buffTextJP);
 		}
 		else {
@@ -270,7 +276,7 @@ static int ZaVoicePlayerLoopMain()
 				"------------------------------------\n"
 				"%s\n"
 				"------------------------------------",
-				pScenaName, offset, StrVoiceID(vinf.voiceID),
+				pScenaName, offset, StrVoiceID(vinf.voiceID).c_str(),
 				buffText);
 		}
 
@@ -300,7 +306,15 @@ static int ZaVoicePlayerLoopAfterOneLoop() {
 
 int ZaVoicePlayerInit(int mode) {
 	::mode = mode;
-	length_voiceid = mode == MODE_AO ? A_LENGTH_VOICE_ID : Z_LENGTH_VOICE_ID;
+	if (mode == MODE_AO) {
+		zaConfigGeneral = &zaConfigData.General;
+		zaConfigGame = &zaConfigData.Ao;
+	}
+	else {
+		zaConfigGeneral = &zaConfigData.General;
+		zaConfigGame = &zaConfigData.Zero;
+	}
+	
 	memset(&zaData, 0, sizeof(zaData));
 	memset(&zaData_old, 0, sizeof(zaData_old));
 	pScenaName = NULL;

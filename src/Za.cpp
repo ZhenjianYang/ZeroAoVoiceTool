@@ -17,13 +17,13 @@ void ZaVoiceStartup(int argc, char * argv[])
 	ZaConfigLoad(DFT_CONFIG_FILE);
 
 	int logparam = 0;
-	if (!zaConfigData.debuglog) {
+	if (!zaConfigData.General.OpenDebugLog) {
 		logparam = ZALOG_OUT_STDOUT | ZALOG_TYPE_INFO | ZALOG_TYPE_INFO | ZALOG_PARAM_NOPREINFO;
 	}
 	else {
 		logparam = ZALOG_OUT_STDLOG | ZALOG_TYPE_ALL;
 	}
-	if (zaConfigData.uselogfile) {
+	if (zaConfigData.General.UseLogFile) {
 		logparam |= ZALOG_OUT_FILE;
 		ZALOG_SETLOGFILE(DFT_LOG_FILE);
 	}
@@ -41,7 +41,7 @@ void ZaVoiceStartup(int argc, char * argv[])
 
 void ZaMain() {
 	ZALOG("准备中...");
-	int amode = ZaRemoteInit(zaConfigData.mode);
+	int amode = ZaRemoteInit(zaConfigData.General.Mode);
 	if (amode != MODE_AO && amode != MODE_ZERO) {
 		ZALOG_ERROR("准备活动失败！");
 		return;
@@ -50,11 +50,12 @@ void ZaMain() {
 
 	ZaVoicePlayerInit(amode);
 	ZALOG("已进入语音播放系统");
-	ZALOG("语音文件目录为: %s", amode == MODE_AO ? zaConfigData.ao_dir_voice.c_str() : zaConfigData.zero_dir_voice.c_str());
-	ZALOG("语音文件后缀为: %s", amode == MODE_AO ? zaConfigData.ao_ext_voice.c_str() : zaConfigData.zero_ext_voiceFile.c_str());
-	ZALOG("语音表文件目录为: %s", amode == MODE_AO ? zaConfigData.ao_dir_voiceTable.c_str() : zaConfigData.zero_dir_voiceTable.c_str());
-	ZALOG("语音表文件后缀为: %s", amode == MODE_AO ? zaConfigData.ao_ext_voiceTable.c_str() : zaConfigData.zero_ext_voiceTable.c_str());
-	if (amode == MODE_AO && zaConfigData.ao_disableOriginalVoice) {
+	const ZaConfigDataGame* zaConfigGame = amode == MODE_AO ? &zaConfigData.Ao : &zaConfigData.Zero;
+	ZALOG("语音文件目录为: %s", zaConfigGame->VoiceDir.c_str());
+	for (int i = 1; i <= zaConfigGame->VoiceExt.size(); ++i) {
+		ZALOG("语音文件后缀%d: %s", i, zaConfigGame->VoiceExt[i-1].c_str());
+	}
+	if (amode == MODE_AO && zaConfigGame->DisableOriginalVoice) {
 		ZALOG("启用了禁用原有剧情语音的功能");
 	}
 
@@ -62,7 +63,7 @@ void ZaMain() {
 	while (!errc)
 	{
 		errc = ZaVoicePlayerLoopOne();
-		Sleep(zaConfigData.sleepTime);
+		Sleep(zaConfigData.General.SleepTime);
 	}
 	ZALOG("已退出语音播放系统");
 

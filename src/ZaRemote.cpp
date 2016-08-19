@@ -60,12 +60,8 @@ static unsigned rAddNewJc[numJc];
 
 static bool ZaInjectRemoteCode(int mode) {
 
-	const unsigned *rOldJctoList = z_rOldJctoList;
-	const unsigned *rAddJcList = z_rAddJcList;
-	if (mode == MODE_AO) {
-		rOldJctoList = a_rOldJctoList;
-		rAddJcList = a_rAddJcList;
-	}
+	const unsigned *rOldJctoList = mode == MODE_AO ? a_rOldJctoList : z_rOldJctoList;
+	const unsigned *rAddJcList = mode == MODE_AO ? a_rAddJcList : z_rAddJcList;
 
 	unsigned char buff[MAX_REMOTE_DADA_SIZE];
 	memset(buff, INIT_CODE, sizeof(buff));
@@ -111,7 +107,7 @@ static bool ZaInjectRemoteCode(int mode) {
 				*(unsigned *)(buff + p) = _rAddZaData; p += 4;
 
 				if (i == irNewShowText &&
-					mode == MODE_AO && zaConfigData.ao_disableOriginalVoice) {
+					(mode == MODE_AO && zaConfigData.Ao.DisableOriginalVoice)) {
 					for (int j = 0; j < 2; ++j)
 						buff[p++] = CODE_NOP;
 				}
