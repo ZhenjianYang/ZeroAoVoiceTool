@@ -6,6 +6,7 @@ static sf::Music music;
 
 int ZaSoundInit(float volumn)
 {
+	ZaSoundStop();
 	ZaSoundSetVolumn(volumn);
 	return 0;
 }

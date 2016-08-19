@@ -47,10 +47,11 @@ void ZaMain() {
 		return;
 	}
 	ZALOG("就绪");
+	const ZaConfigDataGame* zaConfigGame = amode == MODE_AO ? &zaConfigData.Ao : &zaConfigData.Zero;
 
 	ZaVoicePlayerInit(amode);
 	ZALOG("已进入语音播放系统");
-	const ZaConfigDataGame* zaConfigGame = amode == MODE_AO ? &zaConfigData.Ao : &zaConfigData.Zero;
+	
 	ZALOG("语音文件目录为: %s", zaConfigGame->VoiceDir.c_str());
 	for (int i = 1; i <= zaConfigGame->VoiceExt.size(); ++i) {
 		ZALOG("语音文件后缀%d: %s", i, zaConfigGame->VoiceExt[i-1].c_str());

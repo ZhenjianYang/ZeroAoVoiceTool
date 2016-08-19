@@ -314,6 +314,8 @@ int ZaVoicePlayerInit(int mode) {
 		zaConfigGeneral = &zaConfigData.General;
 		zaConfigGame = &zaConfigData.Zero;
 	}
+
+	ZaSoundInit(zaConfigGame->Volume);
 	
 	memset(&zaData, 0, sizeof(zaData));
 	memset(&zaData_old, 0, sizeof(zaData_old));

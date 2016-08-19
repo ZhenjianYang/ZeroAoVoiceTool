@@ -19,6 +19,8 @@
 #define STR_OpenDebugLog "OpenDebugLog"
 #define STR_UseLogFile "UseLogFile"
 
+#define STR_Volume "Volume"
+
 struct ZaConfigDataGame
 {
 	std::string VoiceDir;
@@ -30,6 +32,7 @@ struct ZaConfigDataGame
 
 	int DisableOriginalVoice;
 	int VoiceIdLength;
+	int Volume;
 };
 
 struct ZaConfigDataGeneral

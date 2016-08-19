@@ -72,6 +72,7 @@
 #define Z_DFT_VOICETABLE_EXT "tbl"
 #define Z_DFT_VOICE_NAME "v"
 #define Z_DFT_DISABLE_ORIVOICE 0
+#define Z_DFT_VOLUME 100
 
 #define A_DFT_VOICE_DIR "ao.voice"
 #define A_DFT_VOICE_EXT {"ogg" , "wav"}
@@ -79,6 +80,9 @@
 #define A_DFT_VOICETABLE_EXT "tbl"
 #define A_DFT_VOICE_NAME "v"
 #define A_DFT_DISABLE_ORIVOICE 0
+#define A_DFT_VOLUME 100
+
+#define VOLUMN_MAX 100
 
 #define INVAILD_VOICE_ID 0
 #define INVALID_OFFSET 0xFFFFFF

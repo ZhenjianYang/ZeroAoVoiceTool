@@ -127,6 +127,10 @@ void ZaConfigLoad(const char * configFile)
 			if (mode & MODE_AO) failed = !SetIntVaule(_zaConfigData.Ao.DisableOriginalVoice, pb + p);
 			if (mode & MODE_ZERO) failed = !SetIntVaule(_zaConfigData.Zero.DisableOriginalVoice, pb + p);
 		}
+		else if (p = Compare(pb, STR_Volume)) {
+			if (mode & MODE_AO) failed = !SetIntVaule(_zaConfigData.Ao.Volume, pb + p);
+			if (mode & MODE_ZERO) failed = !SetIntVaule(_zaConfigData.Zero.Volume, pb + p);
+		}
 		else if (p = Compare(pb, STR_OpenDebugLog)) {
 			failed = !SetIntVaule(_zaConfigData.General.OpenDebugLog, pb + p);
 		}
@@ -157,6 +161,7 @@ void ZaConfigSetDefault() {
 	_zaConfigData.Zero.VtblExt = Z_DFT_VOICETABLE_EXT;
 	_zaConfigData.Zero.VtblDir = Z_DFT_VOICETABLE_DIR;
 
+	_zaConfigData.Zero.Volume = Z_DFT_VOLUME;
 	_zaConfigData.Zero.DisableOriginalVoice = Z_DFT_DISABLE_ORIVOICE;
 
 	_zaConfigData.Zero.VoiceIdLength = Z_LENGTH_VOICE_ID;
@@ -170,6 +175,7 @@ void ZaConfigSetDefault() {
 	_zaConfigData.Ao.VtblExt = A_DFT_VOICETABLE_EXT;
 	_zaConfigData.Ao.VtblDir = A_DFT_VOICETABLE_DIR;
 
+	_zaConfigData.Ao.Volume = A_DFT_VOLUME;
 	_zaConfigData.Ao.DisableOriginalVoice = A_DFT_DISABLE_ORIVOICE;
 
 	_zaConfigData.Ao.VoiceIdLength = A_LENGTH_VOICE_ID;
