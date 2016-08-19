@@ -23,5 +23,8 @@
     <ClInclude Include="..\..\src\ZaConst.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\ZaIo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
