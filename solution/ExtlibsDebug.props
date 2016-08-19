@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <ExtlibsMacro />
+    <ExtlibsNames>sfml-audio-d.lib</ExtlibsNames>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <Link />
+    <ClCompile />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="ExtlibsMacro">
+      <Value>$(ExtlibsMacro)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExtlibsNames">
+      <Value>$(ExtlibsNames)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

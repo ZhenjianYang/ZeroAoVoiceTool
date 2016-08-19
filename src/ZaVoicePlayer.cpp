@@ -8,18 +8,9 @@
 #include "ZaRemote.h"
 
 #include <Windows.h>
-#include <io.h>
 #include <string>
 
-#include <string.h>
-#include <fstream>
-
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define VOICEPLAY_RET_PLAYING		0
-#define VOICEPLAY_RET_WAITING		(-1)
-#define VOICEPLAY_RET_ACCESSFAILED	(-2)
-#define VOICEPLAY_RET_INVAILDID		(-2)
-
 
 static int mode;
 static int length_voiceid;
@@ -103,30 +94,18 @@ static const char* StrVoiceID(int voiceID) {
 	return voiceidbuff;
 }
 
-#define VOICEFILE_PATH_MAXLENGTH 1024
-#define VOICEFILE_NAME_MAXLENGTH 20
-static char vfbuff[VOICEFILE_PATH_MAXLENGTH + 1];
-static char vnbuff[VOICEFILE_NAME_MAXLENGTH + 1];
-static int ZaPlayVoice(int voiceID, const char* &filename, bool wait = false) {
-	if (voiceID == InValidVoiceId) return VOICEPLAY_RET_INVAILDID;
+static bool ZaPlayVoice(int voiceID, std::string &filename) {
+	if (voiceID == InValidVoiceId) return false;
 
-	if (mode == MODE_AO) {
-		sprintf_s(vnbuff, "%s%s.%s", zaConfigData.ao_name_voice.c_str(), StrVoiceID(voiceID), zaConfigData.ao_ext_voice.c_str());
-		sprintf_s(vfbuff, "%s\\%s", zaConfigData.ao_dir_voice.c_str(), vnbuff);
-	}
-	else {
-		sprintf_s(vnbuff, "%s%s.%s", zaConfigData.zero_name_voice.c_str(), StrVoiceID(voiceID), zaConfigData.zero_ext_voiceFile.c_str());
-		sprintf_s(vfbuff, "%s\\%s", zaConfigData.zero_dir_voice.c_str(), vnbuff);
-	}
-	filename = vnbuff;
-	if (!_access(vfbuff, 0x04)) {
-		if (ZaSoundPlay(vfbuff, wait))
-			return VOICEPLAY_RET_PLAYING;
-		else
-			return VOICEPLAY_RET_WAITING;
-	}
-	else
-		return VOICEPLAY_RET_ACCESSFAILED;
+	filename = mode == MODE_AO ?
+		zaConfigData.ao_name_voice + StrVoiceID(voiceID) + '.' + zaConfigData.ao_ext_voice
+		: zaConfigData.zero_name_voice + StrVoiceID(voiceID) + '.' + zaConfigData.zero_ext_voiceFile;
+
+	std::string vfileFull = mode == MODE_AO ?
+		zaConfigData.ao_dir_voice + '\\' + filename :
+		zaConfigData.zero_dir_voice + '\\' + filename;
+	
+	return ZaSoundPlay(vfileFull);
 }
 
 static void ZaLoadNewVoiceTable(const char* scenaName) {
@@ -138,21 +117,17 @@ static void ZaLoadNewVoiceTable(const char* scenaName) {
 
 static int ZaVoicePlayerLoopMain()
 {
-	const char* voiceFileName;
-	if (voiceIdWait != InValidVoiceId) {
-		switch (ZaPlayVoice(voiceIdWait, voiceFileName, true)) {
-		case VOICEPLAY_RET_PLAYING:
-			ZALOG("Playing %s ...", voiceFileName);
-			voiceIdWait = InValidVoiceId;
-			break;
-		case VOICEPLAY_RET_ACCESSFAILED:
-			ZALOG_DEBUG("Access %s Failed.", voiceFileName);
-			voiceIdWait = InValidVoiceId;
-			break;
-		case VOICEPLAY_RET_WAITING: default:
-			break;
+	std::string voiceFileName;
+	if (voiceIdWait != InValidVoiceId && ZaSoundStatus() == ZASOUND_STATUS_STOP) {
+		if (ZaPlayVoice(voiceIdWait, voiceFileName)) {
+			ZALOG("Playing %s ...", voiceFileName.c_str());
 		}
+		else {
+			ZALOG_ERROR("Play %s Failed.", voiceFileName.c_str());
+		}
+		voiceIdWait = InValidVoiceId;
 	}
+
 
 	if (!ZaRemoteRead(rAddData, &zaData, sizeof(zaData))) {
 		ZALOG_ERROR("访问远程数据失败: zaData");
@@ -283,29 +258,17 @@ static int ZaVoicePlayerLoopMain()
 		}
 
 		if (vinf.voiceID != InValidVoiceId) {
-			if (offset < FAKE_OFFSET || voiceIdWait != InValidVoiceId) {
-				if (ZaPlayVoice(vinf.voiceID, voiceFileName) == VOICEPLAY_RET_PLAYING) {
-					ZALOG_DEBUG("Playing %s ...", voiceFileName);
+			if (offset < FAKE_OFFSET  || ZaSoundStatus() == ZASOUND_STATUS_STOP || voiceIdWait != InValidVoiceId) {
+				if (ZaPlayVoice(vinf.voiceID, voiceFileName)) {
+					ZALOG_DEBUG("Playing %s ...", voiceFileName.c_str());
 				}
 				else {
-					ZALOG_ERROR("Play %s failed.", voiceFileName);
+					ZALOG_ERROR("Play %s failed.", voiceFileName.c_str());
 				}
 				voiceIdWait = InValidVoiceId;
 			}
 			else {
-				switch (ZaPlayVoice(vinf.voiceID, voiceFileName, true)) {
-				case VOICEPLAY_RET_PLAYING:
-					ZALOG("Playing %s ...", voiceFileName);
-					voiceIdWait = InValidVoiceId;
-					break;
-				case VOICEPLAY_RET_ACCESSFAILED:
-					ZALOG_DEBUG("Access %s Failed.", voiceFileName);
-					voiceIdWait = InValidVoiceId;
-					break;
-				case VOICEPLAY_RET_WAITING: default:
-					voiceIdWait = vinf.voiceID;
-					break;
-				}
+				voiceIdWait = vinf.voiceID;
 			}
 		}//if (vinf.voiceID != InValidVoiceId)
 	}//if (buffText[0] != 0)
