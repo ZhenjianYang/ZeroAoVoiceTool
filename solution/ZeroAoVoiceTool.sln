@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZeroAoVoiceTool", "ZeroAoVoiceTool\ZeroAoVoiceTool.vcxproj", "{5427C515-6326-4B9F-8E2F-30526220AC91}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZeroAoVoiceTool", "ZeroAoVoiceTool\ZeroAoVoiceTool.vcxproj", "{19FCF4E3-76EB-4A78-B30F-E74872CAB258}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaMakeVoiceTable", "ZaMakeVoiceTable\ZaMakeVoiceTable.vcxproj", "{30C5AA49-90AD-4518-9B18-558A713B2CF6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaMakeVoiceTable", "ZaMakeVoiceTable\ZaMakeVoiceTable.vcxproj", "{C9FF2570-AF04-4168-9F35-C235AD65579A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaMakeVoiceTablePrepare", "ZaMakeVoiceTablePrepare\ZaMakeVoiceTablePrepare.vcxproj", "{2004641D-9C0E-44C6-B5CC-DAE610CA54C5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaMakeVoiceTableFound", "ZaMakeVoiceTableFound\ZaMakeVoiceTableFound.vcxproj", "{24B97ACE-2C6E-4297-AFB4-6A87E69FBCCB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaMakeVoiceTableFound", "ZaMakeVoiceTableFound\ZaMakeVoiceTableFound.vcxproj", "{9026A4D8-B024-42F4-BC9E-38743B87BE74}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaMakeVoiceTablePrepare", "ZaMakeVoiceTablePrepare\ZaMakeVoiceTablePrepare.vcxproj", "{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,38 +19,30 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5427C515-6326-4B9F-8E2F-30526220AC91}.Debug|x64.ActiveCfg = Debug|x64
-		{5427C515-6326-4B9F-8E2F-30526220AC91}.Debug|x64.Build.0 = Debug|x64
-		{5427C515-6326-4B9F-8E2F-30526220AC91}.Debug|x86.ActiveCfg = Debug|Win32
-		{5427C515-6326-4B9F-8E2F-30526220AC91}.Debug|x86.Build.0 = Debug|Win32
-		{5427C515-6326-4B9F-8E2F-30526220AC91}.Release|x64.ActiveCfg = Release|x64
-		{5427C515-6326-4B9F-8E2F-30526220AC91}.Release|x64.Build.0 = Release|x64
-		{5427C515-6326-4B9F-8E2F-30526220AC91}.Release|x86.ActiveCfg = Release|Win32
-		{5427C515-6326-4B9F-8E2F-30526220AC91}.Release|x86.Build.0 = Release|Win32
-		{30C5AA49-90AD-4518-9B18-558A713B2CF6}.Debug|x64.ActiveCfg = Debug|x64
-		{30C5AA49-90AD-4518-9B18-558A713B2CF6}.Debug|x64.Build.0 = Debug|x64
-		{30C5AA49-90AD-4518-9B18-558A713B2CF6}.Debug|x86.ActiveCfg = Debug|Win32
-		{30C5AA49-90AD-4518-9B18-558A713B2CF6}.Debug|x86.Build.0 = Debug|Win32
-		{30C5AA49-90AD-4518-9B18-558A713B2CF6}.Release|x64.ActiveCfg = Release|x64
-		{30C5AA49-90AD-4518-9B18-558A713B2CF6}.Release|x64.Build.0 = Release|x64
-		{30C5AA49-90AD-4518-9B18-558A713B2CF6}.Release|x86.ActiveCfg = Release|Win32
-		{30C5AA49-90AD-4518-9B18-558A713B2CF6}.Release|x86.Build.0 = Release|Win32
-		{2004641D-9C0E-44C6-B5CC-DAE610CA54C5}.Debug|x64.ActiveCfg = Debug|x64
-		{2004641D-9C0E-44C6-B5CC-DAE610CA54C5}.Debug|x64.Build.0 = Debug|x64
-		{2004641D-9C0E-44C6-B5CC-DAE610CA54C5}.Debug|x86.ActiveCfg = Debug|Win32
-		{2004641D-9C0E-44C6-B5CC-DAE610CA54C5}.Debug|x86.Build.0 = Debug|Win32
-		{2004641D-9C0E-44C6-B5CC-DAE610CA54C5}.Release|x64.ActiveCfg = Release|x64
-		{2004641D-9C0E-44C6-B5CC-DAE610CA54C5}.Release|x64.Build.0 = Release|x64
-		{2004641D-9C0E-44C6-B5CC-DAE610CA54C5}.Release|x86.ActiveCfg = Release|Win32
-		{2004641D-9C0E-44C6-B5CC-DAE610CA54C5}.Release|x86.Build.0 = Release|Win32
-		{9026A4D8-B024-42F4-BC9E-38743B87BE74}.Debug|x64.ActiveCfg = Debug|x64
-		{9026A4D8-B024-42F4-BC9E-38743B87BE74}.Debug|x64.Build.0 = Debug|x64
-		{9026A4D8-B024-42F4-BC9E-38743B87BE74}.Debug|x86.ActiveCfg = Debug|Win32
-		{9026A4D8-B024-42F4-BC9E-38743B87BE74}.Debug|x86.Build.0 = Debug|Win32
-		{9026A4D8-B024-42F4-BC9E-38743B87BE74}.Release|x64.ActiveCfg = Release|x64
-		{9026A4D8-B024-42F4-BC9E-38743B87BE74}.Release|x64.Build.0 = Release|x64
-		{9026A4D8-B024-42F4-BC9E-38743B87BE74}.Release|x86.ActiveCfg = Release|Win32
-		{9026A4D8-B024-42F4-BC9E-38743B87BE74}.Release|x86.Build.0 = Release|Win32
+		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Debug|x64.ActiveCfg = Debug|Win32
+		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Debug|x86.ActiveCfg = Debug|Win32
+		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Debug|x86.Build.0 = Debug|Win32
+		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Release|x64.ActiveCfg = Release|Win32
+		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Release|x86.ActiveCfg = Release|Win32
+		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Release|x86.Build.0 = Release|Win32
+		{C9FF2570-AF04-4168-9F35-C235AD65579A}.Debug|x64.ActiveCfg = Debug|Win32
+		{C9FF2570-AF04-4168-9F35-C235AD65579A}.Debug|x86.ActiveCfg = Debug|Win32
+		{C9FF2570-AF04-4168-9F35-C235AD65579A}.Debug|x86.Build.0 = Debug|Win32
+		{C9FF2570-AF04-4168-9F35-C235AD65579A}.Release|x64.ActiveCfg = Release|Win32
+		{C9FF2570-AF04-4168-9F35-C235AD65579A}.Release|x86.ActiveCfg = Release|Win32
+		{C9FF2570-AF04-4168-9F35-C235AD65579A}.Release|x86.Build.0 = Release|Win32
+		{24B97ACE-2C6E-4297-AFB4-6A87E69FBCCB}.Debug|x64.ActiveCfg = Debug|Win32
+		{24B97ACE-2C6E-4297-AFB4-6A87E69FBCCB}.Debug|x86.ActiveCfg = Debug|Win32
+		{24B97ACE-2C6E-4297-AFB4-6A87E69FBCCB}.Debug|x86.Build.0 = Debug|Win32
+		{24B97ACE-2C6E-4297-AFB4-6A87E69FBCCB}.Release|x64.ActiveCfg = Release|Win32
+		{24B97ACE-2C6E-4297-AFB4-6A87E69FBCCB}.Release|x86.ActiveCfg = Release|Win32
+		{24B97ACE-2C6E-4297-AFB4-6A87E69FBCCB}.Release|x86.Build.0 = Release|Win32
+		{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}.Debug|x64.ActiveCfg = Debug|Win32
+		{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}.Debug|x86.ActiveCfg = Debug|Win32
+		{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}.Debug|x86.Build.0 = Debug|Win32
+		{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}.Release|x64.ActiveCfg = Release|Win32
+		{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}.Release|x86.ActiveCfg = Release|Win32
+		{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
