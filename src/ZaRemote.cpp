@@ -15,7 +15,7 @@ static HANDLE hProcess = NULL;
 
 static bool enableDebugPriv();
 
-static int ZaFindGameWindow(int mode)
+static int FindGameWindow(int mode)
 {
 	const char* tbuf[] = { Z_DFT_WIN_TITLE, A_DFT_WIN_TITLE };
 	if (mode == MODE_AO) tbuf[0] = tbuf[1];
@@ -34,7 +34,7 @@ static int ZaFindGameWindow(int mode)
 	if (strcmp(tbuf[index], Z_DFT_WIN_TITLE) == 0) return MODE_ZERO;
 	else return MODE_AO;
 }
-static bool ZaOpenProcess() {
+static bool OpenProcess() {
 	DWORD pid;
 	GetWindowThreadProcessId(hWnd, &pid);
 
@@ -58,7 +58,7 @@ static unsigned rAddNewJc[numJc];
 #define REMOTE_DATA_PACK 0x10
 #define PACK(p, pack) (p = (p + (pack) - 1) / (pack) * (pack))
 
-static bool ZaInjectRemoteCode(int mode) {
+static bool InjectRemoteCode(int mode) {
 
 	const unsigned *rOldJctoList = mode == MODE_AO ? a_rOldJctoList : z_rOldJctoList;
 	const unsigned *rAddJcList = mode == MODE_AO ? a_rAddJcList : z_rAddJcList;
@@ -178,11 +178,11 @@ int ZaRemoteInit(int mode)
 #endif
 
 	ZALOG("等待游戏运行...");
-	mode = ZaFindGameWindow(mode);
+	mode = FindGameWindow(mode);
 	ZALOG("游戏已启动！");
 
 	ZALOG("访问游戏进程...");
-	if (!ZaOpenProcess()) {
+	if (!OpenProcess()) {
 		ZaRemoteFinish();
 		ZALOG_ERROR("访问游戏进程失败！");
 		return MODE_NONE;
@@ -190,7 +190,7 @@ int ZaRemoteInit(int mode)
 	ZALOG("访问游戏进程成功");
 
 	ZALOG("写入远程代码...");
-	if (!ZaInjectRemoteCode(mode)) {
+	if (!InjectRemoteCode(mode)) {
 		ZALOG_ERROR("写入远程代码失败！");
 		ZaRemoteFinish();
 		return MODE_NONE;

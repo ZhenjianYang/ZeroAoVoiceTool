@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 
 	string path_rep = dir_evo + ".txt";
 	vector<string> subs_evo;
-	GetSubs(dir_evo, "*.bin", subs_evo);
+	ZaGetSubFiles(dir_evo, "*.bin", subs_evo);
 
 	map<int, int> mpb, mpa, mna, mnb;
 	map<int, int> mp2, mn2;

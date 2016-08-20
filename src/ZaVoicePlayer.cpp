@@ -12,8 +12,6 @@
 #include <Windows.h>
 #include <string>
 
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-
 static int mode;
 static int voiceIdWait;
 
@@ -44,7 +42,7 @@ static bool CheckScenaName(const char *scenaName) {
 	return count >= MIN_SCENANAME_LENGTH && count <= MAX_SCENANAME_LENGTH;
 }
 
-static int ZaTextAnalysis(unsigned char *dst, const unsigned char* src) {
+static int TextAnalysisCN(unsigned char *dst, const unsigned char* src) {
 	int first = 0;
 	while (*src < 0x20 || *src > 0xFF) {
 		src++; first++;
@@ -72,7 +70,7 @@ static int ZaTextAnalysis(unsigned char *dst, const unsigned char* src) {
 	*dst = 0;
 	return first;
 }
-static void ZaTextAnalysisJP(const unsigned char* &buff) {
+static void TextAnalysisJP(const unsigned char* &buff) {
 	if (zaConfigGeneral->RemoveFwdCtrlCh) {
 		while (*buff == '#') {
 			++buff;
@@ -130,7 +128,7 @@ static void ZaLoadAllVoiceTables() {
 
 	std::string searchName = "*." + zaConfigGame->VtblExt;
 
-	GetSubs(dir, searchName, subs);
+	ZaGetSubFiles(dir, searchName, subs);
 
 	for (auto sub : subs) {
 		std::string scenaName = sub.substr(0, sub.rfind('.'));
@@ -248,7 +246,7 @@ static int ZaVoicePlayerLoopMain()
 		return 1;
 	}
 	buffTextSrc[sizeof(buffTextSrc) - 1] = 0;
-	offset += ZaTextAnalysis(buffText, buffTextSrc);
+	offset += TextAnalysisCN(buffText, buffTextSrc);
 
 	if (buffText[0] != 0) {
 		const VoiceInfo* pvinf = zaVoiceTable->GetVoiceInfo(offset);
@@ -259,7 +257,7 @@ static int ZaVoicePlayerLoopMain()
 		const VoiceInfo& vinf = pvinf == nullptr ? InvaildVoiceInfo : *pvinf;
 
 		const unsigned char* buffTextJP = (const unsigned char*)vinf.jpText.c_str();
-		ZaTextAnalysisJP(buffTextJP);
+		TextAnalysisJP(buffTextJP);
 
 		if (buffTextJP[0] != 0) {
 			ZALOG_DEBUG("\nScena:%s,Offset:0x%06X,VoiceID:%s\n"

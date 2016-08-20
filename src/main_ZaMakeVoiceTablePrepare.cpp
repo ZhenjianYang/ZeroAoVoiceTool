@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	vector<string> subs;
-	GetSubs(dir, "*.bin", subs);
+	ZaGetSubFiles(dir, "*.bin", subs);
 
 	
 	CheckFunc checkFunc = CheckJIS;

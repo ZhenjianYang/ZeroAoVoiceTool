@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 	_mkdir(dir_tbl.c_str());
 
 	vector<string> subs_evo;
-	GetSubs(dir_evo, "*.txt", subs_evo);
+	ZaGetSubFiles(dir_evo, "*.txt", subs_evo);
 
 	for (auto sub : subs_evo) {
 		string sname = GetScenaName(sub);

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-static void GetSubs(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs)
+static void ZaGetSubFiles(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs)
 {
 	WIN32_FIND_DATA wfdp;
 	HANDLE hFindp = FindFirstFile((dir + '\\' + searchName).c_str(), &wfdp);
