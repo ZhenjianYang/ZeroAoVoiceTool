@@ -31,8 +31,8 @@ static int FindGameWindow(int mode)
 	
 	ZALOG("游戏标题为：%s", tbuf[index]);
 
-	if (strcmp(tbuf[index], Z_DFT_WIN_TITLE) == 0) return MODE_ZERO;
-	else return MODE_AO;
+	if (strcmp(tbuf[index], Z_DFT_WIN_TITLE) == 0) return GAMEID_ZERO;
+	else return GAMEID_AO;
 }
 static bool OpenProcess() {
 	DWORD pid;
@@ -58,10 +58,10 @@ static unsigned rAddNewJc[numJc];
 #define REMOTE_DATA_PACK 0x10
 #define PACK(p, pack) (p = (p + (pack) - 1) / (pack) * (pack))
 
-static bool InjectRemoteCode(int mode) {
+static bool InjectRemoteCode(int gameId) {
 
-	const unsigned *rOldJctoList = mode == MODE_AO ? a_rOldJctoList : z_rOldJctoList;
-	const unsigned *rAddJcList = mode == MODE_AO ? a_rAddJcList : z_rAddJcList;
+	const unsigned *rOldJctoList = gameId == GAMEID_AO ? a_rOldJctoList : z_rOldJctoList;
+	const unsigned *rAddJcList = gameId == GAMEID_AO ? a_rAddJcList : z_rAddJcList;
 
 	unsigned char buff[MAX_REMOTE_DADA_SIZE];
 	memset(buff, INIT_CODE, sizeof(buff));
@@ -107,7 +107,7 @@ static bool InjectRemoteCode(int mode) {
 				*(unsigned *)(buff + p) = _rAddZaData; p += 4;
 
 				if (i == irNewShowText &&
-					(mode == MODE_AO && zaConfigData.Ao.DisableOriginalVoice)) {
+					(gameId == GAMEID_AO && zaConfig->Ao.DisableOriginalVoice)) {
 					for (int j = 0; j < 2; ++j)
 						buff[p++] = CODE_NOP;
 				}
@@ -178,26 +178,26 @@ int ZaRemoteInit(int mode)
 #endif
 
 	ZALOG("等待游戏运行...");
-	mode = FindGameWindow(mode);
+	int gameId = FindGameWindow(mode);
 	ZALOG("游戏已启动！");
 
 	ZALOG("访问游戏进程...");
 	if (!OpenProcess()) {
 		ZaRemoteFinish();
 		ZALOG_ERROR("访问游戏进程失败！");
-		return MODE_NONE;
+		return GAMEID_INVALID;
 	}
 	ZALOG("访问游戏进程成功");
 
 	ZALOG("写入远程代码...");
-	if (!InjectRemoteCode(mode)) {
+	if (!InjectRemoteCode(gameId)) {
 		ZALOG_ERROR("写入远程代码失败！");
 		ZaRemoteFinish();
-		return MODE_NONE;
+		return GAMEID_INVALID;
 	}
 	ZALOG("写入远程代码成功");
 
-	return mode;
+	return gameId;
 }
 
 void ZaRemoteFinish()

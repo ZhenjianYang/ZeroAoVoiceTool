@@ -2,7 +2,7 @@
 #define __ZAVOICEPLAYER_H__
 
 //语音播放循环初始化
-int ZaVoicePlayerInit(int mode);
+int ZaVoicePlayerInit();
 
 //进行一次语音播放循环
 int ZaVoicePlayerLoopOne();

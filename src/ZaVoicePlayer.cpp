@@ -12,11 +12,7 @@
 #include <Windows.h>
 #include <string>
 
-static int mode;
 static int voiceIdWait;
-
-static const ZaConfigDataGame* zaConfigGame;
-static const ZaConfigDataGeneral* zaConfigGeneral;
 
 #define BUFF_TEXT_SIZE 1024
 static ZaVoiceTablesGroup zaVoiceTablesGroup;
@@ -47,7 +43,7 @@ static int TextAnalysisCN(unsigned char *dst, const unsigned char* src) {
 	while (*src < 0x20 || *src > 0xFF) {
 		src++; first++;
 	}
-	if (zaConfigGeneral->RemoveFwdCtrlCh) {
+	if (zaConfig->General.RemoveFwdCtrlCh) {
 		while (*src == '#') {
 			++src;
 			while (*src >= '0' && *src <= '9') ++src;
@@ -71,7 +67,7 @@ static int TextAnalysisCN(unsigned char *dst, const unsigned char* src) {
 	return first;
 }
 static void TextAnalysisJP(const unsigned char* &buff) {
-	if (zaConfigGeneral->RemoveFwdCtrlCh) {
+	if (zaConfig->General.RemoveFwdCtrlCh) {
 		while (*buff == '#') {
 			++buff;
 			while (*buff >= '0' && *buff <= '9') ++buff;
@@ -82,14 +78,14 @@ static void TextAnalysisJP(const unsigned char* &buff) {
 
 static std::string StrVoiceID(int voiceID) {
 	std::string strVoiceId;
-	strVoiceId.resize(zaConfigGame->VoiceIdLength);
+	strVoiceId.resize(zaConfig->ActiveGame->VoiceIdLength);
 
 	if (voiceID == InValidVoiceId) {
-		for (int i = 0; i < zaConfigGame->VoiceIdLength; ++i)
+		for (int i = 0; i < zaConfig->ActiveGame->VoiceIdLength; ++i)
 			strVoiceId[i] = '-';
 	}
 	else {
-		for (int i = zaConfigGame->VoiceIdLength - 1; i >= 0; --i) {
+		for (int i = zaConfig->ActiveGame->VoiceIdLength - 1; i >= 0; --i) {
 			strVoiceId[i] = voiceID % 10 + '0';
 			voiceID /= 10;
 		}
@@ -98,15 +94,15 @@ static std::string StrVoiceID(int voiceID) {
 	return strVoiceId;
 }
 
-static bool ZaPlayVoice(int voiceID, std::string &filename) {
+static bool PlayVoice(int voiceID, std::string &filename) {
 	if (voiceID == InValidVoiceId) return false;
 
-	const std::string& dir = zaConfigGame->VoiceDir;
+	const std::string& dir = zaConfig->ActiveGame->VoiceDir;
 	const std::string strVoiceID = StrVoiceID(voiceID);
 
-	for (auto ext : zaConfigGame->VoiceExt) 
+	for (auto ext : zaConfig->ActiveGame->VoiceExt)
 	{
-		filename = zaConfigGame->VoiceName + strVoiceID + '.' + ext;
+		filename = zaConfig->ActiveGame->VoiceName + strVoiceID + '.' + ext;
 		std::string filePath = dir + '\\' + filename;
 		
 		if (_access(filePath.c_str(), 4) == 0)
@@ -116,17 +112,17 @@ static bool ZaPlayVoice(int voiceID, std::string &filename) {
 	return false;
 }
 
-static void ZaLoadNewVoiceTable(const std::string& name) {
+static void LoadNewVoiceTable(const std::string& name) {
 	zaVoiceTable = zaVoiceTablesGroup.GetVoiceTable(name);
 	if (zaVoiceTable == nullptr)
 		zaVoiceTable = &InvalidVoiceTable;
 }
-static void ZaLoadAllVoiceTables() {
+static void LoadAllVoiceTables() {
 	std::vector<std::string> subs;
 	
-	const std::string& dir = zaConfigGame->VtblDir;
+	const std::string& dir = zaConfig->ActiveGame->VtblDir;
 
-	std::string searchName = "*." + zaConfigGame->VtblExt;
+	std::string searchName = "*." + zaConfig->ActiveGame->VtblExt;
 
 	ZaGetSubFiles(dir, searchName, subs);
 
@@ -136,11 +132,11 @@ static void ZaLoadAllVoiceTables() {
 	}
 }
 
-static int ZaVoicePlayerLoopMain()
+static int VoicePlayerLoopMain()
 {
 	std::string voiceFileName;
 	if (voiceIdWait != InValidVoiceId && ZaSoundStatus() == ZASOUND_STATUS_STOP) {
-		if (ZaPlayVoice(voiceIdWait, voiceFileName)) {
+		if (PlayVoice(voiceIdWait, voiceFileName)) {
 			ZALOG("Playing %s ...", voiceFileName.c_str());
 		}
 		else {
@@ -166,7 +162,7 @@ static int ZaVoicePlayerLoopMain()
 		scenaName[sizeof(scenaName) - 1] = 0;
 		if (CheckScenaName(scenaName)) {
 			ZALOG_DEBUG("Scena:%s, Loading Voice Table...", scenaName);
-			ZaLoadNewVoiceTable(scenaName);
+			LoadNewVoiceTable(scenaName);
 			ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable->Num());
 		}
 		else {
@@ -200,7 +196,7 @@ static int ZaVoicePlayerLoopMain()
 					return 1;
 				}
 				ZALOG_DEBUG("Scena:%s, Loading Voice Table...", pScenaName);
-				ZaLoadNewVoiceTable(pScenaName);
+				LoadNewVoiceTable(pScenaName);
 				ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable->Num());
 			}
 		}
@@ -217,7 +213,7 @@ static int ZaVoicePlayerLoopMain()
 					return 1;
 				}
 				ZALOG_DEBUG("Scena:%s, Loading Voice Table...", pScenaName);
-				ZaLoadNewVoiceTable(pScenaName);
+				LoadNewVoiceTable(pScenaName);
 				ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable->Num());
 			}
 		}
@@ -228,7 +224,7 @@ static int ZaVoicePlayerLoopMain()
 				pScenaName = scenaName;
 
 				ZALOG_DEBUG("Scena:%s, Loading Voice Table...", pScenaName);
-				ZaLoadNewVoiceTable(pScenaName);
+				LoadNewVoiceTable(pScenaName);
 				ZALOG_DEBUG("Voice Table Records：%d", zaVoiceTable->Num());
 			}
 		}
@@ -280,7 +276,7 @@ static int ZaVoicePlayerLoopMain()
 
 		if (vinf.voiceID != InValidVoiceId) {
 			if (offset < FAKE_OFFSET  || ZaSoundStatus() == ZASOUND_STATUS_STOP || voiceIdWait != InValidVoiceId) {
-				if (ZaPlayVoice(vinf.voiceID, voiceFileName)) {
+				if (PlayVoice(vinf.voiceID, voiceFileName)) {
 					ZALOG_DEBUG("Playing %s ...", voiceFileName.c_str());
 				}
 				else {
@@ -297,23 +293,13 @@ static int ZaVoicePlayerLoopMain()
 	return 0;
 }
 
-static int ZaVoicePlayerLoopAfterOneLoop() {
+static int VoicePlayerLoopAfterOneLoop() {
 	zaData_old = zaData;
 	return 0;
 }
 
-int ZaVoicePlayerInit(int mode) {
-	::mode = mode;
-	if (mode == MODE_AO) {
-		zaConfigGeneral = &zaConfigData.General;
-		zaConfigGame = &zaConfigData.Ao;
-	}
-	else {
-		zaConfigGeneral = &zaConfigData.General;
-		zaConfigGame = &zaConfigData.Zero;
-	}
-
-	ZaSoundInit(zaConfigGame->Volume);
+int ZaVoicePlayerInit() {
+	ZaSoundInit(zaConfig->ActiveGame->Volume);
 	
 	memset(&zaData, 0, sizeof(zaData));
 	memset(&zaData_old, 0, sizeof(zaData_old));
@@ -322,7 +308,7 @@ int ZaVoicePlayerInit(int mode) {
 	voiceIdWait = InValidVoiceId;
 
 	ZALOG_DEBUG("加载语音表...");
-	ZaLoadAllVoiceTables();
+	LoadAllVoiceTables();
 	ZALOG_DEBUG("已加载的语音表数: %d", zaVoiceTablesGroup.Num());
 
 	return 0;
@@ -331,8 +317,8 @@ int ZaVoicePlayerInit(int mode) {
 int ZaVoicePlayerLoopOne()
 {
 	int errc = 0;
-	errc |= ZaVoicePlayerLoopMain();
-	errc |= ZaVoicePlayerLoopAfterOneLoop();
+	errc |= VoicePlayerLoopMain();
+	errc |= VoicePlayerLoopAfterOneLoop();
 	return errc;
 }
 

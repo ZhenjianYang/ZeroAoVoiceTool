@@ -55,10 +55,13 @@
 #define OFF_OFF_SCENANAME		0x34
 #define MAX_SCENA_SIZE			(256 * 1024)
 
-#define MODE_ZERO	2
-#define MODE_AO		1
 #define MODE_AUTO	0
-#define MODE_NONE	4
+#define MODE_AO		1
+#define MODE_ZERO	2
+
+#define GAMEID_INVALID	0
+#define GAMEID_ZERO		1
+#define GAMEID_AO		2
 
 #define DFT_RMFWDCTRLCH 1
 #define DFT_SLEEP_TIME 10

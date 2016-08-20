@@ -35,8 +35,8 @@ extern const unsigned &rSizeData;
 
 //初始化，寻找游戏窗口、打开游戏进程并写入远程代码
 //返回值：
-//      MODE_AO:   窗口为碧之轨迹
-//      MODE_ZERO: 窗口为零之轨迹
+//      GAMEID_AO:   窗口为碧之轨迹
+//      GAMEID_ZERO: 窗口为零之轨迹
 //      其他:      失败
 int ZaRemoteInit(int mode);
 

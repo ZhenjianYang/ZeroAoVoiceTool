@@ -21,7 +21,7 @@
 
 #define STR_Volume "Volume"
 
-struct ZaConfigDataGame
+struct ZaConfigGame
 {
 	std::string VoiceDir;
 	std::string VoiceName;
@@ -35,7 +35,7 @@ struct ZaConfigDataGame
 	int Volume;
 };
 
-struct ZaConfigDataGeneral
+struct ZaConfigGeneral
 {
 	int OpenDebugLog;
 	int UseLogFile;
@@ -45,14 +45,19 @@ struct ZaConfigDataGeneral
 	int Mode;
 };
 
-struct ZaConfigData
+struct ZaConfig
 {
-	ZaConfigDataGeneral General;
-	ZaConfigDataGame Ao;
-	ZaConfigDataGame Zero;
+	int ActiveGameID;
+	const ZaConfigGame* ActiveGame;
+
+	ZaConfigGeneral General;
+	ZaConfigGame Ao;
+	ZaConfigGame Zero;
 };
-extern const ZaConfigData &zaConfigData;
+extern const ZaConfig* const &zaConfig;
 
 void ZaConfigLoad(const char* configFile);
+void ZaConfigSetActive(int gameID);
+void ZaConfigSetDefault();
 
 #endif // !__ZACONFIG_H__
