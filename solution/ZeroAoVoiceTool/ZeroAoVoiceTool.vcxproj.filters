@@ -39,6 +39,9 @@
     <ClCompile Include="..\..\src\ZaVoiceTable.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ZaScenaAnalyzer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Za.h">
@@ -69,6 +72,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\ZaVoiceTable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ZaScenaAnalyzer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

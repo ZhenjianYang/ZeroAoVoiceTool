@@ -52,12 +52,14 @@
 
 #define A_LENGTH_VOICE_ID 9
 
+#define MAX_LENGTH_VOICE_ID 10
+
 #define OFF_OFF_SCENANAME		0x34
-#define MAX_SCENA_SIZE			(256 * 1024)
+#define MAX_SCENA_SIZE			(180 * 1024)
 
 #define MODE_AUTO	0
-#define MODE_AO		1
-#define MODE_ZERO	2
+#define MODE_ZERO	1
+#define MODE_AO		2
 
 #define GAMEID_INVALID	0
 #define GAMEID_ZERO		1

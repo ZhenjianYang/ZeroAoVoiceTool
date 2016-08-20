@@ -85,7 +85,7 @@ void ZaConfigLoad(const char * configFile)
 	ifstream ifs(configFile);
 	char buff[BUFF_SIZE + 1];
 
-	int mode = MODE_AO | MODE_ZERO;
+	int gameID = GAMEID_AO | GAMEID_ZERO;
 
 	int cnt = 0;
 	bool firstline = true;
@@ -106,32 +106,32 @@ void ZaConfigLoad(const char * configFile)
 
 		bool failed = false;
 		int p = 0;
-		if (Compare(pb, STR_general)) mode = MODE_AO | MODE_ZERO;
-		else if (Compare(pb, STR_Ao)) mode = MODE_AO;
-		else if (Compare(pb, STR_Zero)) mode = MODE_ZERO;
+		if (Compare(pb, STR_general)) gameID = GAMEID_AO | GAMEID_ZERO;
+		else if (Compare(pb, STR_Ao)) gameID = GAMEID_AO;
+		else if (Compare(pb, STR_Zero)) gameID = GAMEID_ZERO;
 		else if (p = Compare(pb, STR_VoiceFileDirectory)) {
-			if(mode & MODE_AO) failed = !SetStrVaule(struZaConfig.Ao.VoiceDir, pb + p);
-			if(mode & MODE_ZERO) failed = !SetStrVaule(struZaConfig.Zero.VoiceDir, pb + p);
+			if(gameID & GAMEID_AO) failed = !SetStrVaule(struZaConfig.Ao.VoiceDir, pb + p);
+			if(gameID & GAMEID_ZERO) failed = !SetStrVaule(struZaConfig.Zero.VoiceDir, pb + p);
 		}
 		else if (p = Compare(pb, STR_VoiceFileExtension)) {
-			if (mode & MODE_AO) failed = !SetVStrVaule(struZaConfig.Ao.VoiceExt, pb + p);
-			if (mode & MODE_ZERO) failed = !SetVStrVaule(struZaConfig.Zero.VoiceExt, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetVStrVaule(struZaConfig.Ao.VoiceExt, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetVStrVaule(struZaConfig.Zero.VoiceExt, pb + p);
 		}
 		else if (p = Compare(pb, STR_VoiceTableFileDirectory)) {
-			if (mode & MODE_AO) failed = !SetStrVaule(struZaConfig.Ao.VtblDir, pb + p);
-			if (mode & MODE_ZERO) failed = !SetStrVaule(struZaConfig.Zero.VtblDir, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetStrVaule(struZaConfig.Ao.VtblDir, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetStrVaule(struZaConfig.Zero.VtblDir, pb + p);
 		}
 		else if (p = Compare(pb, STR_VoiceTableFileExtension)) {
-			if (mode & MODE_AO) failed = !SetStrVaule(struZaConfig.Ao.VtblExt, pb + p);
-			if (mode & MODE_ZERO) failed = !SetStrVaule(struZaConfig.Zero.VtblExt, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetStrVaule(struZaConfig.Ao.VtblExt, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetStrVaule(struZaConfig.Zero.VtblExt, pb + p);
 		}
 		else if (p = Compare(pb, STR_DisableOriginalVoice)) {
-			if (mode & MODE_AO) failed = !SetIntVaule(struZaConfig.Ao.DisableOriginalVoice, pb + p);
-			if (mode & MODE_ZERO) failed = !SetIntVaule(struZaConfig.Zero.DisableOriginalVoice, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetIntVaule(struZaConfig.Ao.DisableOriginalVoice, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetIntVaule(struZaConfig.Zero.DisableOriginalVoice, pb + p);
 		}
 		else if (p = Compare(pb, STR_Volume)) {
-			if (mode & MODE_AO) failed = !SetIntVaule(struZaConfig.Ao.Volume, pb + p);
-			if (mode & MODE_ZERO) failed = !SetIntVaule(struZaConfig.Zero.Volume, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetIntVaule(struZaConfig.Ao.Volume, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetIntVaule(struZaConfig.Zero.Volume, pb + p);
 		}
 		else if (p = Compare(pb, STR_OpenDebugLog)) {
 			failed = !SetIntVaule(struZaConfig.General.OpenDebugLog, pb + p);

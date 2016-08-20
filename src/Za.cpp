@@ -56,7 +56,7 @@ void ZaMain() {
 	for (int i = 1; i <= zaConfig->ActiveGame->VoiceExt.size(); ++i) {
 		ZALOG("语音文件后缀%d: %s", i, zaConfig->ActiveGame->VoiceExt[i-1].c_str());
 	}
-	if (gameID == MODE_AO && zaConfig->ActiveGame->DisableOriginalVoice) {
+	if (gameID == GAMEID_AO && zaConfig->ActiveGame->DisableOriginalVoice) {
 		ZALOG("启用了禁用原有剧情语音的功能");
 	}
 

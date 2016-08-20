@@ -52,6 +52,7 @@ public:
 	const int Num() const { return map_name_vtbl.size(); }
 	const ZaVoiceTable* GetVoiceTable(const std::string& name) const;
 	const ZaVoiceTable* AddVoiceTable(const std::string& name, const std::string& vtblFile);
+	void Clear() { destory(); }
 	ZaVoiceTablesGroup() {}
 	~ZaVoiceTablesGroup() { destory(); }
 
