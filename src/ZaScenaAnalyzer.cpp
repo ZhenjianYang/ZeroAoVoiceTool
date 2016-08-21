@@ -139,6 +139,7 @@ static int LoadScenaX(unsigned raScena, char* nameBuff) {
 int ZaDetected_LoadScena(unsigned raScena, const char* &out_scenaName)
 {
 	out_scenaName = nullptr;
+	pScenaName = nullptr;
 	memset(s_scenas, 0, sizeof(s_scenas));
 
 	int errc;
@@ -146,11 +147,7 @@ int ZaDetected_LoadScena(unsigned raScena, const char* &out_scenaName)
 	if (errc) return errc;
 
 	if (scenaName[0] != 0) {
-		ZALOG_DEBUG("Scena:%s, Loading Voice Table...", scenaName);
-		LoadNewVoiceTable(scenaName);
-		ZALOG_DEBUG("Voice Table Records£º%d", zaVoiceTable->Num());
 
-		pScenaName = scenaName;
 		s_scenas[0].aScenaX = raScena;
 		s_scenas[0].pScneaNameX = scenaName;
 
