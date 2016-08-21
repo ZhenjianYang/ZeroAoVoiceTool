@@ -92,13 +92,13 @@ int main(int argc, char* argv[]) {
 			if (voiceId == INVAILD_VOICE_ID && !addnov)
 				continue;
 
+			int off_cn = i < ofcn.size() ? ofcn[i] : INVALID_OFFSET;
+			if (off_cn == INVALID_OFFSET) continue;
+
 			if (first) {
 				first = false;
 				ofs_tbl.open(dir_tbl + '\\' + sname + '.' + voicefile_ext);
 			}
-
-			int off_cn = i < ofcn.size() ? ofcn[i] : INVALID_OFFSET;
-			if (off_cn == INVALID_OFFSET) continue;
 
 			ofs_tbl << std::hex << setfill('0') << setw(6) << setiosflags(ios::uppercase) << setiosflags(ios::right) << off_cn << ' '
 				<< std::dec << setfill('0') << setw(length_voiceid) << setiosflags(ios::right) << voiceId;
