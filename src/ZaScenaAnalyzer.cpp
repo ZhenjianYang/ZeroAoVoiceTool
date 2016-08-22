@@ -50,7 +50,7 @@ static int TextAnalysisCN(unsigned char *dst, const unsigned char* src) {
 	while (*src < 0x20 || *src == 0xFF) {
 		src++; first++;
 	}
-	if (zaConfig->General.RemoveFwdCtrlCh) {
+	if (g_zaConfig->General.RemoveFwdCtrlCh) {
 		while (*src == '#') {
 			++src;
 			while (*src >= '0' && *src <= '9') ++src;
@@ -75,7 +75,7 @@ static int TextAnalysisCN(unsigned char *dst, const unsigned char* src) {
 }
 static const unsigned char* TextAnalysisJP(const unsigned char* buff) {
 	const unsigned char* abuff = buff;
-	if (zaConfig->General.RemoveFwdCtrlCh) {
+	if (g_zaConfig->General.RemoveFwdCtrlCh) {
 		while (*abuff == '#') {
 			++abuff;
 			while (*abuff >= '0' && *abuff <= '9') ++abuff;
@@ -94,8 +94,8 @@ static void ReLoadAllVoiceTables() {
 	zaVoiceTablesGroup.Clear();
 
 	std::vector<std::string> subs;
-	const std::string& dir = zaConfig->ActiveGame->VtblDir;
-	std::string searchName = "*." + zaConfig->ActiveGame->VtblExt;
+	const std::string& dir = g_zaConfig->ActiveGame->VtblDir;
+	std::string searchName = "*." + g_zaConfig->ActiveGame->VtblExt;
 	ZaGetSubFiles(dir, searchName, subs);
 
 	for (auto sub : subs) {
@@ -257,6 +257,8 @@ int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 
 		const unsigned char* buffTextJP = (const unsigned char*)vinf.jpText.c_str();
 		const unsigned char* buffTextJPFixed = TextAnalysisJP(buffTextJP);
+		char buffStrVoiceId[MAX_LENGTH_VOICE_ID + 1];
+		GetStrVoiceID(vinf.voiceID, buffStrVoiceId);
 
 		if (buffTextJPFixed[0] != 0) {
 			ZALOG_DEBUG("\nScena:%s,Offset:0x%06X,VoiceID:%s\n"
@@ -265,7 +267,7 @@ int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 				"------------------------------------\n"
 				"%s\n"
 				"------------------------------------",
-				pScenaName, offset, StrVoiceID(vinf.voiceID),
+				pScenaName, offset, buffStrVoiceId,
 				buffText, buffTextJPFixed);
 		}
 		else {
@@ -273,7 +275,7 @@ int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 				"------------------------------------\n"
 				"%s\n"
 				"------------------------------------",
-				pScenaName, offset, StrVoiceID(vinf.voiceID),
+				pScenaName, offset, buffStrVoiceId,
 				buffText);
 		}
 	}//if (buffText[0] != 0)
@@ -281,21 +283,20 @@ int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 	return 0;
 }
 
-static char strIdBuff[MAX_LENGTH_VOICE_ID + 1];
-const char* StrVoiceID(int voiceID) {
+int GetStrVoiceID(int voiceID, char* buff_strVoiceId) {
 	if (voiceID == InValidVoiceId) {
-		for (int i = 0; i < zaConfig->ActiveGame->VoiceIdLength; ++i)
-			strIdBuff[i] = '-';
+		for (int i = 0; i < g_zaConfig->ActiveGame->VoiceIdLength; ++i)
+			buff_strVoiceId[i] = '-';
 	}
 	else {
-		for (int i = zaConfig->ActiveGame->VoiceIdLength - 1; i >= 0; --i) {
-			strIdBuff[i] = voiceID % 10 + '0';
+		for (int i = g_zaConfig->ActiveGame->VoiceIdLength - 1; i >= 0; --i) {
+			buff_strVoiceId[i] = voiceID % 10 + '0';
 			voiceID /= 10;
 		}
 	}
-	strIdBuff[zaConfig->ActiveGame->VoiceIdLength] = 0;
+	buff_strVoiceId[g_zaConfig->ActiveGame->VoiceIdLength] = 0;
 
-	return strIdBuff;
+	return g_zaConfig->ActiveGame->VoiceIdLength;
 }
 
 

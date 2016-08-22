@@ -11,48 +11,24 @@
 #include <io.h>
 #include <Windows.h>
 #include <string>
+#include <queue>
 
-static int voiceIdWait;
+static std::queue<int> waitList;
 static ZAData zaData, zaData_old;
-
-static bool PlayVoice(int voiceID, std::string &filename) {
-	if (voiceID == InValidVoiceId) return false;
-
-	const std::string& dir = zaConfig->ActiveGame->VoiceDir;
-	const std::string strVoiceID = StrVoiceID(voiceID);
-
-	for (auto ext : zaConfig->ActiveGame->VoiceExt)
-	{
-		filename = zaConfig->ActiveGame->VoiceName + strVoiceID + '.' + ext;
-		std::string filePath = dir + '\\' + filename;
-		
-		if (_access(filePath.c_str(), 4) == 0)
-			return ZaSoundPlay(filePath);
-	}
-
-	return false;
-}
 
 static int VoicePlayerLoopMain()
 {
 	int errc = 0;
-	std::string voiceFileName;
+	char voiceFileName[MAX_LENGTH_VOICE_ID * 2 + 1];
 	const char* scenaName = nullptr;
 	int voiceID = InValidVoiceId;
 	bool wait = false;
 
-	if (voiceIdWait != InValidVoiceId && ZaSoundStatus() == ZASOUND_STATUS_STOP) {
-		if (PlayVoice(voiceIdWait, voiceFileName)) {
-			ZALOG("Playing %s ...", voiceFileName.c_str());
-		}
-		else {
-			ZALOG_ERROR("Play %s Failed.", voiceFileName.c_str());
-		}
-		voiceIdWait = InValidVoiceId;
+	if (ZaWaitingNum() && ZaSoundStatus() == ZASOUND_STATUS_STOP) {
+		ZaPlayWait();
 	}
 
-
-	if (!ZaRemoteRead(rAddData, &zaData, sizeof(zaData))) {
+	if (!ZaRemoteRead(g_rAddData, &zaData, sizeof(zaData))) {
 		ZALOG_ERROR("访问远程数据失败: zaData");
 		return 1;
 	}
@@ -88,17 +64,18 @@ static int VoicePlayerLoopMain()
 	}
 
 	if (voiceID != InValidVoiceId) {
-		if (!wait || ZaSoundStatus() == ZASOUND_STATUS_STOP || voiceIdWait != InValidVoiceId) {
-			if (PlayVoice(voiceID, voiceFileName)) {
-				ZALOG_DEBUG("Playing %s ...", voiceFileName.c_str());
+		if (!wait) {
+			ZaClearWait();
+			if (ZaPlayVoice(voiceID, voiceFileName)) {
+				ZALOG_DEBUG("Playing %s ...", voiceFileName);
 			}
 			else {
-				ZALOG_ERROR("Play %s failed.", voiceFileName.c_str());
+				ZALOG_ERROR("Play %s failed.", voiceFileName);
 			}
-			voiceIdWait = InValidVoiceId;
 		}
-		else {
-			voiceIdWait = voiceID;
+		else 
+		{
+			ZaAddToWait(voiceID);
 		}
 	}
 
@@ -110,12 +87,67 @@ static int VoicePlayerLoopAfterOneLoop() {
 	return 0;
 }
 
+void ZaAddToWait(int voiceId) {
+	waitList.push(voiceId);
+}
+
+void ZaClearWait() {
+	while (!waitList.empty()) waitList.pop();
+}
+
+int ZaWaitingNum() {
+	return waitList.size();
+}
+
+int ZaPlayWait() {
+	if (waitList.empty()) return 1;
+
+	char voiceFileName[MAX_LENGTH_VOICE_ID * 2 + 1];
+	int voiceId = waitList.front();
+	waitList.pop();
+
+	if (ZaPlayVoice(voiceId, voiceFileName)) {
+		ZALOG("Playing %s ...", voiceFileName);
+		return 0;
+	}
+	else {
+		ZALOG_ERROR("Play %s Failed.", voiceFileName);
+		return 1;
+	}
+}
+
+bool ZaPlayVoice(int voiceID, char *out_filename) {
+	if (voiceID == InValidVoiceId) return false;
+
+	const std::string& dir = g_zaConfig->ActiveGame->VoiceDir;
+	const std::string& preName = g_zaConfig->ActiveGame->VoiceName;
+	int index = 0;
+	for (; index < preName.size(); ++index) out_filename[index] = preName[index];
+
+	index += GetStrVoiceID(voiceID, out_filename + index);
+	out_filename[index++] = '.';
+
+	for (auto ext : g_zaConfig->ActiveGame->VoiceExt)
+	{
+		for (int i = 0; i < ext.size(); ++i) out_filename[index + i] = ext[i];
+		out_filename[index + ext.size()] = 0;
+
+		std::string filePath = dir + '\\' + out_filename;
+
+		if (_access(filePath.c_str(), 4) == 0)
+			return ZaSoundPlay(filePath);
+	}
+	out_filename[index - 1] = 0;
+
+	return false;
+}
+
 int ZaVoicePlayerInit() {
-	ZaSoundInit(zaConfig->ActiveGame->Volume);
+	ZaSoundInit(g_zaConfig->ActiveGame->Volume);
 	
 	memset(&zaData, 0, sizeof(zaData));
 	memset(&zaData_old, 0, sizeof(zaData_old));
-	voiceIdWait = InValidVoiceId;
+	ZaClearWait();
 
 	ZaScenaAnalyzerInit();
 

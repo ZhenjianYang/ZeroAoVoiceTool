@@ -30,8 +30,8 @@ struct ZAData
 #define OFFZAD_cText		0x20
 #define OFFZAD_flag			0x24
 
-extern const unsigned &rAddData;
-extern const unsigned &rSizeData;
+extern const unsigned &g_rAddData;
+extern const unsigned &g_rSizeData;
 
 //初始化，寻找游戏窗口、打开游戏进程并写入远程代码
 //返回值：
@@ -41,6 +41,22 @@ extern const unsigned &rSizeData;
 int ZaRemoteInit(int mode);
 
 void ZaRemoteFinish();
+
+//检查游戏是否启动
+//titles : 需要检查的游戏标题列表
+//返回: 
+//        >=0 已启动的游戏标题在标题列表中的编号
+//        <0  游戏未启动 
+int ZaCheckGameStart(int numTitles, const char* titles[]);
+
+//检查游戏是否已结束
+//返回:
+//        true  游戏已结束
+//        false 游戏未结束
+bool ZaCheckGameEnd();
+
+bool ZaOpenProcess();
+bool ZaInjectRemoteCode(int gameId);
 
 bool ZaRemoteRead(unsigned rAdd, void *buff, unsigned size);
 bool ZaRemoteWrite(unsigned rAdd, const void *buff, unsigned size);

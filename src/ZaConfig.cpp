@@ -9,7 +9,7 @@ using namespace std;
 static ZaConfig struZaConfig;
 static ZaConfig* ptrZaConfig = &struZaConfig;
 
-const ZaConfig* const &zaConfig = ptrZaConfig;
+const ZaConfig* const &g_zaConfig = ptrZaConfig;
 
 static void ZaConfigSetDefault();
 

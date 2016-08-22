@@ -7,4 +7,12 @@ int ZaVoicePlayerInit();
 //进行一次语音播放循环
 int ZaVoicePlayerLoopOne();
 
+bool ZaPlayVoice(int voiceID, char *out_filename);
+
+void ZaAddToWait(int voiceId);
+void ZaClearWait();
+int ZaWaitingNum();
+int ZaPlayWait();
+
+
 #endif // !__ZAVOICEPLAYER_H__

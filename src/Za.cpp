@@ -17,13 +17,13 @@ void ZaVoiceStartup(int argc, char * argv[])
 	ZaConfigLoad(DFT_CONFIG_FILE);
 
 	int logparam = 0;
-	if (!zaConfig->General.OpenDebugLog) {
+	if (!g_zaConfig->General.OpenDebugLog) {
 		logparam = ZALOG_OUT_STDOUT | ZALOG_TYPE_INFO | ZALOG_TYPE_INFO | ZALOG_PARAM_NOPREINFO;
 	}
 	else {
 		logparam = ZALOG_OUT_STDLOG | ZALOG_TYPE_ALL;
 	}
-	if (zaConfig->General.UseLogFile) {
+	if (g_zaConfig->General.UseLogFile) {
 		logparam |= ZALOG_OUT_FILE;
 		ZALOG_SETLOGFILE(DFT_LOG_FILE);
 	}
@@ -41,7 +41,7 @@ void ZaVoiceStartup(int argc, char * argv[])
 
 void ZaMain() {
 	ZALOG("准备中...");
-	int gameID = ZaRemoteInit(zaConfig->General.Mode);
+	int gameID = ZaRemoteInit(g_zaConfig->General.Mode);
 	if (gameID != GAMEID_AO && gameID != GAMEID_ZERO) {
 		ZALOG_ERROR("准备活动失败！");
 		return;
@@ -52,20 +52,20 @@ void ZaMain() {
 	ZaVoicePlayerInit();
 	ZALOG("已进入语音播放系统");
 	
-	ZALOG("语音文件目录为: %s", zaConfig->ActiveGame->VoiceDir.c_str());
-	for (int i = 1; i <= zaConfig->ActiveGame->VoiceExt.size(); ++i) {
-		ZALOG("语音文件后缀%d: %s", i, zaConfig->ActiveGame->VoiceExt[i-1].c_str());
+	ZALOG("语音文件目录为: %s", g_zaConfig->ActiveGame->VoiceDir.c_str());
+	for (int i = 1; i <= g_zaConfig->ActiveGame->VoiceExt.size(); ++i) {
+		ZALOG("语音文件后缀%d: %s", i, g_zaConfig->ActiveGame->VoiceExt[i-1].c_str());
 	}
-	if (gameID == GAMEID_AO && zaConfig->ActiveGame->DisableOriginalVoice) {
+	if (gameID == GAMEID_AO && g_zaConfig->ActiveGame->DisableOriginalVoice) {
 		ZALOG("启用了禁用原有剧情语音的功能");
 	}
 
-	int errc = 0;
-	while (!errc)
+	while (!ZaCheckGameEnd())
 	{
-		errc = ZaVoicePlayerLoopOne();
-		Sleep(zaConfig->General.SleepTime);
+		int errc = ZaVoicePlayerLoopOne();
+		Sleep(g_zaConfig->General.SleepTime);
 	}
+	ZALOG("游戏已退出！");
 	ZALOG("已退出语音播放系统");
 
 	ZaRemoteFinish();

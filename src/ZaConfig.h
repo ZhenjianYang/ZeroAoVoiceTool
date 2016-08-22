@@ -54,7 +54,7 @@ struct ZaConfig
 	ZaConfigGame Ao;
 	ZaConfigGame Zero;
 };
-extern const ZaConfig* const &zaConfig;
+extern const ZaConfig* const &g_zaConfig;
 
 void ZaConfigLoad(const char* configFile);
 void ZaConfigSetActive(int gameID);

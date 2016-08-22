@@ -7,40 +7,11 @@
 
 static unsigned _rAddZaData;
 static unsigned _rSizeZaData;
-const unsigned &rAddData = _rAddZaData;
-const unsigned &rSizeData = _rSizeZaData;
+const unsigned &g_rAddData = _rAddZaData;
+const unsigned &g_rSizeData = _rSizeZaData;
 
 static HWND hWnd = NULL;
 static HANDLE hProcess = NULL;
-
-static bool enableDebugPriv();
-
-static int FindGameWindow(int mode)
-{
-	const char* tbuf[] = { Z_DFT_WIN_TITLE, A_DFT_WIN_TITLE };
-	if (mode == MODE_AO) tbuf[0] = tbuf[1];
-	else if (mode == MODE_ZERO) tbuf[1] = tbuf[0];
-
-	hWnd = NULL;
-	int index = 0;
-	while (!(hWnd = ::FindWindowA(NULL, tbuf[index])))
-	{
-		index = 1 - index;
-		if(index == 0) Sleep(1000);
-	}
-	
-	ZALOG("游戏标题为：%s", tbuf[index]);
-
-	if (strcmp(tbuf[index], Z_DFT_WIN_TITLE) == 0) return GAMEID_ZERO;
-	else return GAMEID_AO;
-}
-static bool OpenProcess() {
-	DWORD pid;
-	GetWindowThreadProcessId(hWnd, &pid);
-
-	hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
-	return hProcess != NULL;
-}
 
 static const unsigned z_rOldJctoList[] = { Z_OLD_JCTO_LOADSCENA, Z_OLD_JCTO_LOADSCENA1, Z_OLD_JCTO_LOADBLOCK , Z_OLD_JCTO_SHOWTEXT };
 static const unsigned z_rAddJcList[] = { Z_ADD_JC_LOADSCENA, Z_ADD_JC_LOADSCENA1, Z_ADD_JC_LOADBLOCK, Z_ADD_JC_SHOWTEXT };
@@ -58,7 +29,51 @@ static unsigned rAddNewJc[numJc];
 #define REMOTE_DATA_PACK 0x10
 #define PACK(p, pack) (p = (p + (pack) - 1) / (pack) * (pack))
 
-static bool InjectRemoteCode(int gameId) {
+static bool enableDebugPriv();
+
+static int WaitGameStart(int mode)
+{
+	const char* tbuf[] = { Z_DFT_WIN_TITLE, A_DFT_WIN_TITLE };
+	if (mode == MODE_AO) tbuf[0] = tbuf[1];
+	else if (mode == MODE_ZERO) tbuf[1] = tbuf[0];
+
+	hWnd = NULL;
+	int index = -1;
+	while ((index = ZaCheckGameStart(sizeof(tbuf) / sizeof(*tbuf), tbuf)) < 0);
+
+	ZALOG("游戏标题为：%s", tbuf[index]);
+
+	if (mode == MODE_AUTO) return index == 0 ? GAMEID_ZERO : GAMEID_AO;
+	else if (mode == MODE_AO) return GAMEID_AO;
+	else return GAMEID_ZERO;
+}
+
+int ZaCheckGameStart(int numTitles, const char* titles[]) {
+	hWnd = NULL;
+	int index;
+	for (index = numTitles - 1; index >= 0; --index) {
+		hWnd = ::FindWindowA(NULL, titles[index]);
+		if (hWnd) break;
+	}
+	return index;
+}
+
+bool ZaCheckGameEnd() {
+	DWORD code;
+	if (!GetExitCodeProcess(hProcess, &code) || code != STILL_ACTIVE)
+		return true;
+	return false;
+}
+
+bool ZaOpenProcess() {
+	DWORD pid;
+	GetWindowThreadProcessId(hWnd, &pid);
+
+	hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
+	return hProcess != NULL;
+}
+
+bool ZaInjectRemoteCode(int gameId) {
 
 	const unsigned *rOldJctoList = gameId == GAMEID_AO ? a_rOldJctoList : z_rOldJctoList;
 	const unsigned *rAddJcList = gameId == GAMEID_AO ? a_rAddJcList : z_rAddJcList;
@@ -94,8 +109,8 @@ static bool InjectRemoteCode(int gameId) {
 		ZALOG_ERROR("分配远程数据空间失败！");
 		return false;
 	}
-	ZALOG_DEBUG("分配远程数据空间成功。地址：0x%08X, 大小：0x%04X", _rAddZaData,  _rSizeZaData);
-	
+	ZALOG_DEBUG("分配远程数据空间成功。地址：0x%08X, 大小：0x%04X", _rAddZaData, _rSizeZaData);
+
 	//将占位指令修改为本来的指令
 	for (int i = 0; i < numJc; ++i) {
 		p = rAddNewJc[i];
@@ -107,14 +122,14 @@ static bool InjectRemoteCode(int gameId) {
 				*(unsigned *)(buff + p) = _rAddZaData; p += 4;
 
 				if (i == irNewShowText &&
-					(gameId == GAMEID_AO && zaConfig->Ao.DisableOriginalVoice)) {
+					(gameId == GAMEID_AO && g_zaConfig->Ao.DisableOriginalVoice)) {
 					for (int j = 0; j < 2; ++j)
 						buff[p++] = CODE_NOP;
 				}
 				else
 					p += 2;
 			}
-			else if(buff[p] == FAKE_CODE2
+			else if (buff[p] == FAKE_CODE2
 				&& buff[p + 1] == FAKE_CODE2 && buff[p + 2] == FAKE_CODE2
 				&& buff[p + 3] == FAKE_CODE2 && buff[p + 4] == FAKE_CODE2) {
 				buff[p] = JMP_CODE; p++;
@@ -145,10 +160,6 @@ static bool InjectRemoteCode(int gameId) {
 	return true;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-
 bool ZaRemoteRead(unsigned rAdd, void *buff, unsigned size) {
 	return ReadProcessMemory(hProcess, (LPVOID)rAdd, buff, size, NULL);
 }
@@ -178,11 +189,11 @@ int ZaRemoteInit(int mode)
 #endif
 
 	ZALOG("等待游戏运行...");
-	int gameId = FindGameWindow(mode);
+	int gameId = WaitGameStart(mode);
 	ZALOG("游戏已启动！");
 
 	ZALOG("访问游戏进程...");
-	if (!OpenProcess()) {
+	if (!ZaOpenProcess()) {
 		ZaRemoteFinish();
 		ZALOG_ERROR("访问游戏进程失败！");
 		return GAMEID_INVALID;
@@ -190,7 +201,7 @@ int ZaRemoteInit(int mode)
 	ZALOG("访问游戏进程成功");
 
 	ZALOG("写入远程代码...");
-	if (!InjectRemoteCode(gameId)) {
+	if (!ZaInjectRemoteCode(gameId)) {
 		ZALOG_ERROR("写入远程代码失败！");
 		ZaRemoteFinish();
 		return GAMEID_INVALID;
@@ -207,6 +218,7 @@ void ZaRemoteFinish()
 	hWnd = NULL;
 }
 
+#if !_DEBUG
 bool enableDebugPriv()
 {
 	HANDLE hToken;
@@ -232,3 +244,4 @@ bool enableDebugPriv()
 	}
 	return true;
 }
+#endif // if !_DEBUG
