@@ -46,11 +46,8 @@ for details about the usage.
 External libraries used in this project
 ---------------------------------------
 
--   [SFML](http://www.sfml-dev.org/), licensed under the terms and
-    conditions of the zlib/png license. External libraries used by SFML
-    (and indirectly used by this project) and their licenses can be
-    found in
-    [/extlibs/SFML/license.txt](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/extlibs/SFML/license.txt).
+-   [Audiere](http://audiere.sourceforge.net/), licensed under the
+    [LGPL](http://opensource.org/licenses/lgpl-license.html).
 
 ------------------------------------------------------------------------
 
@@ -89,9 +86,8 @@ ZeroAoVoiceTool
 本项目使用的外部库
 ------------------
 
--   [SFML](http://www.sfml-dev.org/),
-    基于zlib/png协议。SFML使用（本项目间接使用）的外部库及它们的使用协议请参考
-    [/extlibs/SFML/license.txt](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/extlibs/SFML/license.txt).
+-   [Audiere](http://audiere.sourceforge.net/),
+    基于[LGPL协议](http://opensource.org/licenses/lgpl-license.html).
 
 各目录说明
 ----------
