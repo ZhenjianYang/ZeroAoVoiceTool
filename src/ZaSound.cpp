@@ -7,7 +7,6 @@ static audiere::AudioDevicePtr _device = nullptr;
 audiere::OutputStreamPtr _soundStream = nullptr;
 static StopCallBack _callBack = nullptr;
 static void* _callBackParam = nullptr;
-static bool _callBackOnce = true;
 
 class AdrStopCallBack : public audiere::RefImplementation<audiere::StopCallback> {
 public:
@@ -20,17 +19,13 @@ void ADR_CALL AdrStopCallBack::streamStopped(audiere::StopEvent * event)
 	if (!_callBack) {
 		_callBack(_callBackParam);
 	}
-
-	if (_callBackOnce) {
-		_device->unregisterCallback(_adrStopCallBack.get());
-		_callBack = nullptr;
-	}
 }
 
 int ZaSoundInit(float volume)
 {
 	ZaSoundStop();
 	ZaSoundSetVolumn(volume);
+	
 	if (!_device.get()) {
 		_device = audiere::OpenDevice();
 	}
@@ -38,6 +33,7 @@ int ZaSoundInit(float volume)
 	if (!_device.get())
 		return 1;
 
+	ZaSoundSetStopCallBack(nullptr);
 	return 0;
 }
 
@@ -77,13 +73,13 @@ void ZaSoundStop()
 		_soundStream->stop();
 }
 
-void ZaSoundSetStopCallBack(StopCallBack stopCallBack /*= nullptr*/, void* param /*= nullptr*/, bool onlyOnce /*= true*/)
+void ZaSoundSetStopCallBack(StopCallBack stopCallBack /*= nullptr*/, void* param /*= nullptr*/)
 {
-	_callBackOnce = onlyOnce;
 	_callBackParam = param;
 	
 	if (stopCallBack == nullptr) {
-		_device->unregisterCallback(_adrStopCallBack.get());
+		_callBack = nullptr;
+		_device->clearCallbacks();
 	}
 	else {
 		if(_callBack == nullptr)

@@ -18,6 +18,6 @@ int ZaSoundStatus();
 bool ZaSoundPlay(const char* soundFile);
 void ZaSoundStop();
 
-void ZaSoundSetStopCallBack(StopCallBack stopCallBack = nullptr, void* param = nullptr, bool onlyOnce = true);
+void ZaSoundSetStopCallBack(StopCallBack stopCallBack = nullptr, void* param = nullptr);
 
 #endif // !__ZASOUND_H__
