@@ -4,13 +4,9 @@
   <PropertyGroup Label="UserMacros">
     <SFMLHomeIncDir>$(SFMLHome)include\</SFMLHomeIncDir>
     <ExtlibsHome>$(SolutionDir)..\extlibs\</ExtlibsHome>
-    <SFMLHome>$(ExtlibsHome)SFML\</SFMLHome>
-    <SFMLIncDir>$(SFMLHome)include\</SFMLIncDir>
-    <SFMLLibsDir>$(SFMLHome)lib\</SFMLLibsDir>
-    <SFMLBinDir>$(SFMLHome)bin</SFMLBinDir>
-    <ExtIncDirs>$(SFMLIncDir)</ExtIncDirs>
-    <ExtLibsDirs>$(SFMLLibsDir)</ExtLibsDirs>
-    <ExtBinsDirs>$(SFMLBinDir)</ExtBinsDirs>
+    <ExtIncDirs>$(ExtlibsHome)include</ExtIncDirs>
+    <ExtLibsDirs>$(ExtlibsHome)lib</ExtLibsDirs>
+    <ExtBinsDirs>$(ExtlibsHome)bin</ExtBinsDirs>
   </PropertyGroup>
   <PropertyGroup>
     <IncludePath>$(ExtIncDirs);$(IncludePath)</IncludePath>
@@ -29,18 +25,6 @@
   <ItemGroup>
     <BuildMacro Include="ExtlibsHome">
       <Value>$(ExtlibsHome)</Value>
-    </BuildMacro>
-    <BuildMacro Include="SFMLHome">
-      <Value>$(SFMLHome)</Value>
-    </BuildMacro>
-    <BuildMacro Include="SFMLIncDir">
-      <Value>$(SFMLIncDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="SFMLLibsDir">
-      <Value>$(SFMLLibsDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="SFMLBinDir">
-      <Value>$(SFMLBinDir)</Value>
     </BuildMacro>
     <BuildMacro Include="ExtIncDirs">
       <Value>$(ExtIncDirs)</Value>

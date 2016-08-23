@@ -135,7 +135,7 @@ bool ZaPlayVoice(int voiceID, char *out_filename) {
 		std::string filePath = dir + '\\' + out_filename;
 
 		if (_access(filePath.c_str(), 4) == 0)
-			return ZaSoundPlay(filePath);
+			return ZaSoundPlay(filePath.c_str());
 	}
 	out_filename[index - 1] = 0;
 
