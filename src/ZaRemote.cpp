@@ -14,16 +14,21 @@ static HWND hWnd = NULL;
 static HANDLE hProcess = NULL;
 
 static const unsigned z_rOldJctoList[] = { Z_OLD_JCTO_LOADSCENA, Z_OLD_JCTO_LOADSCENA1, Z_OLD_JCTO_LOADBLOCK , Z_OLD_JCTO_SHOWTEXT };
-static const unsigned z_rAddJcList[] = { Z_ADD_JC_LOADSCENA, Z_ADD_JC_LOADSCENA1, Z_ADD_JC_LOADBLOCK, Z_ADD_JC_SHOWTEXT };
+static const unsigned z_rAddrJcList[] = { Z_ADD_JC_LOADSCENA, Z_ADD_JC_LOADSCENA1, Z_ADD_JC_LOADBLOCK, Z_ADD_JC_SHOWTEXT };
+static const unsigned z_ptr_apipmsg = Z_PTR_API_PostMessageA;
 
 static const unsigned a_rOldJctoList[] = { A_OLD_JCTO_LOADSCENA, A_OLD_JCTO_LOADSCENA1, A_OLD_JCTO_LOADBLOCK , A_OLD_JCTO_SHOWTEXT };
-static const unsigned a_rAddJcList[] = { A_ADD_JC_LOADSCENA, A_ADD_JC_LOADSCENA1, A_ADD_JC_LOADBLOCK, A_ADD_JC_SHOWTEXT };
+static const unsigned a_rAddrJcList[] = { A_ADD_JC_LOADSCENA, A_ADD_JC_LOADSCENA1, A_ADD_JC_LOADBLOCK, A_ADD_JC_SHOWTEXT };
+static const unsigned a_ptr_apipmsg = A_PTR_API_PostMessageA;
+
+static const unsigned msgId_add[] = { MSGID_ADDER_LOADSCENA, MSGID_ADDER_LOADSCENA1, MSGID_ADDER_LOADBLOCK, MSGID_ADDER_SHOWTEXT };
 
 static const void* rNewCJList[] = { rNewLoadScena , rNewLoadScena1, rNewLoadBlock, rNewShowText };
+static const void* rNewCJListMsg[] = { rNewLoadScenaMsg , rNewLoadScena1Msg, rNewLoadBlockMsg, rNewShowTextMsg };
 const int numJc = sizeof(rNewCJList) / sizeof(*rNewCJList);
 const int irNewShowText = numJc - 1;
 
-static unsigned rAddNewJc[numJc];
+static unsigned rAddrNewJc[numJc];
 
 #define MAX_REMOTE_DADA_SIZE 512
 #define REMOTE_DATA_PACK 0x10
@@ -73,17 +78,17 @@ bool ZaOpenProcess() {
 	return hProcess != NULL;
 }
 
-bool ZaInjectRemoteCode(int gameId) {
-
+bool ZaInjectRemoteCode(int gameId, int hWnd_this /*= 0*/, unsigned bMsg /*= 0*/) {
+	const unsigned ptr_apipmsg = gameId == GAMEID_AO ? a_ptr_apipmsg : z_ptr_apipmsg;
 	const unsigned *rOldJctoList = gameId == GAMEID_AO ? a_rOldJctoList : z_rOldJctoList;
-	const unsigned *rAddJcList = gameId == GAMEID_AO ? a_rAddJcList : z_rAddJcList;
+	const unsigned *rAddJcList = gameId == GAMEID_AO ? a_rAddrJcList : z_rAddrJcList;
 
 	unsigned char buff[MAX_REMOTE_DADA_SIZE];
 	memset(buff, INIT_CODE, sizeof(buff));
 
 	unsigned p = sizeof(ZAData); PACK(p, REMOTE_DATA_PACK);
 	for (int i = 0; i < numJc; ++i) {
-		rAddNewJc[i] = p;
+		rAddrNewJc[i] = p;
 		unsigned char *t = (unsigned char *)rNewCJList[i];
 		if (*t == JMP_CODE) t += *(unsigned *)(t + 1) + 5;//debug版对策
 
@@ -113,21 +118,21 @@ bool ZaInjectRemoteCode(int gameId) {
 
 	//将占位指令修改为本来的指令
 	for (int i = 0; i < numJc; ++i) {
-		p = rAddNewJc[i];
+		p = rAddrNewJc[i];
 		for (;;) {
-			if (buff[p] == FAKE_CODE1
-				&& buff[p + 1] == FAKE_CODE1 && buff[p + 2] == FAKE_CODE1
-				&& buff[p + 3] == FAKE_CODE1 && buff[p + 4] == FAKE_CODE1) {
-				buff[p] = MOVEBX_CODE; p++;
+			if (hWnd_this ==0 && *(unsigned *)(buff + p) == FAKE_RAZADATA) {
 				*(unsigned *)(buff + p) = _rAddZaData; p += 4;
-
-				if (i == irNewShowText &&
-					(gameId == GAMEID_AO && g_zaConfig->Ao.DisableOriginalVoice)) {
-					for (int j = 0; j < 2; ++j)
-						buff[p++] = CODE_NOP;
-				}
-				else
-					p += 2;
+			}
+			else if (hWnd_this && *(unsigned *)(buff + p) == FAKE_MESSAGE_ID){
+				*(unsigned *)(buff + p) = msgId_add[i] + bMsg;
+			}
+			else if (hWnd_this && *(unsigned *)(buff + p) == FAKE_HWND) {
+				*(unsigned *)(buff + p) = hWnd_this;
+			}
+			else if (hWnd_this && *(unsigned *)(buff + p) == FAKE_PTR_API) {
+				*(unsigned *)(buff + p) = ptr_apipmsg;
+				buff[p - 1] = FAKE_CALLPTR_CODE2;
+				buff[p - 2] = FAKE_CALLPTR_CODE1;
 			}
 			else if (buff[p] == FAKE_CODE2
 				&& buff[p + 1] == FAKE_CODE2 && buff[p + 2] == FAKE_CODE2
@@ -141,6 +146,7 @@ bool ZaInjectRemoteCode(int gameId) {
 		}
 	}
 	memset(buff, 0, sizeof(ZAData));
+	((ZAData*)buff)->disableOriVoice = gameId == GAMEID_AO && g_zaConfig->Ao.DisableOriginalVoice;
 
 	ZALOG_DEBUG("写入远程数据...");
 	if (!ZaRemoteWrite(_rAddZaData, buff, _rSizeZaData)) {
@@ -149,8 +155,8 @@ bool ZaInjectRemoteCode(int gameId) {
 		return false;
 	}
 	for (int i = 0; i < numJc; ++i) {
-		rAddNewJc[i] += _rAddZaData;
-		unsigned ljmp = rAddNewJc[i] - rAddJcList[i] - 5;
+		rAddrNewJc[i] += _rAddZaData;
+		unsigned ljmp = rAddrNewJc[i] - rAddJcList[i] - 5;
 		if (!ZaRemoteWrite(rAddJcList[i] + 1, &ljmp, sizeof(ljmp))) {
 			ZALOG_ERROR("写入远程远程数据失败！");
 			return false;
