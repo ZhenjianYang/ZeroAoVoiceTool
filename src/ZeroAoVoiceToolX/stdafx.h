@@ -14,6 +14,10 @@
 #include <atlbase.h>
 #include <atlapp.h>
 
+#include <atlframe.h>
+#include <atlctrls.h>
+#include <atldlgs.h>
+
 extern CAppModule _Module;
 
 #include <atlwin.h>

@@ -56,6 +56,9 @@
     <ClCompile Include="..\..\src\ZaConfig.cpp">
       <Filter>Source Files %28Shared%29</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ZeroAoVoiceToolX\MainDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\ZeroAoVoiceToolX\ZeroAoVoiceToolX.rc">

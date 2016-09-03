@@ -4,6 +4,17 @@
 
 #pragma once
 
+#define WM_MSG_BASE 0x800
+#define WN_MSG_GAMEFOUND (WM_MSG_BASE + 10)
+#define WN_MSG_GAMEEXIT (WM_MSG_BASE + 20)
+#define WN_MSG_PLAYEND (WM_MSG_BASE + 30)
+#define WN_MSG_LOADVTBLEND (WM_MSG_BASE + 40)
+#define WN_MSG_REMOTEBASE (WM_MSG_BASE + 50)
+#define WN_MSG_LOADSCENA  (WN_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA)
+#define WN_MSG_LOADSCENA1 (WN_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA1)
+#define WN_MSG_LOADBLOCK  (WN_MSG_REMOTEBASE + MSGID_ADDER_LOADBLOCK)
+#define WN_MSG_SHOWTEXT   (WN_MSG_REMOTEBASE + MSGID_ADDER_SHOWTEXT)
+
 class CMainDlg : public CDialogImpl<CMainDlg>, public CUpdateUI<CMainDlg>,
 		public CMessageFilter, public CIdleHandler
 {
@@ -13,7 +24,9 @@ public:
 	};
 	enum Status {
 		Idle,
-		Running
+		WaitingGameStart,
+		LoadingVoiceTable,
+		Running,
 	};
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg)
@@ -42,72 +55,31 @@ public:
 //	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 //	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
-	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-	{
-		// center the dialog on the screen
-		CenterWindow();
+	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
-		// set icons
-		HICON hIcon = AtlLoadIconImage(IDR_MAINFRAME, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON));
-		SetIcon(hIcon, TRUE);
-		HICON hIconSmall = AtlLoadIconImage(IDR_MAINFRAME, LR_DEFAULTCOLOR, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON));
-		SetIcon(hIconSmall, FALSE);
+	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnClose(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-		// register object for message filtering and idle updates
-		CMessageLoop* pLoop = _Module.GetMessageLoop();
-		ATLASSERT(pLoop != NULL);
-		pLoop->AddMessageFilter(this);
-		pLoop->AddIdleHandler(this);
+	void CloseDialog(int nVal);
 
-		UIAddChildWindowContainer(m_hWnd);
+	LRESULT OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
-		m_status = CMainDlg::Idle;
-		m_button_start = this->GetDlgItem(IDC_BUTTON_START);
+	static void SetWorkPath();
 
-		return TRUE;
-	}
+	typedef void(*MonitorFunc)();
 
-	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-	{
-		// unregister message filtering and idle updates
-		CMessageLoop* pLoop = _Module.GetMessageLoop();
-		ATLASSERT(pLoop != NULL);
-		pLoop->RemoveMessageFilter(this);
-		pLoop->RemoveIdleHandler(this);
+	static void Monitor_GameStart();
+	static void Monitor_GameExit();
 
-		return 0;
-	}
+	static MonitorFunc pmfs[];
+	static void ClearAllMonitorFunc();
+	static bool AddMonitorFunc(MonitorFunc func);
+	static void RemoveMonitorFunc(MonitorFunc func);
+	static DWORD WINAPI Thread_Monitor(LPVOID lpParmeter);
 
-	LRESULT OnClose(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-	{
-		this->CloseDialog(0);
-		return 0;
-	}
-
-	void CloseDialog(int nVal)
-	{
-		DestroyWindow();
-		::PostQuitMessage(nVal);
-	}
-	LRESULT OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-	{
-		// TODO: 在此添加控件通知处理程序代码
-		switch (m_status)
-		{
-		case CMainDlg::Idle:
-			m_button_start.SetWindowTextA("Stop");
-			m_status = CMainDlg::Running;
-			break;
-		case CMainDlg::Running:
-			m_button_start.SetWindowTextA("Start");
-			m_status = CMainDlg::Idle;
-			break;
-		default:
-			break;
-		}
-		return 0;
-	}
-	// 状态
 	Status m_status;
 	CButton m_button_start;
+
+	static HANDLE s_th_monitor;
+	static HWND s_hWnd_main;
 };

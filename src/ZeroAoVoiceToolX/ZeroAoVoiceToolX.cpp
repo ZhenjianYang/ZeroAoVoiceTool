@@ -3,10 +3,6 @@
 
 #include "stdafx.h"
 
-#include <atlframe.h>
-#include <atlctrls.h>
-#include <atldlgs.h>
-
 #include "resource.h"
 
 #include "MainDlg.h"
