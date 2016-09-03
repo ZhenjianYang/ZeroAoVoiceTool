@@ -120,19 +120,20 @@ bool ZaInjectRemoteCode(int gameId, int hWnd_this /*= 0*/, unsigned bMsg /*= 0*/
 	for (int i = 0; i < numJc; ++i) {
 		p = rAddrNewJc[i];
 		for (;;) {
-			if (hWnd_this ==0 && *(unsigned *)(buff + p) == FAKE_RAZADATA) {
+			if (*(unsigned *)(buff + p) == FAKE_RAZADATA) {
 				*(unsigned *)(buff + p) = _rAddZaData; p += 4;
 			}
-			else if (hWnd_this && *(unsigned *)(buff + p) == FAKE_MESSAGE_ID){
-				*(unsigned *)(buff + p) = msgId_add[i] + bMsg;
+			else if (*(unsigned *)(buff + p) == FAKE_MESSAGE_ID){
+				*(unsigned *)(buff + p) = msgId_add[i] + bMsg; p += 4;
 			}
-			else if (hWnd_this && *(unsigned *)(buff + p) == FAKE_HWND) {
-				*(unsigned *)(buff + p) = hWnd_this;
+			else if (*(unsigned *)(buff + p) == FAKE_HWND) {
+				*(unsigned *)(buff + p) = hWnd_this; p += 4;
 			}
-			else if (hWnd_this && *(unsigned *)(buff + p) == FAKE_PTR_API) {
+			else if (*(unsigned *)(buff + p) == FAKE_PTR_API) {
 				*(unsigned *)(buff + p) = ptr_apipmsg;
 				buff[p - 1] = FAKE_CALLPTR_CODE2;
 				buff[p - 2] = FAKE_CALLPTR_CODE1;
+				p += 4;
 			}
 			else if (buff[p] == FAKE_CODE2
 				&& buff[p + 1] == FAKE_CODE2 && buff[p + 2] == FAKE_CODE2
