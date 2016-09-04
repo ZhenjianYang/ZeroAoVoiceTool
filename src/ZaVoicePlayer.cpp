@@ -142,14 +142,14 @@ bool ZaPlayVoice(int voiceID, char *out_filename) {
 	return false;
 }
 
-int ZaVoicePlayerInit() {
+int ZaVoicePlayerInit(void* data /*= 0*/){
 	ZaSoundInit(g_zaConfig->ActiveGame->Volume);
 	
 	memset(&_zaData, 0, sizeof(_zaData));
 	memset(&_zaData_old, 0, sizeof(_zaData_old));
 	ZaClearWait();
 
-	ZaScenaAnalyzerInit();
+	ZaScenaAnalyzerInit(data);
 
 	return 0;
 }

@@ -59,7 +59,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	ZALOG_OPEN_WITHPARAM(logparam);
 
-	ZALOG("Zero Ao Voice Tool %s", ZA_VERSION);
+	ZALOG_DEBUG("Zero Ao Voice Tool %s", ZA_VERSION);
 
 	return TRUE;
 }
@@ -88,7 +88,7 @@ void CMainDlg::CloseDialog(int nVal)
 	::PostQuitMessage(nVal);
 }
 
-LRESULT CMainDlg::OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+LRESULT CMainDlg::OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& bHandled)
 {
 	// TODO: 在此添加控件通知处理程序代码
 	switch (m_status)
@@ -97,22 +97,16 @@ LRESULT CMainDlg::OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWN
 		m_button_start.SetWindowTextA("Stop");
 		m_status = CMainDlg::WaitingGameStart;
 		AddMonitorFunc(CMainDlg::Monitor_GameStart);
-		ZALOG("等待游戏运行...");
+		ZALOG_DEBUG("等待游戏运行...");
+		break;
+	case CMainDlg::StoppingInitVoicePlayer:
 		break;
 	case CMainDlg::WaitingGameStart:
-		m_button_start.SetWindowTextA("Start");
-		RemoveMonitorFunc(CMainDlg::Monitor_GameStart);
-		m_status = CMainDlg::Idle;
-		break;
 	case CMainDlg::InitVoicePlayer:
-		m_button_start.SetWindowTextA("Start");
-		m_status = CMainDlg::Idle;
-		break;
 	case CMainDlg::Running:
-		m_button_start.SetWindowTextA("Start");
-		m_status = CMainDlg::Idle;
-		break;
 	default:
+		m_button_start.SetWindowTextA("Start");
+		OnStop(WM_MSG_STOP, m_status, 0, bHandled);
 		break;
 	}
 	return 0;
@@ -124,13 +118,42 @@ LRESULT CMainDlg::OnError(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 }
 LRESULT CMainDlg::OnStop(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	m_status = CMainDlg::Idle;
+	ClearAllMonitorFunc();
+
+	CMainDlg::Status status = (CMainDlg::Status)wParam;
+	switch (status)
+	{
+	case CMainDlg::WaitingGameStart:
+		ZALOG_DEBUG("终止等待游戏运行");
+		break;
+	case CMainDlg::InitVoicePlayer:
+		s_sign_stop = 1;
+		m_status = CMainDlg::StoppingInitVoicePlayer;
+		m_button_start.EnableWindow(FALSE);
+		ZALOG_DEBUG("终止语音系统初试化...");
+		break;
+	case CMainDlg::Running:
+		ZaVoicePlayerEnd();
+		ZALOG_DEBUG("已退出语音播放系统");
+		ZaRemoteEnd();
+		ZALOG_DEBUG("已关闭远程进程句柄");
+		break;
+	case CMainDlg::Idle:
+	case CMainDlg::StoppingInitVoicePlayer:
+	default:
+		throw "错误：此时不应有Idle或StoppingInitVoicePlayer";
+	}
+
 	return 0;
 }
 LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	RemoveMonitorFunc(CMainDlg::Monitor_GameStart);
+	if (m_status != WaitingGameStart) return 0;
+
 	m_gameID = (int)wParam;
-	ZALOG("游戏已启动,游戏标题为:%s",
+	ZALOG_DEBUG("游戏已启动,游戏标题为:%s",
 		m_gameID == GAMEID_AO ? A_DFT_WIN_TITLE : Z_DFT_WIN_TITLE);
 
 	if (ZaRemoteInit(m_gameID, (int)m_hWnd, WM_MSG_REMOTEBASE)) {
@@ -138,10 +161,10 @@ LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	}
 	
 	ZaConfigSetActive(m_gameID);
-	ZALOG("就绪");
+	ZALOG_DEBUG("就绪");
 
-	if (s_th_initplayer) CloseHandle(s_th_initplayer);
-	s_th_initplayer = CreateThread(NULL, 0, CMainDlg::Thread_InitVoicePlayer, NULL, 0, NULL);
+	s_sign_stop = 0;
+	s_th_initplayer = CreateThread(NULL, 0, CMainDlg::Thread_InitVoicePlayer, &s_sign_stop, 0, NULL);
 	m_status = InitVoicePlayer;
 
 	return 0;
@@ -149,7 +172,7 @@ LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 LRESULT CMainDlg::OnGameExit(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	RemoveMonitorFunc(CMainDlg::Monitor_GameExit);
-	ZALOG("游戏已退出！");
+	ZALOG_DEBUG("游戏已退出！");
 
 	ZaVoicePlayerEnd();
 	ZaRemoteEnd();
@@ -166,19 +189,36 @@ LRESULT CMainDlg::OnPlayEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandl
 LRESULT CMainDlg::OnInitPlayerEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	CloseHandle(s_th_initplayer); s_th_initplayer = NULL;
-	ZALOG("已进入语音播放系统");
+	if (m_status == StoppingInitVoicePlayer) {
+		::SendMessage(m_hWnd, WM_MSG_INITPLAYERSTOPPED, 0, 0);
+		return 0;
+	}
+	else if (m_status != InitVoicePlayer) return 0;
 
-	ZALOG("语音文件目录为: %s", g_zaConfig->ActiveGame->VoiceDir.c_str());
+	ZALOG_DEBUG("已进入语音播放系统");
+
+	ZALOG_DEBUG("语音文件目录为: %s", g_zaConfig->ActiveGame->VoiceDir.c_str());
 	for (unsigned i = 1; i <= g_zaConfig->ActiveGame->VoiceExt.size(); ++i) {
-		ZALOG("语音文件后缀%d: %s", i, g_zaConfig->ActiveGame->VoiceExt[i - 1].c_str());
+		ZALOG_DEBUG("语音文件后缀%d: %s", i, g_zaConfig->ActiveGame->VoiceExt[i - 1].c_str());
 	}
 	if (m_gameID == GAMEID_AO && g_zaConfig->ActiveGame->DisableOriginalVoice) {
-		ZALOG("启用了禁用原有剧情语音的功能");
+		ZALOG_DEBUG("启用了禁用原有剧情语音的功能");
 	}
 
 	AddMonitorFunc(CMainDlg::Monitor_GameExit);
 	memset(&m_zadata, 0, sizeof(m_zadata));
 	m_status = Running;
+	return 0;
+}
+LRESULT CMainDlg::OnInitPlayerStoped(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
+{
+	ZaVoicePlayerEnd();
+	ZALOG_DEBUG("已终止语音系统初试化");
+	ZaRemoteEnd();
+	ZALOG_DEBUG("已关闭远程进程句柄");
+
+	m_button_start.EnableWindow(TRUE);
+	m_status = CMainDlg::Idle;
 	return 0;
 }
 LRESULT CMainDlg::OnRLoadScena(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -354,21 +394,11 @@ DWORD WINAPI CMainDlg::Thread_Monitor(LPVOID lpParmeter) {
 }
 
 DWORD WINAPI CMainDlg::Thread_InitVoicePlayer(LPVOID lpParmeter) {
-	int errc = ZaVoicePlayerInit();
-	if (errc) {
-		::SendMessage(s_hWnd_main,
-			WM_MSG_ERROR,
-			CMainDlg::InitVoicePlayerFailed,
-			0
-		);
-	}
-	else {
-		::SendMessage(s_hWnd_main,
-			WM_MSG_INITPLAYEREND,
-			0,
-			0
-		);
-	}
+	int errc = ZaVoicePlayerInit(lpParmeter);
+	::SendMessage(s_hWnd_main,
+		WM_MSG_INITPLAYEREND,
+		errc,
+		0);
 	return errc;
 }
 
@@ -381,3 +411,4 @@ int CMainDlg::PlayEndCallBack(void *)
 HANDLE CMainDlg::s_th_initplayer;
 HANDLE CMainDlg::s_th_monitor;
 HWND CMainDlg::s_hWnd_main;
+unsigned CMainDlg::s_sign_stop;

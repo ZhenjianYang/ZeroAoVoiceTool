@@ -11,6 +11,7 @@
 #define WM_MSG_GAMEEXIT (WM_MSG_BASE + 20)
 #define WM_MSG_PLAYEND (WM_MSG_BASE + 30)
 #define WM_MSG_INITPLAYEREND (WM_MSG_BASE + 40)
+#define WM_MSG_INITPLAYERSTOPPED (WM_MSG_BASE + 41)
 #define WM_MSG_REMOTEBASE (WM_MSG_BASE + 50)
 #define WM_MSG_LOADSCENA  (WM_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA)
 #define WM_MSG_LOADSCENA1 (WM_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA1)
@@ -28,6 +29,7 @@ public:
 		Idle = 0,
 		WaitingGameStart,
 		InitVoicePlayer,
+		StoppingInitVoicePlayer,
 		Running,
 	};
 	enum ErrorType {
@@ -62,6 +64,7 @@ public:
 		MESSAGE_HANDLER(WM_MSG_GAMEEXIT, OnGameExit)
 		MESSAGE_HANDLER(WM_MSG_PLAYEND, OnPlayEnd)
 		MESSAGE_HANDLER(WM_MSG_INITPLAYEREND, OnInitPlayerEnd)
+		MESSAGE_HANDLER(WM_MSG_INITPLAYERSTOPPED, OnInitPlayerStoped)
 		MESSAGE_HANDLER(WM_MSG_LOADSCENA, OnRLoadScena)
 		MESSAGE_HANDLER(WM_MSG_LOADSCENA1, OnRLoadScena1)
 		MESSAGE_HANDLER(WM_MSG_LOADBLOCK, OnRLoadBlock)
@@ -88,6 +91,7 @@ public:
 	LRESULT OnGameExit(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnPlayEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnInitPlayerEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnInitPlayerStoped(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRLoadScena(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRLoadScena1(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRLoadBlock(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -119,4 +123,5 @@ public:
 	static HANDLE s_th_monitor;
 	static HWND s_hWnd_main;
 	static HANDLE s_th_initplayer;
+	static unsigned s_sign_stop;
 };

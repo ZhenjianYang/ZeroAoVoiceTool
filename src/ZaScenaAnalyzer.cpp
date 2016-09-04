@@ -94,7 +94,7 @@ static void LoadNewVoiceTable(const std::string& name) {
 static void ClearAllVoiceTable() {
 	_zaVoiceTablesGroup.Clear();
 }
-static void ReLoadAllVoiceTables() {
+static void ReLoadAllVoiceTables(void * data) {
 	ClearAllVoiceTable();
 
 	std::vector<std::string> subs;
@@ -103,19 +103,21 @@ static void ReLoadAllVoiceTables() {
 	ZaGetSubFiles(dir, searchName, subs);
 
 	for (auto sub : subs) {
+		if (data && *(unsigned*)data) break;
+
 		std::string _scenaName = sub.substr(0, sub.rfind('.'));
 		_zaVoiceTablesGroup.AddVoiceTable(_scenaName, dir + '\\' + sub);
 	}
 }
 
-int ZaScenaAnalyzerInit()
+int ZaScenaAnalyzerInit(void* data /*= 0*/)
 {
 	_pScenaName = NULL;
 	_scenaName[0] = 0;
 	_zaVoiceTable = &InvalidVoiceTable;
 
 	ZALOG_DEBUG("加载语音表...");
-	ReLoadAllVoiceTables();
+	ReLoadAllVoiceTables(data);
 	ZALOG_DEBUG("已加载的语音表数: %d", _zaVoiceTablesGroup.Num());
 
 	return 0;

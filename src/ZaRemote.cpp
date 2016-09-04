@@ -127,7 +127,7 @@ void ZaRemoteEnd()
 		ZALOG_DEBUG("清理远程数据...");
 		if (!ZaCleanRemoteCode())
 		{
-			ZALOG_ERROR("清理远程失败！");
+			ZALOG_DEBUG("清理远程失败！");
 		}
 		else {
 			ZALOG_DEBUG("清理远程成功");
@@ -162,6 +162,7 @@ bool ZaCleanRemoteCode()
 		}
 	}
 
+	::Sleep(5);
 	return ZaRemoteFree(_rAddZaData, _rSizeZaData);
 }
 bool ZaInjectRemoteCode(int hWnd_this, unsigned bMsg) {

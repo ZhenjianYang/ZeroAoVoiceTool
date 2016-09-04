@@ -2,8 +2,8 @@
 #define __ZAVOICEPLAYER_H__
 
 //语音播放循环初始化
-int ZaVoicePlayerInit();
-//结束语音播放循环
+int ZaVoicePlayerInit(void* data = 0);
+//终止语音播放循环初试化(上方法在另一线程调用时使用)
 int ZaVoicePlayerEnd();
 
 //进行一次语音播放循环

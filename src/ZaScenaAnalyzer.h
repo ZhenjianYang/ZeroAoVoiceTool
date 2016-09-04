@@ -1,7 +1,7 @@
 #ifndef __ZASCENAANALYZER_H__
 #define __ZASCENAANALYZER_H__
 
-int ZaScenaAnalyzerInit();
+int ZaScenaAnalyzerInit(void* data = 0);
 int ZaScenaAnalyzerEnd();
 
 int ZaDetected_LoadScena(unsigned raScena, const char* &out_scenaName);
