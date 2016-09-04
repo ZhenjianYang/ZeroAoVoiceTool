@@ -16,7 +16,7 @@ static audiere::StopCallbackPtr _adrStopCallBack = new AdrStopCallBack;
 
 void ADR_CALL AdrStopCallBack::streamStopped(audiere::StopEvent * event)
 {
-	if (!_callBack) {
+	if (_callBack) {
 		_callBack(_callBackParam);
 	}
 }
