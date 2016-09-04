@@ -9,6 +9,7 @@
 typedef int(*StopCallBack)(void*);
 
 int ZaSoundInit(float volumn);
+int ZaSoundEnd();
 
 void ZaSoundSetVolumn(float volumn);
 float ZaSoundGetVolumn();
@@ -18,6 +19,6 @@ int ZaSoundStatus();
 bool ZaSoundPlay(const char* soundFile);
 void ZaSoundStop();
 
-void ZaSoundSetStopCallBack(StopCallBack stopCallBack = nullptr, void* param = nullptr);
+void ZaSoundSetStopCallBack(StopCallBack stopCallBack = nullptr, void* _param = nullptr);
 
 #endif // !__ZASOUND_H__

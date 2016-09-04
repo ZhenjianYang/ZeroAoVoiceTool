@@ -37,14 +37,19 @@ struct ZAData
 extern const unsigned &g_rAddData;
 extern const unsigned &g_rSizeData;
 
-//初始化，寻找游戏窗口、打开游戏进程并写入远程代码
+//等待游戏运行
 //返回值：
 //      GAMEID_AO:   窗口为碧之轨迹
 //      GAMEID_ZERO: 窗口为零之轨迹
 //      其他:      失败
-int ZaRemoteInit(int mode);
+int ZaRemoteWaitGameStart(int mode);
 
-void ZaRemoteFinish();
+//初始化，打开游戏进程并写入远程代码
+//需要先用上面的方法获取 gameID
+//hWnd_this : 本窗口的句柄，非0时为基于消息的模式
+int ZaRemoteInit(int hWnd_this = 0, unsigned bMsg = 0);
+
+void ZaRemoteEnd();
 
 //检查游戏是否启动
 //titles : 需要检查的游戏标题列表
@@ -58,10 +63,6 @@ int ZaCheckGameStart(int numTitles, const char* titles[]);
 //        true  游戏已结束
 //        false 游戏未结束
 bool ZaCheckGameEnd();
-
-bool ZaOpenProcess();
-//注入代码，若hWnd_this != 0，则为消息模式
-bool ZaInjectRemoteCode(int gameId, int hWnd_this = 0, unsigned bMsg = 0);
 
 bool ZaRemoteRead(unsigned rAdd, void *buff, unsigned size);
 bool ZaRemoteWrite(unsigned rAdd, const void *buff, unsigned size);

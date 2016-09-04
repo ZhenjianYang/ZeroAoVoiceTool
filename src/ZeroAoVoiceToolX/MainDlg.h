@@ -7,15 +7,15 @@
 #define WM_MSG_BASE 0x800
 #define WM_MSG_ERROR (WM_MSG_BASE + 1)
 #define WM_MSG_STOP (WM_MSG_BASE + 2)
-#define WN_MSG_GAMEFOUND (WM_MSG_BASE + 10)
-#define WN_MSG_GAMEEXIT (WM_MSG_BASE + 20)
-#define WN_MSG_PLAYEND (WM_MSG_BASE + 30)
-#define WN_MSG_INITPLAYEREND (WM_MSG_BASE + 40)
-#define WN_MSG_REMOTEBASE (WM_MSG_BASE + 50)
-#define WN_MSG_LOADSCENA  (WN_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA)
-#define WN_MSG_LOADSCENA1 (WN_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA1)
-#define WN_MSG_LOADBLOCK  (WN_MSG_REMOTEBASE + MSGID_ADDER_LOADBLOCK)
-#define WN_MSG_SHOWTEXT   (WN_MSG_REMOTEBASE + MSGID_ADDER_SHOWTEXT)
+#define WM_MSG_GAMEFOUND (WM_MSG_BASE + 10)
+#define WM_MSG_GAMEEXIT (WM_MSG_BASE + 20)
+#define WM_MSG_PLAYEND (WM_MSG_BASE + 30)
+#define WM_MSG_INITPLAYEREND (WM_MSG_BASE + 40)
+#define WM_MSG_REMOTEBASE (WM_MSG_BASE + 50)
+#define WM_MSG_LOADSCENA  (WM_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA)
+#define WM_MSG_LOADSCENA1 (WM_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA1)
+#define WM_MSG_LOADBLOCK  (WM_MSG_REMOTEBASE + MSGID_ADDER_LOADBLOCK)
+#define WM_MSG_SHOWTEXT   (WM_MSG_REMOTEBASE + MSGID_ADDER_SHOWTEXT)
 
 class CMainDlg : public CDialogImpl<CMainDlg>, public CUpdateUI<CMainDlg>,
 		public CMessageFilter, public CIdleHandler
@@ -54,6 +54,16 @@ public:
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		MESSAGE_HANDLER(WM_CLOSE, OnClose)
 		COMMAND_HANDLER(IDC_BUTTON_START, BN_CLICKED, OnBnClickedButtonStart)
+		MESSAGE_HANDLER(WM_MSG_ERROR, OnError)
+		MESSAGE_HANDLER(WM_MSG_STOP, OnStop)
+		MESSAGE_HANDLER(WM_MSG_GAMEFOUND, OnGameFound)
+		MESSAGE_HANDLER(WM_MSG_GAMEEXIT, OnGameExit)
+		MESSAGE_HANDLER(WM_MSG_PLAYEND, OnPlayEnd)
+		MESSAGE_HANDLER(WM_MSG_INITPLAYEREND, OnInitPlayerEnd)
+		MESSAGE_HANDLER(WM_MSG_LOADSCENA, OnRLoadScena)
+		MESSAGE_HANDLER(WM_MSG_LOADSCENA1, OnRLoadScena1)
+		MESSAGE_HANDLER(WM_MSG_LOADBLOCK, OnRLoadBlock)
+		MESSAGE_HANDLER(WM_MSG_SHOWTEXT, OnRShowText)
 	END_MSG_MAP()
 
 // Handler prototypes (uncomment arguments if needed):
@@ -69,6 +79,17 @@ public:
 	void CloseDialog(int nVal);
 
 	LRESULT OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+
+	LRESULT OnError(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnStop(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnGameExit(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnPlayEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnInitPlayerEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnRLoadScena(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnRLoadScena1(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnRLoadBlock(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	static void SetWorkPath();
 
@@ -87,6 +108,8 @@ public:
 
 	Status m_status;
 	CButton m_button_start;
+
+	int gameID;
 
 	static HANDLE s_th_monitor;
 	static HWND s_hWnd_main;

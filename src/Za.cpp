@@ -18,7 +18,7 @@ void ZaVoiceStartup(int argc, char * argv[])
 
 	int logparam = 0;
 	if (!g_zaConfig->General.OpenDebugLog) {
-		logparam = ZALOG_OUT_STDOUT | ZALOG_TYPE_INFO | ZALOG_TYPE_INFO | ZALOG_PARAM_NOPREINFO;
+		logparam = ZALOG_OUT_STDOUT | ZALOG_TYPE_INFO | ZALOG_TYPE_ERROR | ZALOG_PARAM_NOPREINFO;
 	}
 	else {
 		logparam = ZALOG_OUT_STDLOG | ZALOG_TYPE_ALL;
@@ -40,12 +40,19 @@ void ZaVoiceStartup(int argc, char * argv[])
 }
 
 void ZaMain() {
+	int errc;
 	ZALOG("准备中...");
-	int gameID = ZaRemoteInit(g_zaConfig->General.Mode);
-	if (gameID != GAMEID_AO && gameID != GAMEID_ZERO) {
+
+	ZALOG("等待游戏运行...");
+	int gameID = ZaRemoteWaitGameStart(g_zaConfig->General.Mode);
+	ZALOG("游戏已启动！");
+
+	errc = ZaRemoteInit();
+	if (errc) {
 		ZALOG_ERROR("准备活动失败！");
 		return;
 	}
+
 	ZaConfigSetActive(gameID);
 	ZALOG("就绪");
 
@@ -62,15 +69,15 @@ void ZaMain() {
 
 	while (!ZaCheckGameEnd())
 	{
-		int errc = ZaVoicePlayerLoopOne();
+		errc = ZaVoicePlayerLoopOne();
 		Sleep(g_zaConfig->General.SleepTime);
 	}
 	ZALOG("游戏已退出！");
 	ZALOG("已退出语音播放系统");
 
-	ZaRemoteFinish();
+	ZaVoicePlayerEnd();
+	ZaRemoteEnd();
 }
-
 
 void SetWorkPath(const char * exepath)
 {

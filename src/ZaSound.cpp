@@ -23,7 +23,9 @@ void ADR_CALL AdrStopCallBack::streamStopped(audiere::StopEvent * event)
 
 int ZaSoundInit(float volume)
 {
+	ZaSoundSetStopCallBack(nullptr);
 	ZaSoundStop();
+
 	ZaSoundSetVolumn(volume);
 	
 	if (!_device.get()) {
@@ -33,7 +35,15 @@ int ZaSoundInit(float volume)
 	if (!_device.get())
 		return 1;
 
+	return 0;
+}
+
+int ZaSoundEnd()
+{
 	ZaSoundSetStopCallBack(nullptr);
+	ZaSoundStop();
+	_soundStream = nullptr;
+
 	return 0;
 }
 
@@ -73,9 +83,11 @@ void ZaSoundStop()
 		_soundStream->stop();
 }
 
-void ZaSoundSetStopCallBack(StopCallBack stopCallBack /*= nullptr*/, void* param /*= nullptr*/)
+void ZaSoundSetStopCallBack(StopCallBack stopCallBack /*= nullptr*/, void* _param /*= nullptr*/)
 {
-	_callBackParam = param;
+	if (!_device.get()) return;
+
+	_callBackParam = _param;
 	
 	if (stopCallBack == nullptr) {
 		_callBack = nullptr;

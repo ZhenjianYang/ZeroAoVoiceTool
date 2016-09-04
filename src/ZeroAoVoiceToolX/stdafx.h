@@ -18,6 +18,8 @@
 #include <atlctrls.h>
 #include <atldlgs.h>
 
+#include <ZaConst.h>
+
 extern CAppModule _Module;
 
 #include <atlwin.h>

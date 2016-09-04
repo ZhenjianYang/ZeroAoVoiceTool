@@ -86,6 +86,7 @@ void CMainDlg::CloseDialog(int nVal)
 	DestroyWindow();
 	::PostQuitMessage(nVal);
 }
+
 LRESULT CMainDlg::OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -116,6 +117,47 @@ LRESULT CMainDlg::OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWN
 	return 0;
 }
 
+LRESULT CMainDlg::OnError(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+LRESULT CMainDlg::OnStop(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+LRESULT CMainDlg::OnGameExit(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+LRESULT CMainDlg::OnPlayEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+LRESULT CMainDlg::OnInitPlayerEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+LRESULT CMainDlg::OnRLoadScena(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+LRESULT CMainDlg::OnRLoadScena1(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+LRESULT CMainDlg::OnRLoadBlock(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+LRESULT CMainDlg::OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return 0;
+}
+
 void CMainDlg::SetWorkPath() {
 	char buff[1024];
 	GetModuleFileName(NULL, (LPSTR)buff, sizeof(buff));
@@ -143,7 +185,7 @@ void CMainDlg::Monitor_GameStart() {
 	if (index == 0 && g_zaConfig->General.Mode != MODE_AO
 		|| index == 1 && g_zaConfig->General.Mode != MODE_ZERO)
 		::SendMessage(s_hWnd_main,
-			WN_MSG_GAMEFOUND,
+			WM_MSG_GAMEFOUND,
 			index == 0 ? GAMEID_ZERO : GAMEID_ZERO,
 			0
 		);
@@ -151,7 +193,7 @@ void CMainDlg::Monitor_GameStart() {
 void CMainDlg::Monitor_GameExit() {
 	if (ZaCheckGameEnd()) {
 		::SendMessage(s_hWnd_main,
-			WN_MSG_GAMEEXIT,
+			WM_MSG_GAMEEXIT,
 			0,
 			0
 		);
@@ -209,7 +251,7 @@ DWORD WINAPI CMainDlg::Thread_InitVoicePlayer(LPVOID lpParmeter) {
 	}
 	else {
 		::SendMessage(s_hWnd_main,
-			WN_MSG_INITPLAYEREND,
+			WM_MSG_INITPLAYEREND,
 			0,
 			0
 		);

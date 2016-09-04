@@ -6,10 +6,10 @@
 
 using namespace std;
 
-static ZaConfig struZaConfig;
-static ZaConfig* ptrZaConfig = &struZaConfig;
+static ZaConfig _struZaConfig;
+static ZaConfig* _ptrZaConfig = &_struZaConfig;
 
-const ZaConfig* const &g_zaConfig = ptrZaConfig;
+const ZaConfig* const &g_zaConfig = _ptrZaConfig;
 
 static void ZaConfigSetDefault();
 
@@ -77,7 +77,7 @@ static bool SetIntVaule(int& value, const char* buff) {
 	return true;
 }
 
-#define BUFF_SIZE 1204
+#define BUFF_SIZE 1024
 void ZaConfigLoad(const char * configFile)
 {
 	ZaConfigSetDefault();
@@ -110,34 +110,34 @@ void ZaConfigLoad(const char * configFile)
 		else if (Compare(pb, STR_Ao)) gameID = GAMEID_AO;
 		else if (Compare(pb, STR_Zero)) gameID = GAMEID_ZERO;
 		else if (p = Compare(pb, STR_VoiceFileDirectory)) {
-			if(gameID & GAMEID_AO) failed = !SetStrVaule(struZaConfig.Ao.VoiceDir, pb + p);
-			if(gameID & GAMEID_ZERO) failed = !SetStrVaule(struZaConfig.Zero.VoiceDir, pb + p);
+			if(gameID & GAMEID_AO) failed = !SetStrVaule(_struZaConfig.Ao.VoiceDir, pb + p);
+			if(gameID & GAMEID_ZERO) failed = !SetStrVaule(_struZaConfig.Zero.VoiceDir, pb + p);
 		}
 		else if (p = Compare(pb, STR_VoiceFileExtension)) {
-			if (gameID & GAMEID_AO) failed = !SetVStrVaule(struZaConfig.Ao.VoiceExt, pb + p);
-			if (gameID & GAMEID_ZERO) failed = !SetVStrVaule(struZaConfig.Zero.VoiceExt, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetVStrVaule(_struZaConfig.Ao.VoiceExt, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetVStrVaule(_struZaConfig.Zero.VoiceExt, pb + p);
 		}
 		else if (p = Compare(pb, STR_VoiceTableFileDirectory)) {
-			if (gameID & GAMEID_AO) failed = !SetStrVaule(struZaConfig.Ao.VtblDir, pb + p);
-			if (gameID & GAMEID_ZERO) failed = !SetStrVaule(struZaConfig.Zero.VtblDir, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetStrVaule(_struZaConfig.Ao.VtblDir, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetStrVaule(_struZaConfig.Zero.VtblDir, pb + p);
 		}
 		else if (p = Compare(pb, STR_VoiceTableFileExtension)) {
-			if (gameID & GAMEID_AO) failed = !SetStrVaule(struZaConfig.Ao.VtblExt, pb + p);
-			if (gameID & GAMEID_ZERO) failed = !SetStrVaule(struZaConfig.Zero.VtblExt, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetStrVaule(_struZaConfig.Ao.VtblExt, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetStrVaule(_struZaConfig.Zero.VtblExt, pb + p);
 		}
 		else if (p = Compare(pb, STR_DisableOriginalVoice)) {
-			if (gameID & GAMEID_AO) failed = !SetIntVaule(struZaConfig.Ao.DisableOriginalVoice, pb + p);
-			if (gameID & GAMEID_ZERO) failed = !SetIntVaule(struZaConfig.Zero.DisableOriginalVoice, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetIntVaule(_struZaConfig.Ao.DisableOriginalVoice, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetIntVaule(_struZaConfig.Zero.DisableOriginalVoice, pb + p);
 		}
 		else if (p = Compare(pb, STR_Volume)) {
-			if (gameID & GAMEID_AO) failed = !SetIntVaule(struZaConfig.Ao.Volume, pb + p);
-			if (gameID & GAMEID_ZERO) failed = !SetIntVaule(struZaConfig.Zero.Volume, pb + p);
+			if (gameID & GAMEID_AO) failed = !SetIntVaule(_struZaConfig.Ao.Volume, pb + p);
+			if (gameID & GAMEID_ZERO) failed = !SetIntVaule(_struZaConfig.Zero.Volume, pb + p);
 		}
 		else if (p = Compare(pb, STR_OpenDebugLog)) {
-			failed = !SetIntVaule(struZaConfig.General.OpenDebugLog, pb + p);
+			failed = !SetIntVaule(_struZaConfig.General.OpenDebugLog, pb + p);
 		}
 		else if (p = Compare(pb, STR_UseLogFile)) {
-			failed = !SetIntVaule(struZaConfig.General.UseLogFile, pb + p);
+			failed = !SetIntVaule(_struZaConfig.General.UseLogFile, pb + p);
 		}
 		else failed = true;
 
@@ -152,12 +152,12 @@ void ZaConfigSetActive(int gameID)
 	switch (gameID)
 	{
 	case GAMEID_ZERO:
-		ptrZaConfig->ActiveGameID = GAMEID_ZERO;
-		ptrZaConfig->ActiveGame = &ptrZaConfig->Zero;
+		_ptrZaConfig->ActiveGameID = GAMEID_ZERO;
+		_ptrZaConfig->ActiveGame = &_ptrZaConfig->Zero;
 		break;
 	case GAMEID_AO:
-		ptrZaConfig->ActiveGameID = GAMEID_AO;
-		ptrZaConfig->ActiveGame = &ptrZaConfig->Ao;
+		_ptrZaConfig->ActiveGameID = GAMEID_AO;
+		_ptrZaConfig->ActiveGame = &_ptrZaConfig->Ao;
 		break;
 	default:
 		break;
@@ -166,39 +166,39 @@ void ZaConfigSetActive(int gameID)
 }
 
 void ZaConfigSetDefault() {
-	struZaConfig.ActiveGameID = GAMEID_INVALID;
-	struZaConfig.ActiveGame = nullptr;
+	_struZaConfig.ActiveGameID = GAMEID_INVALID;
+	_struZaConfig.ActiveGame = nullptr;
 
-	struZaConfig.General.OpenDebugLog = DFT_DEBUGLOG;
-	struZaConfig.General.UseLogFile = DFT_USELOGFILE;
+	_struZaConfig.General.OpenDebugLog = DFT_DEBUGLOG;
+	_struZaConfig.General.UseLogFile = DFT_USELOGFILE;
 
-	struZaConfig.General.SleepTime = DFT_SLEEP_TIME;
-	struZaConfig.General.RemoveFwdCtrlCh = DFT_RMFWDCTRLCH;
-	struZaConfig.General.Mode = MODE_AUTO;
-
-
-	struZaConfig.Zero.VoiceDir = Z_DFT_VOICE_DIR;
-	struZaConfig.Zero.VoiceExt = Z_DFT_VOICE_EXT;
-	struZaConfig.Zero.VoiceName = Z_DFT_VOICE_NAME;
-
-	struZaConfig.Zero.VtblExt = Z_DFT_VOICETABLE_EXT;
-	struZaConfig.Zero.VtblDir = Z_DFT_VOICETABLE_DIR;
-
-	struZaConfig.Zero.Volume = Z_DFT_VOLUME;
-	struZaConfig.Zero.DisableOriginalVoice = Z_DFT_DISABLE_ORIVOICE;
-
-	struZaConfig.Zero.VoiceIdLength = Z_LENGTH_VOICE_ID;
+	_struZaConfig.General.SleepTime = DFT_SLEEP_TIME;
+	_struZaConfig.General.RemoveFwdCtrlCh = DFT_RMFWDCTRLCH;
+	_struZaConfig.General.Mode = MODE_AUTO;
 
 
-	struZaConfig.Ao.VoiceDir = A_DFT_VOICE_DIR;
-	struZaConfig.Ao.VoiceExt = A_DFT_VOICE_EXT;
-	struZaConfig.Ao.VoiceName = A_DFT_VOICE_NAME;
+	_struZaConfig.Zero.VoiceDir = Z_DFT_VOICE_DIR;
+	_struZaConfig.Zero.VoiceExt = Z_DFT_VOICE_EXT;
+	_struZaConfig.Zero.VoiceName = Z_DFT_VOICE_NAME;
 
-	struZaConfig.Ao.VtblExt = A_DFT_VOICETABLE_EXT;
-	struZaConfig.Ao.VtblDir = A_DFT_VOICETABLE_DIR;
+	_struZaConfig.Zero.VtblExt = Z_DFT_VOICETABLE_EXT;
+	_struZaConfig.Zero.VtblDir = Z_DFT_VOICETABLE_DIR;
 
-	struZaConfig.Ao.Volume = A_DFT_VOLUME;
-	struZaConfig.Ao.DisableOriginalVoice = A_DFT_DISABLE_ORIVOICE;
+	_struZaConfig.Zero.Volume = Z_DFT_VOLUME;
+	_struZaConfig.Zero.DisableOriginalVoice = Z_DFT_DISABLE_ORIVOICE;
 
-	struZaConfig.Ao.VoiceIdLength = A_LENGTH_VOICE_ID;
+	_struZaConfig.Zero.VoiceIdLength = Z_LENGTH_VOICE_ID;
+
+
+	_struZaConfig.Ao.VoiceDir = A_DFT_VOICE_DIR;
+	_struZaConfig.Ao.VoiceExt = A_DFT_VOICE_EXT;
+	_struZaConfig.Ao.VoiceName = A_DFT_VOICE_NAME;
+
+	_struZaConfig.Ao.VtblExt = A_DFT_VOICETABLE_EXT;
+	_struZaConfig.Ao.VtblDir = A_DFT_VOICETABLE_DIR;
+
+	_struZaConfig.Ao.Volume = A_DFT_VOLUME;
+	_struZaConfig.Ao.DisableOriginalVoice = A_DFT_DISABLE_ORIVOICE;
+
+	_struZaConfig.Ao.VoiceIdLength = A_LENGTH_VOICE_ID;
 }

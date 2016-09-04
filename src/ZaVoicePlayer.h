@@ -3,6 +3,8 @@
 
 //语音播放循环初始化
 int ZaVoicePlayerInit();
+//结束语音播放循环
+int ZaVoicePlayerEnd();
 
 //进行一次语音播放循环
 int ZaVoicePlayerLoopOne();
