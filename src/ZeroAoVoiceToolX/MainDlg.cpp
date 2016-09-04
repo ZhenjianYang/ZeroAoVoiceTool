@@ -34,6 +34,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	s_hWnd_main = this->m_hWnd;
 	s_th_monitor = CreateThread(NULL, 0, CMainDlg::Thread_Monitor, NULL, 0, NULL);
+	s_th_initplayer = NULL;
 
 	SetWorkPath();
 	ZaConfigLoad(DFT_CONFIG_FILE);
@@ -101,7 +102,7 @@ LRESULT CMainDlg::OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWN
 		RemoveMonitorFunc(CMainDlg::Monitor_GameStart);
 		m_status = CMainDlg::Idle;
 		break;
-	case CMainDlg::LoadingVoiceTable:
+	case CMainDlg::InitVoicePlayer:
 		m_button_start.SetWindowTextA("Start");
 		m_status = CMainDlg::Idle;
 		break;
@@ -139,8 +140,9 @@ void CMainDlg::Monitor_GameStart() {
 	int index = ZaCheckGameStart(sizeof(tbuf) / sizeof(*tbuf), tbuf);
 	if (index < 0) return;
 
-	if (index == 0 && g_zaConfig->General.Mode != MODE_AO)
-		SendMessageA(s_hWnd_main,
+	if (index == 0 && g_zaConfig->General.Mode != MODE_AO
+		|| index == 1 && g_zaConfig->General.Mode != MODE_ZERO)
+		::SendMessage(s_hWnd_main,
 			WN_MSG_GAMEFOUND,
 			index == 0 ? GAMEID_ZERO : GAMEID_ZERO,
 			0
@@ -148,7 +150,7 @@ void CMainDlg::Monitor_GameStart() {
 }
 void CMainDlg::Monitor_GameExit() {
 	if (ZaCheckGameEnd()) {
-		SendMessageA(s_hWnd_main,
+		::SendMessage(s_hWnd_main,
 			WN_MSG_GAMEEXIT,
 			0,
 			0
@@ -167,13 +169,14 @@ bool CMainDlg::AddMonitorFunc(MonitorFunc func) {
 	int count = 0;
 	for (MonitorFunc *p = pmfs; p < pmf_end; ++p)
 		if (*p == NULL) {
-			*p = func;
-			++count;
+			*p = func; func = NULL;
 		}
-	if (count == 1) {
-		ResumeThread(s_th_monitor); return true;
+		else
+			++count;
+	if (count == 0) {
+		ResumeThread(s_th_monitor); 
 	}
-	return false;
+	return pmf_end - pmfs == count;
 }
 void CMainDlg::RemoveMonitorFunc(MonitorFunc func) {
 	for (MonitorFunc *p = pmfs; p < pmf_end; ++p)
@@ -192,7 +195,28 @@ DWORD WINAPI CMainDlg::Thread_Monitor(LPVOID lpParmeter) {
 		if (count == 0) SuspendThread(s_th_monitor);
 		Sleep(1000);
 	}
+	return 0;
 }
 
+DWORD WINAPI CMainDlg::Thread_InitVoicePlayer(LPVOID lpParmeter) {
+	int errc = ZaVoicePlayerInit();
+	if (errc) {
+		::SendMessage(s_hWnd_main,
+			WM_MSG_ERROR,
+			CMainDlg::InitVoicePlayerFailed,
+			0
+		);
+	}
+	else {
+		::SendMessage(s_hWnd_main,
+			WN_MSG_INITPLAYEREND,
+			0,
+			0
+		);
+	}
+	return errc;
+}
+
+HANDLE CMainDlg::s_th_initplayer;
 HANDLE CMainDlg::s_th_monitor;
 HWND CMainDlg::s_hWnd_main;

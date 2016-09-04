@@ -5,10 +5,12 @@
 #pragma once
 
 #define WM_MSG_BASE 0x800
+#define WM_MSG_ERROR (WM_MSG_BASE + 1)
+#define WM_MSG_STOP (WM_MSG_BASE + 2)
 #define WN_MSG_GAMEFOUND (WM_MSG_BASE + 10)
 #define WN_MSG_GAMEEXIT (WM_MSG_BASE + 20)
 #define WN_MSG_PLAYEND (WM_MSG_BASE + 30)
-#define WN_MSG_LOADVTBLEND (WM_MSG_BASE + 40)
+#define WN_MSG_INITPLAYEREND (WM_MSG_BASE + 40)
 #define WN_MSG_REMOTEBASE (WM_MSG_BASE + 50)
 #define WN_MSG_LOADSCENA  (WN_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA)
 #define WN_MSG_LOADSCENA1 (WN_MSG_REMOTEBASE + MSGID_ADDER_LOADSCENA1)
@@ -23,10 +25,14 @@ public:
 		IDD = IDD_MAINDLG,
 	};
 	enum Status {
-		Idle,
+		Idle = 0,
 		WaitingGameStart,
-		LoadingVoiceTable,
+		InitVoicePlayer,
 		Running,
+	};
+	enum ErrorType {
+		Unknow = 0,
+		InitVoicePlayerFailed,
 	};
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg)
@@ -77,9 +83,12 @@ public:
 	static void RemoveMonitorFunc(MonitorFunc func);
 	static DWORD WINAPI Thread_Monitor(LPVOID lpParmeter);
 
+	static DWORD WINAPI Thread_InitVoicePlayer(LPVOID lpParmeter);
+
 	Status m_status;
 	CButton m_button_start;
 
 	static HANDLE s_th_monitor;
 	static HWND s_hWnd_main;
+	static HANDLE s_th_initplayer;
 };
