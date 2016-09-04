@@ -47,7 +47,7 @@ int ZaRemoteWaitGameStart(int mode);
 //初始化，打开游戏进程并写入远程代码
 //需要先用上面的方法获取 gameID
 //hWnd_this : 本窗口的句柄，非0时为基于消息的模式
-int ZaRemoteInit(int hWnd_this = 0, unsigned bMsg = 0);
+int ZaRemoteInit(int gameID, int hWnd_this = 0, unsigned bMsg = 0);
 
 void ZaRemoteEnd();
 

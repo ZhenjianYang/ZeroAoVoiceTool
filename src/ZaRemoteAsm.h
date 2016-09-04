@@ -275,8 +275,8 @@ __declspec(naked) void rNewLoadScenaMsg()
 		push eax
 		push FAKE_MESSAGE_ID
 		push FAKE_HWND
-		mov eax, [FAKE_PTR_API]
-		call eax
+		mov eax, FAKE_PTR_API
+		call dword ptr[eax]
 
 		pop ecx
 		pop ebx
@@ -381,8 +381,8 @@ __declspec(naked) void rNewShowTextMsg()
 		push eax
 		push FAKE_MESSAGE_ID
 		push FAKE_HWND
-		mov eax, [FAKE_PTR_API]
-		call eax
+		mov eax, FAKE_PTR_API
+		call dword ptr [eax]
 
 	rNewShowTextEnd :
 		pop ecx

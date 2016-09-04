@@ -32,7 +32,9 @@ public:
 	};
 	enum ErrorType {
 		Unknow = 0,
+		InitRemoteFailed,
 		InitVoicePlayerFailed,
+		ReadRemoteDataFailedRunning
 	};
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg)
@@ -106,10 +108,13 @@ public:
 
 	static DWORD WINAPI Thread_InitVoicePlayer(LPVOID lpParmeter);
 
+	static int PlayEndCallBack(void*);
+
 	Status m_status;
 	CButton m_button_start;
 
-	int gameID;
+	int m_gameID;
+	ZAData m_zadata;
 
 	static HANDLE s_th_monitor;
 	static HWND s_hWnd_main;

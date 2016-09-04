@@ -19,6 +19,7 @@
 #include <atldlgs.h>
 
 #include <ZaConst.h>
+#include <ZaRemote.h>
 
 extern CAppModule _Module;
 

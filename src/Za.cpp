@@ -47,7 +47,7 @@ void ZaMain() {
 	int gameID = ZaRemoteWaitGameStart(g_zaConfig->General.Mode);
 	ZALOG("游戏已启动！");
 
-	errc = ZaRemoteInit();
+	errc = ZaRemoteInit(gameID);
 	if (errc) {
 		ZALOG_ERROR("准备活动失败！");
 		return;

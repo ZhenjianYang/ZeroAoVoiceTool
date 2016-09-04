@@ -51,11 +51,9 @@ int ZaRemoteWaitGameStart(int mode)
 
 	ZALOG("游戏标题为：%s", tbuf[index]);
 
-	if (mode == MODE_AUTO) _gameID = index == 0 ? GAMEID_ZERO : GAMEID_AO;
-	else if (mode == MODE_AO) _gameID = GAMEID_AO;
-	else _gameID = GAMEID_ZERO;
-
-	return _gameID;
+	if (mode == MODE_AUTO) return index == 0 ? GAMEID_ZERO : GAMEID_AO;
+	else if (mode == MODE_AO) return GAMEID_AO;
+	else return GAMEID_ZERO;
 }
 
 int ZaCheckGameStart(int numTitles, const char* titles[]) {
@@ -91,7 +89,7 @@ bool ZaRemoteFree(unsigned rAdd, unsigned size) {
 	return VirtualFreeEx(_hProcess, (LPVOID)rAdd, size, MEM_DECOMMIT);
 }
 
-int ZaRemoteInit(int hWnd_this /*= 0*/, unsigned bMsg /*= 0*/)
+int ZaRemoteInit(int gameID, int hWnd_this /*= 0*/, unsigned bMsg /*= 0*/)
 {
 #if !_DEBUG
 	//对旧系统的支持
@@ -102,6 +100,7 @@ int ZaRemoteInit(int hWnd_this /*= 0*/, unsigned bMsg /*= 0*/)
 		enableDebugPriv();
 	}
 #endif
+	_gameID = gameID;
 
 	ZALOG("访问游戏进程...");
 	if (!ZaOpenProcess()) {
@@ -130,7 +129,9 @@ void ZaRemoteEnd()
 		{
 			ZALOG_ERROR("清理远程失败！");
 		}
-		ZALOG_DEBUG("清理远程成功");
+		else {
+			ZALOG_DEBUG("清理远程成功");
+		}
 	}
 
 	CloseHandle(_hProcess); 
@@ -167,7 +168,7 @@ bool ZaInjectRemoteCode(int hWnd_this, unsigned bMsg) {
 	const unsigned ptr_apipmsg = _gameID == GAMEID_AO ? a_ptr_apipmsg : z_ptr_apipmsg;
 	const unsigned *rOldJctoList = _gameID == GAMEID_AO ? a_rOldJctoList : z_rOldJctoList;
 	const unsigned *rAddrJcList = _gameID == GAMEID_AO ? a_rAddrJcList : z_rAddrJcList;
-
+	const void* *NewCJList = hWnd_this ? rNewCJListMsg : rNewCJList;
 	unsigned rAddrNewJc[numJc];
 
 	unsigned char buff[MAX_REMOTE_DADA_SIZE];
@@ -176,7 +177,7 @@ bool ZaInjectRemoteCode(int hWnd_this, unsigned bMsg) {
 	unsigned p = sizeof(ZAData); PACK(p, REMOTE_DATA_PACK);
 	for (int i = 0; i < numJc; ++i) {
 		rAddrNewJc[i] = p;
-		unsigned char *t = (unsigned char *)rNewCJList[i];
+		unsigned char *t = (unsigned char *)NewCJList[i];
 		if (*t == JMP_CODE) t += *(unsigned *)(t + 1) + 5;//debug版对策
 
 		for (;;) {
@@ -218,8 +219,6 @@ bool ZaInjectRemoteCode(int hWnd_this, unsigned bMsg) {
 			}
 			else if (*(unsigned *)(buff + p) == FAKE_PTR_API) {
 				*(unsigned *)(buff + p) = ptr_apipmsg;
-				buff[p - 1] = FAKE_CALLPTR_CODE2;
-				buff[p - 2] = FAKE_CALLPTR_CODE1;
 				p += 4;
 			}
 			else if (buff[p] == FAKE_CODE2
