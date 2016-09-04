@@ -77,16 +77,15 @@ void _zalog_print(int type, const char* format, ...) {
 
 	char tbuff[2048];
 
-	time_t tt;
-	tm ltime, *ptm = &ltime;
-	time(&tt);
-	localtime_s(ptm, &tt);
+	SYSTEMTIME tm;
+	LPSYSTEMTIME ptm = &tm;
+	GetLocalTime(ptm);
 
 	int len = 0;
 	if (!(_param & ZALOG_PARAM_NOPREINFO)) {
-		len = sprintf_s(tbuff, "[%02d-%02d-%02d %02d:%02d:%02d][%s]",
-			ptm->tm_year - 100, ptm->tm_mon + 1, ptm->tm_mday,
-			ptm->tm_hour, ptm->tm_min, ptm->tm_sec,
+		len = sprintf_s(tbuff, "[%02d-%02d-%02d %02d:%02d:%02d.%03d][%s]",
+			ptm->wYear, ptm->wMonth, ptm->wDay,
+			ptm->wHour, ptm->wMinute, ptm->wSecond, ptm->wMilliseconds,
 			strmark);
 	}
 
