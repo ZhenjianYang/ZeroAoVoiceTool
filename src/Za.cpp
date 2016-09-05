@@ -5,6 +5,7 @@
 #include "ZaConfig.h"
 #include "ZaRemote.h"
 #include "ZaVoicePlayer.h"
+#include "ZaSound.h"
 
 #include <Windows.h>
 
@@ -43,6 +44,9 @@ void ZaMain() {
 	int errc;
 	ZALOG("准备中...");
 
+	ZaSoundInit();
+	ZALOG("音频系统已启动");
+
 	ZALOG("等待游戏运行...");
 	int gameID = ZaRemoteWaitGameStart(g_zaConfig->General.Mode);
 	ZALOG("游戏已启动！");
@@ -54,6 +58,7 @@ void ZaMain() {
 	}
 
 	ZaConfigSetActive(gameID);
+	ZaSoundSetVolumn(g_zaConfig->ActiveGame->Volume);
 	ZALOG("就绪");
 
 	ZaVoicePlayerInit();
@@ -73,10 +78,13 @@ void ZaMain() {
 		Sleep(g_zaConfig->General.SleepTime);
 	}
 	ZALOG("游戏已退出！");
-	ZALOG("已退出语音播放系统");
-
+	
 	ZaVoicePlayerEnd();
+	ZALOG("已退出语音播放系统");
 	ZaRemoteEnd();
+	ZALOG_DEBUG("已关闭远程进程句柄");
+	ZaSoundEnd();
+	ZALOG("已关闭音频系统");
 }
 
 void SetWorkPath(const char * exepath)

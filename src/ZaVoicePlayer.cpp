@@ -143,8 +143,6 @@ bool ZaPlayVoice(int voiceID, char *out_filename) {
 }
 
 int ZaVoicePlayerInit(void* data /*= 0*/){
-	ZaSoundInit(g_zaConfig->ActiveGame->Volume);
-	
 	memset(&_zaData, 0, sizeof(_zaData));
 	memset(&_zaData_old, 0, sizeof(_zaData_old));
 	ZaClearWait();
@@ -156,7 +154,6 @@ int ZaVoicePlayerInit(void* data /*= 0*/){
 
 int ZaVoicePlayerEnd()
 {
-	ZaSoundEnd();
 	ZaScenaAnalyzerEnd();
 	ZaClearWait();
 

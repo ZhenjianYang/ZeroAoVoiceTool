@@ -25,14 +25,15 @@ public:
 	enum {
 		IDD = IDD_MAINDLG,
 	};
-	enum Status {
+	enum class Status {
 		Idle = 0,
 		WaitingGameStart,
 		InitVoicePlayer,
 		StoppingInitVoicePlayer,
 		Running,
+		Exitting
 	};
-	enum ErrorType {
+	enum class ErrorType {
 		Unknow = 0,
 		InitRemoteFailed,
 		InitVoicePlayerFailed,
@@ -123,5 +124,7 @@ public:
 	static HANDLE s_th_monitor;
 	static HWND s_hWnd_main;
 	static HANDLE s_th_initplayer;
-	static unsigned s_sign_stop;
+	static HANDLE s_event_monitor;
+	static unsigned s_sign_initplayerstop;
+	static unsigned s_sign_monitorstop;
 };

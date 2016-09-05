@@ -43,6 +43,7 @@ int ZaSoundEnd()
 	ZaSoundSetStopCallBack(nullptr);
 	ZaSoundStop();
 	_soundStream = nullptr;
+	_device = nullptr;
 
 	return 0;
 }
