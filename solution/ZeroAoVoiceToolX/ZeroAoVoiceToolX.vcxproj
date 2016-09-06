@@ -135,7 +135,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ExceptionHandling />
       <DebugInformationFormat />
-      <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/EHs %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -163,7 +163,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties RESOURCE_FILE="\ZJ.Yang\Documents\GitHub\ZeroAoVoiceTool\src\ZeroAoVoiceToolX\ZeroAoVoiceToolX.rc" />
+      <UserProperties RESOURCE_FILE="..\..\src\ZeroAoVoiceToolX\ZeroAoVoiceToolX.rc" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
