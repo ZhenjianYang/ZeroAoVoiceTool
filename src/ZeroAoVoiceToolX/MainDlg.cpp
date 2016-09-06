@@ -57,6 +57,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	if (g_zaConfig->General.OpenDebugLog) {
 		AllocConsole();
+		::DeleteMenu(::GetSystemMenu(GetConsoleWindow(), FALSE), SC_CLOSE, MF_BYCOMMAND);
 		freopen("CONOUT$", "a+", stderr);
 	}
 
