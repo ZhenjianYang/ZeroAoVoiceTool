@@ -70,6 +70,14 @@ public:
 		MESSAGE_HANDLER(WM_MSG_LOADSCENA1, OnRLoadScena1)
 		MESSAGE_HANDLER(WM_MSG_LOADBLOCK, OnRLoadBlock)
 		MESSAGE_HANDLER(WM_MSG_SHOWTEXT, OnRShowText)
+		NOTIFY_HANDLER(IDC_SLIDER_ZV, NM_CUSTOMDRAW, OnNMCustomdrawSliderV)
+		NOTIFY_HANDLER(IDC_SPIN_ZV, UDN_DELTAPOS, OnDeltaposSpinV)
+		NOTIFY_HANDLER(IDC_SLIDER_AV, NM_CUSTOMDRAW, OnNMCustomdrawSliderV)
+		NOTIFY_HANDLER(IDC_SPIN_AV, UDN_DELTAPOS, OnDeltaposSpinV)
+		COMMAND_HANDLER(IDC_BUTTON_ZVB, BN_CLICKED, OnBnClickedButtonVb)
+		COMMAND_HANDLER(IDC_BUTTON_ZVTB, BN_CLICKED, OnBnClickedButtonVb)
+		COMMAND_HANDLER(IDC_BUTTON_AVB, BN_CLICKED, OnBnClickedButtonVb)
+		COMMAND_HANDLER(IDC_BUTTON_AVTB, BN_CLICKED, OnBnClickedButtonVb)
 	END_MSG_MAP()
 
 // Handler prototypes (uncomment arguments if needed):
@@ -98,6 +106,36 @@ public:
 	LRESULT OnRLoadBlock(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
+	LRESULT OnNMCustomdrawSliderV(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/);
+	LRESULT OnDeltaposSpinV(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/);
+	LRESULT OnBnClickedButtonVb(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+private:
+	void LoadConfig();
+
+public:
+	Status m_status;
+	CButton m_button_start;
+
+	CStatic m_group_zero;
+	CStatic m_static_zvp, m_static_zve, m_static_zvtp, m_static_zvte, m_static_zv;
+	CEdit m_edit_zvp, m_edit_zve, m_edit_zvtp, m_edit_zvte, m_edit_zv;
+	CButton m_button_zvb, m_button_zvtb;
+	CTrackBarCtrl m_slider_zv;
+	CUpDownCtrl m_spin_zv;
+	CButton m_check_zdov;
+
+	CStatic m_group_ao;
+	CStatic m_static_avp, m_static_ave, m_static_avtp, m_static_avte, m_static_av;
+	CEdit m_edit_avp, m_edit_ave, m_edit_avtp, m_edit_avte, m_edit_av;
+	CButton m_button_avb, m_button_avtb;
+	CTrackBarCtrl m_slider_av;
+	CUpDownCtrl m_spin_av;
+	CButton m_check_adov;
+
+	int m_gameID;
+	ZAData m_zadata;
+
+public:
 	static void SetWorkPath();
 
 	typedef void(*MonitorFunc)();
@@ -114,12 +152,6 @@ public:
 	static DWORD WINAPI Thread_InitVoicePlayer(LPVOID lpParmeter);
 
 	static int PlayEndCallBack(void*);
-
-	Status m_status;
-	CButton m_button_start;
-
-	int m_gameID;
-	ZAData m_zadata;
 
 	static HANDLE s_th_monitor;
 	static HWND s_hWnd_main;

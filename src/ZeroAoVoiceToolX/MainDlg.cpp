@@ -31,7 +31,52 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	UIAddChildWindowContainer(m_hWnd);
 
 	m_status = Status::Idle;
+
 	m_button_start = this->GetDlgItem(IDC_BUTTON_START);
+	
+	m_group_zero = this->GetDlgItem(IDC_GROUP_ZERO);
+	m_static_zvp = this->GetDlgItem(IDC_STATIC_ZVP);
+	m_edit_zvp = this->GetDlgItem(IDC_EDIT_ZVP);
+	m_button_zvb = this->GetDlgItem(IDC_BUTTON_ZVB);
+	m_static_zve = this->GetDlgItem(IDC_STATIC_ZVE);
+	m_edit_zve = this->GetDlgItem(IDC_EDIT_ZVE);
+	m_static_zvtp = this->GetDlgItem(IDC_STATIC_ZVTP);
+	m_edit_zvtp = this->GetDlgItem(IDC_EDIT_ZVTP);
+	m_button_zvtb = this->GetDlgItem(IDC_BUTTON_ZVTB);
+	m_static_zvte = this->GetDlgItem(IDC_STATIC_ZVTE);
+	m_edit_zvte = this->GetDlgItem(IDC_EDIT_ZVTE);
+	m_static_zv = this->GetDlgItem(IDC_STATIC_ZV);
+	m_slider_zv = this->GetDlgItem(IDC_SLIDER_ZV);
+	m_spin_zv = this->GetDlgItem(IDC_SPIN_ZV);
+	m_edit_zv = this->GetDlgItem(IDC_EDIT_ZV);
+	m_check_zdov = this->GetDlgItem(IDC_CHECK_ZDOV);
+
+	m_group_ao = this->GetDlgItem(IDC_GROUP_AO);
+	m_static_avp = this->GetDlgItem(IDC_STATIC_AVP);
+	m_edit_avp = this->GetDlgItem(IDC_EDIT_AVP);
+	m_button_avb = this->GetDlgItem(IDC_BUTTON_AVB);
+	m_static_ave = this->GetDlgItem(IDC_STATIC_AVE);
+	m_edit_ave = this->GetDlgItem(IDC_EDIT_AVE);
+	m_static_avtp = this->GetDlgItem(IDC_STATIC_AVTP);
+	m_edit_avtp = this->GetDlgItem(IDC_EDIT_AVTP);
+	m_button_avtb = this->GetDlgItem(IDC_BUTTON_AVTB);
+	m_static_avte = this->GetDlgItem(IDC_STATIC_AVTE);
+	m_edit_avte = this->GetDlgItem(IDC_EDIT_AVTE);
+	m_static_av = this->GetDlgItem(IDC_STATIC_AV);
+	m_slider_av = this->GetDlgItem(IDC_SLIDER_AV);
+	m_spin_av = this->GetDlgItem(IDC_SPIN_AV);
+	m_edit_av = this->GetDlgItem(IDC_EDIT_AV);
+	m_check_adov = this->GetDlgItem(IDC_CHECK_ADOV);
+
+	m_slider_zv.SetRange(0, VOLUME_MAX);
+	m_edit_zve.SetReadOnly();
+	m_edit_zvte.SetReadOnly();
+	m_edit_zv.SetReadOnly();
+
+	m_slider_av.SetRange(0, VOLUME_MAX);
+	m_edit_ave.SetReadOnly();
+	m_edit_avte.SetReadOnly();
+	m_edit_av.SetReadOnly();
 
 	s_hWnd_main = this->m_hWnd;
 	s_sign_monitorstop = 0;
@@ -42,6 +87,8 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	SetWorkPath();
 	ZaConfigLoad(DFT_CONFIG_FILE);
+
+	LoadConfig();
 
 	int logparam = 0;
 	if (!g_zaConfig->General.OpenDebugLog) {
@@ -213,7 +260,7 @@ LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	}
 	
 	ZaConfigSetActive(m_gameID);
-	ZaSoundSetVolumn(g_zaConfig->ActiveGame->Volume);
+	ZaSoundSetVolumn((float)g_zaConfig->ActiveGame->Volume);
 	ZALOG_DEBUG("就绪");
 
 	s_sign_initplayerstop = 0;
@@ -372,6 +419,146 @@ LRESULT CMainDlg::OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	return 0;
 }
 
+LRESULT CMainDlg::OnNMCustomdrawSliderV(int idCtrl, LPNMHDR pNMHDR, BOOL& /*bHandled*/)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	CTrackBarCtrl slider = NULL;
+	CEdit edit = NULL;
+	
+	switch (idCtrl)
+	{
+	case IDC_SLIDER_ZV:
+		slider = m_slider_zv;
+		edit = m_edit_zv;
+		break;
+	case IDC_SLIDER_AV:
+		slider = m_slider_av;
+		edit = m_edit_av;
+		break;
+	default:
+		return 0;
+		break;
+	}
+
+	CString str;
+	str.Format("%d", slider.GetPos());
+	edit.SetWindowTextA(str);
+
+	return 0;
+}
+LRESULT CMainDlg::OnDeltaposSpinV(int idCtrl, LPNMHDR pNMHDR, BOOL& /*bHandled*/)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	CTrackBarCtrl slider = NULL;
+
+	switch (idCtrl)
+	{
+	case IDC_SPIN_ZV:
+		slider = m_slider_zv;
+		break;
+	case IDC_SPIN_AV:
+		slider = m_slider_av;
+		break;
+	default:
+		return 0;
+		break;
+	}
+
+	int pos = slider.GetPos();
+	if (pNMUpDown->iDelta == 1 && pos > slider.GetRangeMin())
+	{
+		--pos;
+	}
+	else if (pNMUpDown->iDelta == -1 && pos < slider.GetRangeMax())
+	{
+		++pos;
+	}
+	slider.SetPos(pos);
+
+	return 0;
+}
+LRESULT CMainDlg::OnBnClickedButtonVb(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	int ids = 0;
+	CEdit edit = NULL;
+
+	switch (wID)
+	{
+	case IDC_BUTTON_ZVB:
+		ids = IDS_TEXT_ZVP;
+		edit = m_edit_zvp;
+		break;
+	case IDC_BUTTON_ZVTB:
+		ids = IDS_TEXT_ZVTP;
+		edit = m_edit_zvtp;
+		break;
+	case IDC_BUTTON_AVB:
+		ids = IDS_TEXT_AVP;
+		edit = m_edit_avp;
+		break;
+	case IDC_BUTTON_AVTB:
+		ids = IDS_TEXT_AVTP;
+		edit = m_edit_avtp;
+		break;
+	default:
+		return 0;
+		break;
+	}
+
+	CString title;
+	title.LoadStringA(ids);
+	CFolderDialog fd(NULL, title);
+
+	if (IDOK == fd.DoModal()) {
+		edit.SetWindowTextA(fd.GetFolderPath());
+	}
+
+	return 0;
+}
+
+void CMainDlg::LoadConfig()
+{
+	WTL::CString str;
+
+	////////////////////////////////////////////////////////////////
+
+	m_edit_zvp.SetWindowTextA(g_zaConfig->Zero.VoiceDir.c_str());
+	
+	str.Empty();
+	for (auto ext : g_zaConfig->Zero.VoiceExt) {
+		str += ext.c_str();
+		str += " ";
+	}
+	m_edit_zve.SetWindowTextA(str);
+	m_edit_zvtp.SetWindowTextA(g_zaConfig->Zero.VtblDir.c_str());
+	m_edit_zvte.SetWindowTextA(g_zaConfig->Zero.VtblExt.c_str());
+
+	m_slider_zv.SetPos(g_zaConfig->Zero.Volume);
+
+	m_check_zdov.SetCheck(g_zaConfig->Zero.DisableOriginalVoice);
+
+	////////////////////////////////////////////////////////////////
+
+	m_edit_avp.SetWindowTextA(g_zaConfig->Ao.VoiceDir.c_str());
+
+	str.Empty();
+	for (auto ext : g_zaConfig->Ao.VoiceExt) {
+		str += ext.c_str();
+		str += " ";
+	}
+	m_edit_ave.SetWindowTextA(str);
+	m_edit_avtp.SetWindowTextA(g_zaConfig->Ao.VtblDir.c_str());
+	m_edit_avte.SetWindowTextA(g_zaConfig->Ao.VtblExt.c_str());
+
+	m_slider_av.SetPos(g_zaConfig->Ao.Volume);
+
+	m_check_adov.SetCheck(g_zaConfig->Ao.DisableOriginalVoice);
+}
+
 void CMainDlg::SetWorkPath() {
 	char buff[1024];
 	GetModuleFileName(NULL, (LPSTR)buff, sizeof(buff));
@@ -481,3 +668,6 @@ HWND CMainDlg::s_hWnd_main;
 HANDLE CMainDlg::s_event_monitor;
 unsigned CMainDlg::s_sign_initplayerstop;
 unsigned CMainDlg::s_sign_monitorstop;
+
+
+

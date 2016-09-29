@@ -18,6 +18,9 @@
 #include <atlctrls.h>
 #include <atldlgs.h>
 
+#include <atlmisc.h>
+#include <atldlgs.h>
+
 #include <ZaConst.h>
 #include <ZaRemote.h>
 
