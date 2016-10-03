@@ -8,10 +8,10 @@
 
 typedef int(*StopCallBack)(void*);
 
-int ZaSoundInit(float volumn = VOLUME_MAX);
+int ZaSoundInit(int volumn = VOLUME_MAX);
 int ZaSoundEnd();
 
-void ZaSoundSetVolumn(float volumn);
+void ZaSoundSetVolumn(int volumn);
 float ZaSoundGetVolumn();
 
 int ZaSoundStatus();

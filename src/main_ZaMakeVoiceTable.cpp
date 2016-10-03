@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
 		ofstream ofs_tbl;
 
 		bool first = true;
-		for (int i = 0; i < levo.size(); ++i) {
+		for (int i = 0; i < (int)levo.size(); ++i) {
 			if (ofevo[i] == INVALID_OFFSET)
 				continue;
 
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 			if (voiceId == INVAILD_VOICE_ID && !addnov)
 				continue;
 
-			int off_cn = i < ofcn.size() ? ofcn[i] : INVALID_OFFSET;
+			int off_cn = i < (int)ofcn.size() ? ofcn[i] : INVALID_OFFSET;
 			if (off_cn == INVALID_OFFSET) continue;
 
 			if (first) {
@@ -163,7 +163,7 @@ int GetVoiceId(const string& str) {
 
 	int left = -1;
 	while ((left = str.find('#', left + 1)) != string::npos
-		&& left + length_voiceid + 1 < str.size())
+		&& left + length_voiceid + 1 < (int)str.size())
 	{
 		if (str[left + length_voiceid + 1] != 'V') continue;
 		

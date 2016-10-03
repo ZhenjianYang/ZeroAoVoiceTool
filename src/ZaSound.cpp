@@ -21,7 +21,7 @@ void ADR_CALL AdrStopCallBack::streamStopped(audiere::StopEvent * event)
 	}
 }
 
-int ZaSoundInit(float volume)
+int ZaSoundInit(int volume)
 {
 	ZaSoundSetStopCallBack(nullptr);
 	ZaSoundStop();
@@ -48,9 +48,9 @@ int ZaSoundEnd()
 	return 0;
 }
 
-void ZaSoundSetVolumn(float volumn)
+void ZaSoundSetVolumn(int volumn)
 {
-	_volume = volumn;
+	_volume = (float)volumn / VOLUME_MAX;
 }
 
 float ZaSoundGetVolumn()

@@ -74,11 +74,11 @@ bool ZaCheckGameEnd() {
 }
 
 bool ZaRemoteRead(unsigned rAdd, void *buff, unsigned size) {
-	return ReadProcessMemory(_hProcess, (LPVOID)rAdd, buff, size, NULL);
+	return ReadProcessMemory(_hProcess, (LPVOID)rAdd, buff, size, NULL) == TRUE;
 }
 
 bool ZaRemoteWrite(unsigned rAdd, const void *buff, unsigned size) {
-	return WriteProcessMemory(_hProcess, (LPVOID)rAdd, buff, size, NULL);
+	return WriteProcessMemory(_hProcess, (LPVOID)rAdd, buff, size, NULL) == TRUE;
 }
 
 unsigned ZaRemoteAlloc(unsigned size) {
@@ -86,7 +86,7 @@ unsigned ZaRemoteAlloc(unsigned size) {
 }
 
 bool ZaRemoteFree(unsigned rAdd, unsigned size) {
-	return VirtualFreeEx(_hProcess, (LPVOID)rAdd, size, MEM_DECOMMIT);
+	return VirtualFreeEx(_hProcess, (LPVOID)rAdd, size, MEM_DECOMMIT) == TRUE;
 }
 
 int ZaRemoteInit(int gameID, int hWnd_this /*= 0*/, unsigned bMsg /*= 0*/)

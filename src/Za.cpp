@@ -65,7 +65,7 @@ void ZaMain() {
 	ZALOG("已进入语音播放系统");
 	
 	ZALOG("语音文件目录为: %s", g_zaConfig->ActiveGame->VoiceDir.c_str());
-	for (int i = 1; i <= g_zaConfig->ActiveGame->VoiceExt.size(); ++i) {
+	for (int i = 1; i <= (int)g_zaConfig->ActiveGame->VoiceExt.size(); ++i) {
 		ZALOG("语音文件后缀%d: %s", i, g_zaConfig->ActiveGame->VoiceExt[i-1].c_str());
 	}
 	if (gameID == GAMEID_AO && g_zaConfig->ActiveGame->DisableOriginalVoice) {
