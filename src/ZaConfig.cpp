@@ -11,8 +11,6 @@ static ZaConfig* _ptrZaConfig = &_struZaConfig;
 
 const ZaConfig* const &g_zaConfig = _ptrZaConfig;
 
-static void ZaConfigSetDefault();
-
 static int Compare(const char* buff, const char* item) {
 	int p;
 	for (p = 0; item[p] != 0; ++p) {
@@ -78,7 +76,7 @@ static bool SetIntVaule(int& value, const char* buff) {
 }
 
 #define BUFF_SIZE 1024
-void ZaConfigLoad(const char * configFile)
+bool ZaConfigLoad(const char * configFile)
 {
 	ZaConfigSetDefault();
 
@@ -139,12 +137,55 @@ void ZaConfigLoad(const char * configFile)
 		else if (p = Compare(pb, STR_UseLogFile)) {
 			failed = !SetIntVaule(_struZaConfig.General.UseLogFile, pb + p);
 		}
+		else if (p = Compare(pb, STR_AutoStart)) {
+			failed = !SetIntVaule(_struZaConfig.General.AutoStart, pb + p);
+		}
 		else failed = true;
 
 		if (failed) {
 			cout << "Config File Bad Line " << cnt << endl;
 		}
 	}
+
+	return true;
+}
+
+bool ZaConfigSave(const char * configFile)
+{
+	ofstream ofs(configFile);
+	if (!ofs) return false;
+
+	ofs << STR_general << endl;
+	ofs << STR_OpenDebugLog << " = " << _struZaConfig.General.OpenDebugLog << endl;
+	ofs << STR_UseLogFile << " = " << _struZaConfig.General.UseLogFile << endl;
+	ofs << STR_AutoStart << " = " << _struZaConfig.General.AutoStart << endl;
+	ofs << endl;
+
+	ofs  << STR_Ao << endl;
+	ofs << STR_VoiceFileDirectory << " = " << _struZaConfig.Ao.VoiceDir << endl;
+	string tmp;
+	if (_struZaConfig.Ao.VoiceExt.size() > 0) tmp = _struZaConfig.Ao.VoiceExt[0];
+	for (int i = 1; i < (int)_struZaConfig.Ao.VoiceExt.size(); ++i) tmp.push_back(' '), tmp += _struZaConfig.Ao.VoiceExt[i];
+	ofs << STR_VoiceFileExtension << " = " << tmp << endl;
+	ofs << STR_VoiceTableFileDirectory << " = " << _struZaConfig.Ao.VtblDir << endl;
+	ofs << STR_VoiceTableFileExtension << " = " << _struZaConfig.Ao.VtblExt << endl;
+	ofs << STR_DisableOriginalVoice << " = " << _struZaConfig.Ao.DisableOriginalVoice << endl;
+	ofs << STR_Volume << " = " << _struZaConfig.Ao.Volume << endl;
+	ofs << endl;
+
+	ofs << STR_Zero << endl;
+	ofs << STR_VoiceFileDirectory << " = " << _struZaConfig.Zero.VoiceDir << endl;
+	if (_struZaConfig.Zero.VoiceExt.size() > 0) tmp = _struZaConfig.Zero.VoiceExt[0];
+	for (int i = 1; i < (int)_struZaConfig.Zero.VoiceExt.size(); ++i) tmp.push_back(' '), tmp += _struZaConfig.Zero.VoiceExt[i];
+	ofs << STR_VoiceFileExtension << " = " << tmp << endl;
+	ofs << STR_VoiceTableFileDirectory << " = " << _struZaConfig.Zero.VtblDir << endl;
+	ofs << STR_VoiceTableFileExtension << " = " << _struZaConfig.Zero.VtblExt << endl;
+	//ofs << STR_DisableOriginalVoice << " = " << _struZaConfig.Zero.DisableOriginalVoice << endl;
+	ofs << STR_Volume << " = " << _struZaConfig.Zero.Volume << endl;
+	ofs << endl;
+
+	ofs.close();
+	return true;
 }
 
 void ZaConfigSetActive(int gameID)
@@ -165,40 +206,51 @@ void ZaConfigSetActive(int gameID)
 	
 }
 
-void ZaConfigSetDefault() {
-	_struZaConfig.ActiveGameID = GAMEID_INVALID;
-	_struZaConfig.ActiveGame = nullptr;
+void ZaConfigSetDefault(ZaConfig* pconfig) {
+	if (pconfig == NULL) pconfig = _ptrZaConfig;
 
-	_struZaConfig.General.OpenDebugLog = DFT_DEBUGLOG;
-	_struZaConfig.General.UseLogFile = DFT_USELOGFILE;
+	pconfig->ActiveGameID = GAMEID_INVALID;
+	pconfig->ActiveGame = nullptr;
 
-	_struZaConfig.General.SleepTime = DFT_SLEEP_TIME;
-	_struZaConfig.General.RemoveFwdCtrlCh = DFT_RMFWDCTRLCH;
-	_struZaConfig.General.Mode = MODE_AUTO;
+	pconfig->General.OpenDebugLog = DFT_DEBUGLOG;
+	pconfig->General.UseLogFile = DFT_USELOGFILE;
 
+	pconfig->General.SleepTime = DFT_SLEEP_TIME;
+	pconfig->General.RemoveFwdCtrlCh = DFT_RMFWDCTRLCH;
+	pconfig->General.Mode = MODE_AUTO;
 
-	_struZaConfig.Zero.VoiceDir = Z_DFT_VOICE_DIR;
-	_struZaConfig.Zero.VoiceExt = Z_DFT_VOICE_EXT;
-	_struZaConfig.Zero.VoiceName = Z_DFT_VOICE_NAME;
-
-	_struZaConfig.Zero.VtblExt = Z_DFT_VOICETABLE_EXT;
-	_struZaConfig.Zero.VtblDir = Z_DFT_VOICETABLE_DIR;
-
-	_struZaConfig.Zero.Volume = Z_DFT_VOLUME;
-	_struZaConfig.Zero.DisableOriginalVoice = Z_DFT_DISABLE_ORIVOICE;
-
-	_struZaConfig.Zero.VoiceIdLength = Z_LENGTH_VOICE_ID;
+	pconfig->General.AutoStart = 0;
 
 
-	_struZaConfig.Ao.VoiceDir = A_DFT_VOICE_DIR;
-	_struZaConfig.Ao.VoiceExt = A_DFT_VOICE_EXT;
-	_struZaConfig.Ao.VoiceName = A_DFT_VOICE_NAME;
+	pconfig->Zero.VoiceDir = Z_DFT_VOICE_DIR;
+	pconfig->Zero.VoiceExt = Z_DFT_VOICE_EXT;
+	pconfig->Zero.VoiceName = Z_DFT_VOICE_NAME;
 
-	_struZaConfig.Ao.VtblExt = A_DFT_VOICETABLE_EXT;
-	_struZaConfig.Ao.VtblDir = A_DFT_VOICETABLE_DIR;
+	pconfig->Zero.VtblExt = Z_DFT_VOICETABLE_EXT;
+	pconfig->Zero.VtblDir = Z_DFT_VOICETABLE_DIR;
 
-	_struZaConfig.Ao.Volume = A_DFT_VOLUME;
-	_struZaConfig.Ao.DisableOriginalVoice = A_DFT_DISABLE_ORIVOICE;
+	pconfig->Zero.Volume = Z_DFT_VOLUME;
+	pconfig->Zero.DisableOriginalVoice = Z_DFT_DISABLE_ORIVOICE;
 
-	_struZaConfig.Ao.VoiceIdLength = A_LENGTH_VOICE_ID;
+	pconfig->Zero.VoiceIdLength = Z_LENGTH_VOICE_ID;
+
+
+	pconfig->Ao.VoiceDir = A_DFT_VOICE_DIR;
+	pconfig->Ao.VoiceExt = A_DFT_VOICE_EXT;
+	pconfig->Ao.VoiceName = A_DFT_VOICE_NAME;
+
+	pconfig->Ao.VtblExt = A_DFT_VOICETABLE_EXT;
+	pconfig->Ao.VtblDir = A_DFT_VOICETABLE_DIR;
+
+	pconfig->Ao.Volume = A_DFT_VOLUME;
+	pconfig->Ao.DisableOriginalVoice = A_DFT_DISABLE_ORIVOICE;
+
+	pconfig->Ao.VoiceIdLength = A_LENGTH_VOICE_ID;
+}
+
+void ZaConfigSetConfig(const ZaConfig & config)
+{
+	_struZaConfig.General = config.General;
+	_struZaConfig.Ao = config.Ao;
+	_struZaConfig.Zero = config.Zero;
 }

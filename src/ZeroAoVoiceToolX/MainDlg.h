@@ -90,8 +90,6 @@ public:
 	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnClose(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-	void CloseDialog(int nVal);
-
 	LRESULT OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	LRESULT OnError(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -109,12 +107,15 @@ public:
 	LRESULT OnNMCustomdrawSliderV(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/);
 	LRESULT OnDeltaposSpinV(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/);
 	LRESULT OnBnClickedButtonVb(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-private:
+
+	void CloseDialog(int nVal);
 	void LoadConfig();
+	void SaveConfig();
 
 public:
 	Status m_status;
 	CButton m_button_start;
+	CButton m_check_autostart;
 
 	CStatic m_group_zero;
 	CStatic m_static_zvp, m_static_zve, m_static_zvtp, m_static_zvte, m_static_zv;

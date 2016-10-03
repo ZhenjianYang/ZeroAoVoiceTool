@@ -33,6 +33,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_status = Status::Idle;
 
 	m_button_start = this->GetDlgItem(IDC_BUTTON_START);
+	m_check_autostart = this->GetDlgItem(IDC_CHECK_AUTOSTART);
 	
 	m_group_zero = this->GetDlgItem(IDC_GROUP_ZERO);
 	m_static_zvp = this->GetDlgItem(IDC_STATIC_ZVP);
@@ -115,6 +116,10 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	ZaSoundInit();
 	ZALOG_DEBUG("音频系统已启动");
 
+	if (g_zaConfig->General.AutoStart) {
+		::SendMessage(this->m_hWnd, WM_COMMAND, IDC_BUTTON_START, BN_CLICKED);
+	}
+
 	return TRUE;
 }
 
@@ -176,6 +181,8 @@ LRESULT CMainDlg::OnClose(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 	TerminateThread(s_th_monitor, 0);
 	CloseHandle(s_th_monitor); s_th_monitor = NULL;
 
+	SaveConfig();
+
 	this->CloseDialog(0);
 	return 0;
 }
@@ -192,6 +199,7 @@ LRESULT CMainDlg::OnBnClickedButtonStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWN
 	switch (m_status)
 	{
 	case Status::Idle:
+		SaveConfig();
 		m_button_start.SetWindowTextA("Stop");
 		m_status = Status::WaitingGameStart;
 		AddMonitorFunc(CMainDlg::Monitor_GameStart);
@@ -260,7 +268,7 @@ LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	}
 	
 	ZaConfigSetActive(m_gameID);
-	ZaSoundSetVolumn((float)g_zaConfig->ActiveGame->Volume);
+	ZaSoundSetVolumn(g_zaConfig->ActiveGame->Volume);
 	ZALOG_DEBUG("就绪");
 
 	s_sign_initplayerstop = 0;
@@ -277,6 +285,7 @@ LRESULT CMainDlg::OnGameExit(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 	ZaVoicePlayerEnd();
 	ZaRemoteEnd();
 
+	m_button_start.SetWindowTextA("Start");
 	m_status = Status::Idle;
 	return 0;
 }
@@ -524,6 +533,8 @@ void CMainDlg::LoadConfig()
 {
 	WTL::CString str;
 
+	m_check_autostart.SetCheck(g_zaConfig->General.AutoStart);
+
 	////////////////////////////////////////////////////////////////
 
 	m_edit_zvp.SetWindowTextA(g_zaConfig->Zero.VoiceDir.c_str());
@@ -557,6 +568,31 @@ void CMainDlg::LoadConfig()
 	m_slider_av.SetPos(g_zaConfig->Ao.Volume);
 
 	m_check_adov.SetCheck(g_zaConfig->Ao.DisableOriginalVoice);
+}
+
+void CMainDlg::SaveConfig()
+{
+	ZaConfig config;
+	ZaConfigSetDefault(&config);
+	config.General = g_zaConfig->General;
+	config.General.AutoStart = m_check_autostart.GetCheck();
+
+	char buff[1024];
+	m_edit_avp.GetWindowTextA(buff, sizeof(buff));
+	config.Ao.VoiceDir = buff;
+	m_edit_avtp.GetWindowTextA(buff, sizeof(buff));
+	config.Ao.VtblDir = buff;
+	config.Ao.Volume = m_slider_av.GetPos();
+	config.Ao.DisableOriginalVoice = m_check_adov.GetCheck();
+
+	m_edit_zvp.GetWindowTextA(buff, sizeof(buff));
+	config.Zero.VoiceDir = buff;
+	m_edit_zvtp.GetWindowTextA(buff, sizeof(buff));
+	config.Zero.VtblDir = buff;
+	config.Zero.Volume = m_slider_zv.GetPos();
+
+	ZaConfigSetConfig(config);
+	ZaConfigSave(DFT_CONFIG_FILE);
 }
 
 void CMainDlg::SetWorkPath() {
@@ -641,9 +677,7 @@ DWORD WINAPI CMainDlg::Thread_Monitor(LPVOID lpParmeter) {
 
 		if (count == 0) WaitForSingleObject(s_event_monitor, INFINITE);
 		else Sleep(1000);
-		ZALOG_DEBUG("I'm Thread_Monitor");
 	}
-	ZALOG_DEBUG("I'm Thread_Monitor, Exit");
 	return 0;
 }
 
