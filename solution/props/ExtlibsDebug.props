@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <ExtlibsMacro />
-    <ExtlibsNames>sfml-audio-d.lib</ExtlibsNames>
+    <ExtlibsNames>audiere.lib</ExtlibsNames>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>

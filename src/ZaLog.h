@@ -31,11 +31,11 @@
 #if !ZALOG_NOLOG
 
 #define ZALOG_SETLOGFILE(filename) _zalog_setlogfile(filename)
-#define ZALOG_SETPARAM(param) _zalog_setparam(param)
-#define ZALOG_ADDPARAM(param) _zalog_addparam(param)
-#define ZALOG_DELPARAM(param) _zalog_delparam(param)
+#define ZALOG_SETPARAM(_param) _zalog_setparam(_param)
+#define ZALOG_ADDPARAM(_param) _zalog_addparam(_param)
+#define ZALOG_DELPARAM(_param) _zalog_delparam(_param)
 #define ZALOG_OPEN _zalog_open(ZALOG_PARAM_DFT)
-#define ZALOG_OPEN_WITHPARAM(param) _zalog_open(param)
+#define ZALOG_OPEN_WITHPARAM(_param) _zalog_open(_param)
 #define ZALOG_CLOSE _zalog_close()
 
 #define ZALOG_INFO(format, ...)  _zalog_print(ZALOG_TYPE_INFO, format , __VA_ARGS__)
@@ -45,11 +45,11 @@
 
 #define ZALOG_EMPTY_LINE _zalog_empty_line()
 
-void _zalog_addparam(int param);
-void _zalog_delparam(int param);
-void _zalog_setparam(int param);
+void _zalog_addparam(int _param);
+void _zalog_delparam(int _param);
+void _zalog_setparam(int _param);
 void _zalog_setlogfile(const char* filename);
-void _zalog_open(int param);
+void _zalog_open(int _param);
 void _zalog_close();
 
 void _zalog_print(int type, const char* format, ...);

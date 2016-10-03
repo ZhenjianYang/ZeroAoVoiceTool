@@ -1,20 +1,24 @@
 #ifndef __ZASOUND_H__
 #define __ZASOUND_H__
 
-#include <string>
+#include "ZaConst.h"
 
 #define ZASOUND_STATUS_PLAYING 0
 #define ZASOUND_STATUS_STOP    1
-#define ZASOUND_STATUS_PAUSE   2
 
-int ZaSoundInit(float volumn);
+typedef int(*StopCallBack)(void*);
 
-void ZaSoundSetVolumn(float volumn);
+int ZaSoundInit(int volumn = VOLUME_MAX);
+int ZaSoundEnd();
+
+void ZaSoundSetVolumn(int volumn);
 float ZaSoundGetVolumn();
 
 int ZaSoundStatus();
 
-bool ZaSoundPlay(const std::string& soundFile);
+bool ZaSoundPlay(const char* soundFile);
 void ZaSoundStop();
+
+void ZaSoundSetStopCallBack(StopCallBack stopCallBack = nullptr, void* _param = nullptr);
 
 #endif // !__ZASOUND_H__

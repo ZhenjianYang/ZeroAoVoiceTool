@@ -16,10 +16,12 @@
 
 #define STR_DisableOriginalVoice	"DisableOriginalVoice"
 
+#define STR_Volume "Volume"
+
 #define STR_OpenDebugLog "OpenDebugLog"
 #define STR_UseLogFile "UseLogFile"
 
-#define STR_Volume "Volume"
+#define STR_AutoStart "AutoStart"
 
 struct ZaConfigGame
 {
@@ -39,6 +41,7 @@ struct ZaConfigGeneral
 {
 	int OpenDebugLog;
 	int UseLogFile;
+	int AutoStart;
 
 	int RemoveFwdCtrlCh;
 	int SleepTime;
@@ -56,8 +59,10 @@ struct ZaConfig
 };
 extern const ZaConfig* const &g_zaConfig;
 
-void ZaConfigLoad(const char* configFile);
+bool ZaConfigLoad(const char* configFile);
+bool ZaConfigSave(const char* configFile);
 void ZaConfigSetActive(int gameID);
-void ZaConfigSetDefault();
+void ZaConfigSetDefault(ZaConfig* pconfig = NULL);
+void ZaConfigSetConfig(const ZaConfig& config);
 
 #endif // !__ZACONFIG_H__

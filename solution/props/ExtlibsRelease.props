@@ -2,8 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <ExtlibsNames>sfml-audio-s.lib;sfml-system-s.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;winmm.lib</ExtlibsNames>
-    <ExtlibsMacro>SFML_STATIC</ExtlibsMacro>
+    <ExtlibsNames>audiere.lib</ExtlibsNames>
+    <ExtlibsMacro>
+    </ExtlibsMacro>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
