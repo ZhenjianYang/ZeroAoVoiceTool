@@ -16,19 +16,19 @@ etc.) or anything modified from them.
 
 By now, this tool can only work for:
 
--   *The Legend of Heroes: Zero no Kiseki* , Chinese Simplified version,
-    version 1.1 (version 1.1 has 1000 save slots but version 1.0 has
+-   *The Legend of Heroes: Zero no Kiseki* , Chinese Simplified,
+    version 1.1 (version 1.1 has 1000 save slots while version 1.0 has
     only 100)
 
--   *The Legend of Heroes: Ao no Kiseki*, Chinese Simplified version,
+-   *The Legend of Heroes: Ao no Kiseki*, Chinese Simplified,
     version 1.0
 
 To let it work, you need three things done before:
 
--   first, you need to extact the voice files(\*.at9) from the PS Vita
+-   First, you need to extact the voice files(\*.at9) from the PS Vita
     games *Zero no Kiseki Evolution* & *Ao no Kiseki Evolution* (no
     mater they are card or downloaded games) and convert them to
-    supported files(\*.wav, \*.ogg).
+    supported files(\*.wav or \*.ogg).
 
 -   Second, you need to make voice table files for each scena file(a
     scena file means a file under the folder "scena").This project also
@@ -48,6 +48,9 @@ External libraries used in this project
 
 -   [Audiere](http://audiere.sourceforge.net/), licensed under the
     [LGPL](http://opensource.org/licenses/lgpl-license.html).
+    
+-   [Windows Template Library (WTL)](http://wtl.sourceforge.net/), licensed under the
+    [Microsoft Public License (MS-PL)](https://opensource.org/licenses/MS-PL).
 
 ------------------------------------------------------------------------
 
@@ -88,6 +91,9 @@ ZeroAoVoiceTool
 
 -   [Audiere](http://audiere.sourceforge.net/),
     基于[LGPL协议](http://opensource.org/licenses/lgpl-license.html).
+    
+-   [Windows Template Library (WTL)](http://wtl.sourceforge.net/), 基于
+    [Microsoft Public License (MS-PL)](https://opensource.org/licenses/MS-PL).
 
 各目录说明
 ----------
@@ -103,7 +109,9 @@ ZeroAoVoiceTool
 
 -   **solution** 用VS2015建立的工程，各项目分述如下
 
--   -   **ZeroAoVoiceTool** 即为前文提及的外挂语音程序
+-   -   **ZeroAoVoiceTool** 即为前文提及的外挂语音程序，为控制台程序
+
+-   -   **ZeroAoVoiceToolX** 同样为前文提及的外挂语音程序，为窗口程序
 
 -   -   **ZaMakeVoiceTableFound**
         测试程序，用于寻找scena文件文本的特征。已无用。
@@ -119,7 +127,7 @@ TODO
 
 -   简陋的界面...
 
--   简陋的音频播放系统——现在，使用SFML作为音频播放系统，至少已经支持了ogg音频的播放
+-   简陋的音频播放系统——现在，使用Audiere作为音频播放系统，至少已经支持了ogg音频的播放
 
 -   ...
 
