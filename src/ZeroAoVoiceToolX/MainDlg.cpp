@@ -79,6 +79,8 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_edit_avte.SetReadOnly();
 	m_edit_av.SetReadOnly();
 
+	m_check_zdov.ShowWindow(0);
+
 	s_hWnd_main = this->m_hWnd;
 	s_sign_monitorstop = 0;
 	s_event_monitor = ::CreateEvent(NULL, FALSE, FALSE, "Monitor Event");
@@ -87,23 +89,23 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	s_th_initplayer = NULL;
 
 	SetWorkPath();
-	ZaConfigLoad(DFT_CONFIG_FILE);
+	Za::Config::LoadFromFile(DFT_CONFIG_FILE);
 
 	LoadConfig();
 
 	int logparam = 0;
-	if (!g_zaConfig->General.OpenDebugLog) {
+	if (!Za::Config::MainConfig->General->OpenDebugLog) {
 		logparam = ZALOG_OUT_STDOUT | ZALOG_TYPE_INFO | ZALOG_TYPE_INFO | ZALOG_PARAM_NOPREINFO;
 	}
 	else {
 		logparam = ZALOG_OUT_STDLOG | ZALOG_TYPE_ALL;
 	}
-	if (g_zaConfig->General.UseLogFile) {
+	if (Za::Config::MainConfig->General->UseLogFile) {
 		logparam |= ZALOG_OUT_FILE;
 		ZALOG_SETLOGFILE(DFT_LOG_FILE);
 	}
 
-	if (g_zaConfig->General.OpenDebugLog) {
+	if (Za::Config::MainConfig->General->OpenDebugLog) {
 		AllocConsole();
 		::DeleteMenu(::GetSystemMenu(GetConsoleWindow(), FALSE), SC_CLOSE, MF_BYCOMMAND);
 		freopen("CONOUT$", "a+", stderr);
@@ -116,7 +118,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	ZaSoundInit();
 	ZALOG_DEBUG("音频系统已启动");
 
-	if (g_zaConfig->General.AutoStart) {
+	if (Za::Config::MainConfig->General->AutoStart) {
 		::SendMessage(this->m_hWnd, WM_COMMAND, IDC_BUTTON_START, BN_CLICKED);
 	}
 
@@ -176,7 +178,7 @@ LRESULT CMainDlg::OnClose(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 
 	s_sign_monitorstop = 1;
 	::SetEvent(s_event_monitor);
-	if (g_zaConfig->General.OpenDebugLog)
+	if (Za::Config::MainConfig->General->OpenDebugLog)
 		FreeConsole();
 	TerminateThread(s_th_monitor, 0);
 	CloseHandle(s_th_monitor); s_th_monitor = NULL;
@@ -267,8 +269,8 @@ LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 		::SendMessage(m_hWnd, WM_MSG_ERROR, (WPARAM)ErrorType::InitRemoteFailed, 0);
 	}
 	
-	ZaConfigSetActive(m_gameID);
-	ZaSoundSetVolumn(g_zaConfig->ActiveGame->Volume);
+	Za::Config::SetActiveGame(m_gameID);
+	ZaSoundSetVolumn(Za::Config::MainConfig->ActiveGame->Volume);
 	ZALOG_DEBUG("就绪");
 
 	s_sign_initplayerstop = 0;
@@ -307,11 +309,11 @@ LRESULT CMainDlg::OnInitPlayerEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& 
 
 	ZALOG_DEBUG("已进入语音播放系统");
 
-	ZALOG_DEBUG("语音文件目录为: %s", g_zaConfig->ActiveGame->VoiceDir.c_str());
-	for (unsigned i = 1; i <= g_zaConfig->ActiveGame->VoiceExt.size(); ++i) {
-		ZALOG_DEBUG("语音文件后缀%d: %s", i, g_zaConfig->ActiveGame->VoiceExt[i - 1].c_str());
+	ZALOG_DEBUG("语音文件目录为: %s", Za::Config::MainConfig->ActiveGame->VoiceDir.c_str());
+	for (unsigned i = 1; i <= Za::Config::MainConfig->ActiveGame->VoiceExt.size(); ++i) {
+		ZALOG_DEBUG("语音文件后缀%d: %s", i, Za::Config::MainConfig->ActiveGame->VoiceExt[i - 1].c_str());
 	}
-	if (m_gameID == GAMEID_AO && g_zaConfig->ActiveGame->DisableOriginalVoice) {
+	if (m_gameID == GAMEID_AO && Za::Config::MainConfig->ActiveGame->DisableOriginalVoice) {
 		ZALOG_DEBUG("启用了禁用原有剧情语音的功能");
 	}
 
@@ -533,66 +535,71 @@ void CMainDlg::LoadConfig()
 {
 	WTL::CString str;
 
-	m_check_autostart.SetCheck(g_zaConfig->General.AutoStart);
+	m_check_autostart.SetCheck(Za::Config::MainConfig->General->AutoStart);
 
 	////////////////////////////////////////////////////////////////
 
-	m_edit_zvp.SetWindowTextA(g_zaConfig->Zero.VoiceDir.c_str());
+	m_edit_zvp.SetWindowTextA(Za::Config::MainConfig->Zero->VoiceDir.c_str());
 	
 	str.Empty();
-	for (auto ext : g_zaConfig->Zero.VoiceExt) {
+	for (auto ext : Za::Config::MainConfig->Zero->VoiceExt) {
 		str += ext.c_str();
 		str += " ";
 	}
 	m_edit_zve.SetWindowTextA(str);
-	m_edit_zvtp.SetWindowTextA(g_zaConfig->Zero.VtblDir.c_str());
-	m_edit_zvte.SetWindowTextA(g_zaConfig->Zero.VtblExt.c_str());
+	m_edit_zvtp.SetWindowTextA(Za::Config::MainConfig->Zero->VoiceTableDir.c_str());
+	m_edit_zvte.SetWindowTextA(Za::Config::MainConfig->Zero->VoiceTableExt.c_str());
 
-	m_slider_zv.SetPos(g_zaConfig->Zero.Volume);
+	m_slider_zv.SetPos(Za::Config::MainConfig->Zero->Volume);
 
-	m_check_zdov.SetCheck(g_zaConfig->Zero.DisableOriginalVoice);
+	m_check_zdov.SetCheck(Za::Config::MainConfig->Zero->DisableOriginalVoice);
 
 	////////////////////////////////////////////////////////////////
 
-	m_edit_avp.SetWindowTextA(g_zaConfig->Ao.VoiceDir.c_str());
+	m_edit_avp.SetWindowTextA(Za::Config::MainConfig->Ao->VoiceDir.c_str());
 
 	str.Empty();
-	for (auto ext : g_zaConfig->Ao.VoiceExt) {
+	for (auto ext : Za::Config::MainConfig->Ao->VoiceExt) {
 		str += ext.c_str();
 		str += " ";
 	}
 	m_edit_ave.SetWindowTextA(str);
-	m_edit_avtp.SetWindowTextA(g_zaConfig->Ao.VtblDir.c_str());
-	m_edit_avte.SetWindowTextA(g_zaConfig->Ao.VtblExt.c_str());
+	m_edit_avtp.SetWindowTextA(Za::Config::MainConfig->Ao->VoiceTableDir.c_str());
+	m_edit_avte.SetWindowTextA(Za::Config::MainConfig->Ao->VoiceTableExt.c_str());
 
-	m_slider_av.SetPos(g_zaConfig->Ao.Volume);
+	m_slider_av.SetPos(Za::Config::MainConfig->Ao->Volume);
 
-	m_check_adov.SetCheck(g_zaConfig->Ao.DisableOriginalVoice);
+	m_check_adov.SetCheck(Za::Config::MainConfig->Ao->DisableOriginalVoice);
 }
 
 void CMainDlg::SaveConfig()
 {
-	ZaConfig config;
-	ZaConfigSetDefault(&config);
-	config.General = g_zaConfig->General;
-	config.General.AutoStart = m_check_autostart.GetCheck();
+	Za::Config::LoadDefault();
+
+	Za::Config::ConfigData::GameConfig aoConfig = *Za::Config::MainConfig->Ao;
+	Za::Config::ConfigData::GameConfig zeroConfig = *Za::Config::MainConfig->Zero;
+	Za::Config::ConfigData::GeneralConfig generalConfig = *Za::Config::MainConfig->General;
+
+	generalConfig.AutoStart = m_check_autostart.GetCheck();
 
 	char buff[1024];
 	m_edit_avp.GetWindowTextA(buff, sizeof(buff));
-	config.Ao.VoiceDir = buff;
+	aoConfig.VoiceDir = buff;
 	m_edit_avtp.GetWindowTextA(buff, sizeof(buff));
-	config.Ao.VtblDir = buff;
-	config.Ao.Volume = m_slider_av.GetPos();
-	config.Ao.DisableOriginalVoice = m_check_adov.GetCheck();
+	aoConfig.VoiceTableDir = buff;
+	aoConfig.Volume = m_slider_av.GetPos();
+	aoConfig.DisableOriginalVoice = m_check_adov.GetCheck();
 
 	m_edit_zvp.GetWindowTextA(buff, sizeof(buff));
-	config.Zero.VoiceDir = buff;
+	zeroConfig.VoiceDir = buff;
 	m_edit_zvtp.GetWindowTextA(buff, sizeof(buff));
-	config.Zero.VtblDir = buff;
-	config.Zero.Volume = m_slider_zv.GetPos();
+	zeroConfig.VoiceTableDir = buff;
+	zeroConfig.Volume = m_slider_zv.GetPos();
 
-	ZaConfigSetConfig(config);
-	ZaConfigSave(DFT_CONFIG_FILE);
+	Za::Config::Set(generalConfig);
+	Za::Config::Set(aoConfig, GAMEID_AO);
+	Za::Config::Set(zeroConfig, GAMEID_ZERO);
+	Za::Config::SaveToFile(DFT_CONFIG_FILE);
 }
 
 void CMainDlg::SetWorkPath() {
@@ -619,8 +626,8 @@ void CMainDlg::Monitor_GameStart() {
 	int index = ZaCheckGameStart(sizeof(tbuf) / sizeof(*tbuf), tbuf);
 	if (index < 0) return;
 
-	if (index == 0 && g_zaConfig->General.Mode != MODE_AO
-		|| index == 1 && g_zaConfig->General.Mode != MODE_ZERO)
+	if (index == 0 && Za::Config::MainConfig->General->Mode != MODE_AO
+		|| index == 1 && Za::Config::MainConfig->General->Mode != MODE_ZERO)
 		::SendMessage(s_hWnd_main,
 			WM_MSG_GAMEFOUND,
 			index == 0 ? GAMEID_ZERO : GAMEID_AO,

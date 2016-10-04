@@ -50,7 +50,7 @@ static int TextAnalysisCN(unsigned char *dst, const unsigned char* src) {
 	while (*src < 0x20 || *src == 0xFF) {
 		src++; first++;
 	}
-	if (g_zaConfig->General.RemoveFwdCtrlCh) {
+	if (Za::Config::MainConfig->General->RemoveFwdCtrlCh) {
 		while (*src == '#') {
 			++src;
 			while (*src >= '0' && *src <= '9') ++src;
@@ -75,7 +75,7 @@ static int TextAnalysisCN(unsigned char *dst, const unsigned char* src) {
 }
 static const unsigned char* TextAnalysisJP(const unsigned char* buff) {
 	const unsigned char* abuff = buff;
-	if (g_zaConfig->General.RemoveFwdCtrlCh) {
+	if (Za::Config::MainConfig->General->RemoveFwdCtrlCh) {
 		while (*abuff == '#') {
 			++abuff;
 			while (*abuff >= '0' && *abuff <= '9') ++abuff;
@@ -98,8 +98,8 @@ static void ReLoadAllVoiceTables(void * data) {
 	ClearAllVoiceTable();
 
 	std::vector<std::string> subs;
-	const std::string& dir = g_zaConfig->ActiveGame->VtblDir;
-	std::string searchName = "*." + g_zaConfig->ActiveGame->VtblExt;
+	const std::string& dir = Za::Config::MainConfig->ActiveGame->VoiceTableDir;
+	std::string searchName = "*." + Za::Config::MainConfig->ActiveGame->VoiceTableExt;
 	ZaGetSubFiles(dir, searchName, subs);
 
 	for (auto sub : subs) {
@@ -297,18 +297,18 @@ int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 
 int GetStrVoiceID(int voiceID, char* buff_strVoiceId) {
 	if (voiceID == InValidVoiceId) {
-		for (int i = 0; i < g_zaConfig->ActiveGame->VoiceIdLength; ++i)
+		for (int i = 0; i < Za::Config::MainConfig->ActiveGame->VoiceIdLength; ++i)
 			buff_strVoiceId[i] = '-';
 	}
 	else {
-		for (int i = g_zaConfig->ActiveGame->VoiceIdLength - 1; i >= 0; --i) {
+		for (int i = Za::Config::MainConfig->ActiveGame->VoiceIdLength - 1; i >= 0; --i) {
 			buff_strVoiceId[i] = voiceID % 10 + '0';
 			voiceID /= 10;
 		}
 	}
-	buff_strVoiceId[g_zaConfig->ActiveGame->VoiceIdLength] = 0;
+	buff_strVoiceId[Za::Config::MainConfig->ActiveGame->VoiceIdLength] = 0;
 
-	return g_zaConfig->ActiveGame->VoiceIdLength;
+	return Za::Config::MainConfig->ActiveGame->VoiceIdLength;
 }
 
 

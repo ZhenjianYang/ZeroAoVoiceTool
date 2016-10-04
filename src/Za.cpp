@@ -15,16 +15,16 @@ static void ZaMain();
 void ZaVoiceStartup(int argc, char * argv[])
 {
 	SetWorkPath(argv[0]);
-	ZaConfigLoad(DFT_CONFIG_FILE);
+	Za::Config::LoadFromFile(DFT_CONFIG_FILE);
 
 	int logparam = 0;
-	if (!g_zaConfig->General.OpenDebugLog) {
+	if (!Za::Config::MainConfig->General->OpenDebugLog) {
 		logparam = ZALOG_OUT_STDOUT | ZALOG_TYPE_INFO | ZALOG_TYPE_ERROR | ZALOG_PARAM_NOPREINFO;
 	}
 	else {
 		logparam = ZALOG_OUT_STDLOG | ZALOG_TYPE_ALL;
 	}
-	if (g_zaConfig->General.UseLogFile) {
+	if (Za::Config::MainConfig->General->UseLogFile) {
 		logparam |= ZALOG_OUT_FILE;
 		ZALOG_SETLOGFILE(DFT_LOG_FILE);
 	}
@@ -48,7 +48,7 @@ void ZaMain() {
 	ZALOG("音频系统已启动");
 
 	ZALOG("等待游戏运行...");
-	int gameID = ZaRemoteWaitGameStart(g_zaConfig->General.Mode);
+	int gameID = ZaRemoteWaitGameStart(Za::Config::MainConfig->General->Mode);
 	ZALOG("游戏已启动！");
 
 	errc = ZaRemoteInit(gameID);
@@ -57,25 +57,25 @@ void ZaMain() {
 		return;
 	}
 
-	ZaConfigSetActive(gameID);
-	ZaSoundSetVolumn(g_zaConfig->ActiveGame->Volume);
+	Za::Config::SetActiveGame(gameID);
+	ZaSoundSetVolumn(Za::Config::MainConfig->ActiveGame->Volume);
 	ZALOG("就绪");
 
 	ZaVoicePlayerInit();
 	ZALOG("已进入语音播放系统");
 	
-	ZALOG("语音文件目录为: %s", g_zaConfig->ActiveGame->VoiceDir.c_str());
-	for (int i = 1; i <= (int)g_zaConfig->ActiveGame->VoiceExt.size(); ++i) {
-		ZALOG("语音文件后缀%d: %s", i, g_zaConfig->ActiveGame->VoiceExt[i-1].c_str());
+	ZALOG("语音文件目录为: %s", Za::Config::MainConfig->ActiveGame->VoiceDir.c_str());
+	for (int i = 1; i <= (int)Za::Config::MainConfig->ActiveGame->VoiceExt.size(); ++i) {
+		ZALOG("语音文件后缀%d: %s", i, Za::Config::MainConfig->ActiveGame->VoiceExt[i-1].c_str());
 	}
-	if (gameID == GAMEID_AO && g_zaConfig->ActiveGame->DisableOriginalVoice) {
+	if (gameID == GAMEID_AO && Za::Config::MainConfig->ActiveGame->DisableOriginalVoice) {
 		ZALOG("启用了禁用原有剧情语音的功能");
 	}
 
 	while (!ZaCheckGameEnd())
 	{
 		errc = ZaVoicePlayerLoopOne();
-		Sleep(g_zaConfig->General.SleepTime);
+		Sleep(Za::Config::MainConfig->General->SleepTime);
 	}
 	ZALOG("游戏已退出！");
 	

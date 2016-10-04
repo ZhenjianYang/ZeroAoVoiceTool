@@ -78,6 +78,7 @@
 
 #define DFT_USELOGFILE 0
 #define DFT_DEBUGLOG 0
+#define DFT_AUTOSTART 0
 
 #define Z_DFT_VOICE_DIR "zero.voice"
 #define Z_DFT_VOICE_EXT {"ogg" , "wav"}

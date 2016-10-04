@@ -23,46 +23,66 @@
 
 #define STR_AutoStart "AutoStart"
 
-struct ZaConfigGame
-{
-	std::string VoiceDir;
-	std::string VoiceName;
-	std::vector<std::string> VoiceExt;
+#define CH_Equal '='
 
-	std::string VtblDir;
-	std::string VtblExt;
+namespace Za {
+	class Config {
+	public:
+		class ConfigData
+		{
+			friend class Config;
+		public:
+			struct GeneralConfig
+			{
+				int OpenDebugLog;
+				int UseLogFile;
+				int AutoStart;
 
-	int DisableOriginalVoice;
-	int VoiceIdLength;
-	int Volume;
-};
+				int RemoveFwdCtrlCh;
+				int SleepTime;
+				int Mode;
+			};
 
-struct ZaConfigGeneral
-{
-	int OpenDebugLog;
-	int UseLogFile;
-	int AutoStart;
+			struct GameConfig
+			{
+				std::string VoiceDir;
+				std::string VoiceName;
+				std::vector<std::string> VoiceExt;
 
-	int RemoveFwdCtrlCh;
-	int SleepTime;
-	int Mode;
-};
+				std::string VoiceTableDir;
+				std::string VoiceTableExt;
 
-struct ZaConfig
-{
-	int ActiveGameID;
-	const ZaConfigGame* ActiveGame;
+				int DisableOriginalVoice;
+				int VoiceIdLength;
+				int Volume;
+			};
 
-	ZaConfigGeneral General;
-	ZaConfigGame Ao;
-	ZaConfigGame Zero;
-};
-extern const ZaConfig* const &g_zaConfig;
+			const int ActiveGameID = m_ActiveGameID;
+			const GameConfig* const &ActiveGame = m_pActiveGame;
 
-bool ZaConfigLoad(const char* configFile);
-bool ZaConfigSave(const char* configFile);
-void ZaConfigSetActive(int gameID);
-void ZaConfigSetDefault(ZaConfig* pconfig = NULL);
-void ZaConfigSetConfig(const ZaConfig& config);
+			const GeneralConfig* const General = &m_general;
+			const GameConfig* const Ao = &m_ao;
+			const GameConfig* const Zero = &m_zero;
+
+		private:
+			int m_ActiveGameID;
+			GameConfig* m_pActiveGame;
+			GameConfig m_ao;
+			GameConfig m_zero;
+			GeneralConfig m_general;
+		};
+
+		static const ConfigData* const MainConfig;
+
+		static bool LoadFromFile(const char* configFile, ConfigData* pConfigDo = nullptr);
+		static bool SaveToFile(const char* configFile, ConfigData* pConfigDo = nullptr);
+		static void SetActiveGame(int gameID, ConfigData* pConfigDo = nullptr);
+		static void LoadDefault(ConfigData* pConfigDo = nullptr);
+		//将ao或zero的配置项复制给pConfigDo
+		static void Set(const ConfigData::GameConfig& gameConfig, int gameId, ConfigData* pConfigDo = nullptr);
+		//将general的配置项复制给pConfigDo
+		static void Set(const ConfigData::GeneralConfig& generalConfig, ConfigData* pConfigDo = nullptr);
+	};
+}
 
 #endif // !__ZACONFIG_H__

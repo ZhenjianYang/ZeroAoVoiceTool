@@ -119,15 +119,15 @@ int ZaPlayWait() {
 bool ZaPlayVoice(int voiceID, char *out_filename) {
 	if (voiceID == InValidVoiceId) return false;
 
-	const std::string& dir = g_zaConfig->ActiveGame->VoiceDir;
-	const std::string& preName = g_zaConfig->ActiveGame->VoiceName;
+	const std::string& dir = Za::Config::MainConfig->ActiveGame->VoiceDir;
+	const std::string& preName = Za::Config::MainConfig->ActiveGame->VoiceName;
 	int index = 0;
 	for (; index < (int)preName.size(); ++index) out_filename[index] = preName[index];
 
 	index += GetStrVoiceID(voiceID, out_filename + index);
 	out_filename[index++] = '.';
 
-	for (auto ext : g_zaConfig->ActiveGame->VoiceExt)
+	for (auto ext : Za::Config::MainConfig->ActiveGame->VoiceExt)
 	{
 		for (int i = 0; i < (int)ext.size(); ++i) out_filename[index + i] = ext[i];
 		out_filename[index + ext.size()] = 0;

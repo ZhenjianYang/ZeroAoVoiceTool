@@ -234,7 +234,7 @@ bool ZaInjectRemoteCode(int hWnd_this, unsigned bMsg) {
 		}
 	}
 	memset(buff, 0, sizeof(ZAData));
-	((ZAData*)buff)->disableOriVoice = _gameID == GAMEID_AO && g_zaConfig->Ao.DisableOriginalVoice;
+	((ZAData*)buff)->disableOriVoice = _gameID == GAMEID_AO && Za::Config::MainConfig->Ao->DisableOriginalVoice;
 
 	ZALOG_DEBUG("写入远程数据...");
 	if (!ZaRemoteWrite(_rAddZaData, buff, _rSizeZaData)) {
