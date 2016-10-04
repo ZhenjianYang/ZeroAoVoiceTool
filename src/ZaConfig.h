@@ -82,6 +82,9 @@ namespace Za {
 		static void Set(const ConfigData::GameConfig& gameConfig, int gameId, ConfigData* pConfigDo = nullptr);
 		//将general的配置项复制给pConfigDo
 		static void Set(const ConfigData::GeneralConfig& generalConfig, ConfigData* pConfigDo = nullptr);
+
+	private:
+		virtual ~Config() = 0;
 	};
 }
 
