@@ -1,8 +1,6 @@
 #ifndef __ZASCENAANALYZER_H__
 #define __ZASCENAANALYZER_H__
 
-#include "ZaConst.h"
-
 namespace Za {
 	class ScenaAnalyzer {
 	public:
