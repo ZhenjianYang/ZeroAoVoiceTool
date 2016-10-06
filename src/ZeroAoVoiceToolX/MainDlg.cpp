@@ -115,7 +115,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	ZALOG_DEBUG("Zero Ao Voice Tool %s", ZA_VERSION);
 
-	ZaSoundInit();
+	Za::Sound::Init();
 	ZALOG_DEBUG("音频系统已启动");
 
 	if (Za::Config::MainConfig->General->AutoStart) {
@@ -172,7 +172,7 @@ LRESULT CMainDlg::OnClose(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 		break;
 	}
 
-	ZaSoundEnd();
+	Za::Sound::End();
 	ZALOG_DEBUG("已关闭音频系统");
 	ZALOG_DEBUG("Zero Ao Voice Tool End");
 
@@ -270,7 +270,7 @@ LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	}
 	
 	Za::Config::SetActiveGame(m_gameID);
-	ZaSoundSetVolumn(Za::Config::MainConfig->ActiveGame->Volume);
+	Za::Sound::SetVolumn(Za::Config::MainConfig->ActiveGame->Volume);
 	ZALOG_DEBUG("就绪");
 
 	s_sign_initplayerstop = 0;
@@ -294,7 +294,7 @@ LRESULT CMainDlg::OnGameExit(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 LRESULT CMainDlg::OnPlayEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	ZaPlayWait();
-	if (ZaWaitingNum() == 0) ZaSoundSetStopCallBack();
+	if (ZaWaitingNum() == 0) Za::Sound::SetStopCallBack();
 	return 0;
 }
 LRESULT CMainDlg::OnInitPlayerEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -406,7 +406,7 @@ LRESULT CMainDlg::OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 		if (errc) ::SendMessage(m_hWnd, WM_MSG_ERROR, (WPARAM)ErrorType::ReadRemoteDataFailedRunning, 0);
 
 		if (voiceID != InValidVoiceId) {
-			if (ZaSoundStatus() == ZASOUND_STATUS_STOP
+			if (Za::Sound::GetStatus() == Za::Sound::Status::Stop
 				&& ZaWaitingNum() == 0) {
 				wait = false;
 			}
@@ -422,7 +422,7 @@ LRESULT CMainDlg::OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 			else
 			{
 				ZaAddToWait(voiceID);
-				ZaSoundSetStopCallBack(CMainDlg::PlayEndCallBack);
+				Za::Sound::SetStopCallBack(CMainDlg::PlayEndCallBack);
 			}
 		}
 	}

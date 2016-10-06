@@ -1,24 +1,35 @@
 #ifndef __ZASOUND_H__
 #define __ZASOUND_H__
 
-#include "ZaConst.h"
+namespace Za {
+	class Sound {
 
-#define ZASOUND_STATUS_PLAYING 0
-#define ZASOUND_STATUS_STOP    1
+	public:
+		enum class Status
+		{
+			Playing = 0,
+			Stop = 1
+		};
+		typedef int(*StopCallBackType)(void*);
 
-typedef int(*StopCallBack)(void*);
+		static const int VolumnMax;
 
-int ZaSoundInit(int volumn = VOLUME_MAX);
-int ZaSoundEnd();
+		static int Init(int volumn = VolumnMax);
+		static int End();
 
-void ZaSoundSetVolumn(int volumn);
-float ZaSoundGetVolumn();
+		static void SetVolumn(int volumn);
+		static int GetVolumn();
 
-int ZaSoundStatus();
+		static Status GetStatus();
 
-bool ZaSoundPlay(const char* soundFile);
-void ZaSoundStop();
+		static bool Play(const char* soundFile);
+		static void Stop();
 
-void ZaSoundSetStopCallBack(StopCallBack stopCallBack = nullptr, void* _param = nullptr);
+		static void SetStopCallBack(StopCallBackType stopCallBack = nullptr, void* param = nullptr);
+
+	private:
+		virtual ~Sound() = 0;
+	};
+}
 
 #endif // !__ZASOUND_H__

@@ -44,7 +44,7 @@ void ZaMain() {
 	int errc;
 	ZALOG("准备中...");
 
-	ZaSoundInit();
+	Za::Sound::Init();
 	ZALOG("音频系统已启动");
 
 	ZALOG("等待游戏运行...");
@@ -58,7 +58,7 @@ void ZaMain() {
 	}
 
 	Za::Config::SetActiveGame(gameID);
-	ZaSoundSetVolumn(Za::Config::MainConfig->ActiveGame->Volume);
+	Za::Sound::SetVolumn(Za::Config::MainConfig->ActiveGame->Volume);
 	ZALOG("就绪");
 
 	ZaVoicePlayerInit();
@@ -83,7 +83,7 @@ void ZaMain() {
 	ZALOG("已退出语音播放系统");
 	Za::Remote::End();
 	ZALOG_DEBUG("已关闭远程进程句柄");
-	ZaSoundEnd();
+	Za::Sound::End();
 	ZALOG("已关闭音频系统");
 }
 

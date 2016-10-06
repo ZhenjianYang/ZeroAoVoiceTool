@@ -26,7 +26,7 @@ static int VoicePlayerLoopMain()
 	int voiceID = InValidVoiceId;
 	bool wait = false;
 
-	if (ZaWaitingNum() && ZaSoundStatus() == ZASOUND_STATUS_STOP) {
+	if (ZaWaitingNum() && Za::Sound::GetStatus() == Za::Sound::Status::Stop) {
 		ZaPlayWait();
 	}
 
@@ -138,7 +138,7 @@ bool ZaPlayVoice(int voiceID, char *out_filename) {
 		std::string filePath = dir + '\\' + out_filename;
 
 		if (_access(filePath.c_str(), 4) == 0)
-			return ZaSoundPlay(filePath.c_str());
+			return Za::Sound::Play(filePath.c_str());
 	}
 	out_filename[index - 1] = 0;
 

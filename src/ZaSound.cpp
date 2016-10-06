@@ -1,12 +1,16 @@
 #include "ZaSound.h"
 
+#include "ZaConst.h"
 #include <audiere.h>
 
-static float _volume = 1.0f;
+const int Za::Sound::VolumnMax = VOLUME_MAX;
+
+static int _volume;
+static Za::Sound::StopCallBackType _callBack;
+static void* _callBackParam;
+
 static audiere::AudioDevicePtr _device = nullptr;
-audiere::OutputStreamPtr _soundStream = nullptr;
-static StopCallBack _callBack = nullptr;
-static void* _callBackParam = nullptr;
+static audiere::OutputStreamPtr _soundStream = nullptr;
 
 class AdrStopCallBack : public audiere::RefImplementation<audiere::StopCallback> {
 public:
@@ -21,12 +25,12 @@ void ADR_CALL AdrStopCallBack::streamStopped(audiere::StopEvent * event)
 	}
 }
 
-int ZaSoundInit(int volume)
+int Za::Sound::Init(int volume)
 {
-	ZaSoundSetStopCallBack(nullptr);
-	ZaSoundStop();
+	Za::Sound::SetStopCallBack(nullptr);
+	Za::Sound::Stop();
 
-	ZaSoundSetVolumn(volume);
+	Za::Sound::SetVolumn(volume);
 	
 	if (!_device.get()) {
 		_device = audiere::OpenDevice();
@@ -38,53 +42,53 @@ int ZaSoundInit(int volume)
 	return 0;
 }
 
-int ZaSoundEnd()
+int Za::Sound::End()
 {
-	ZaSoundSetStopCallBack(nullptr);
-	ZaSoundStop();
+	Za::Sound::SetStopCallBack(nullptr);
+	Za::Sound::Stop();
 	_soundStream = nullptr;
 	_device = nullptr;
 
 	return 0;
 }
 
-void ZaSoundSetVolumn(int volumn)
+void Za::Sound::SetVolumn(int volumn)
 {
-	_volume = (float)volumn / VOLUME_MAX;
+	_volume = volumn;
 }
 
-float ZaSoundGetVolumn()
+int Za::Sound::GetVolumn()
 {
 	return _volume;
 }
 
-int ZaSoundStatus()
+Za::Sound::Status Za::Sound::GetStatus()
 {
 	if (_soundStream && _soundStream->isPlaying())
-		return ZASOUND_STATUS_PLAYING;
+		return Za::Sound::Status::Playing;
 	else
-		return ZASOUND_STATUS_STOP;
+		return Za::Sound::Status::Stop;
 }
 
-bool ZaSoundPlay(const char* soundFile)
+bool Za::Sound::Play(const char* soundFile)
 {
-	ZaSoundStop();
+	Za::Sound::Stop();
 	_soundStream = audiere::OpenSound(_device, soundFile, true);
 	if (!_soundStream) return false;
 
-	_soundStream->setVolume(_volume);
+	_soundStream->setVolume((float)_volume / VolumnMax);
 	_soundStream->play();
 
 	return true;
 }
 
-void ZaSoundStop()
+void Za::Sound::Stop()
 {
 	if(_soundStream)
 		_soundStream->stop();
 }
 
-void ZaSoundSetStopCallBack(StopCallBack stopCallBack /*= nullptr*/, void* _param /*= nullptr*/)
+void Za::Sound::SetStopCallBack(StopCallBackType stopCallBack /*= nullptr*/, void* _param /*= nullptr*/)
 {
 	if (!_device.get()) return;
 
