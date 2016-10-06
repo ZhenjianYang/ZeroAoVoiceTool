@@ -74,18 +74,6 @@ namespace Za {
 		static bool RemoteFree(unsigned rAdd, unsigned size);
 
 	private:
-		static unsigned _remoteDataAddr;
-		static unsigned _remoteDataSize;
-
-		static int _hWnd;
-		static int _hProcess;
-		static int _gameId;
-
-		static bool _openProcess();
-		static bool _injectRemoteCode(int hWnd_this, unsigned bMsg);
-		static bool _cleanRemoteData();
-
-	private:
 		virtual ~Remote() = 0;
 	};
 }

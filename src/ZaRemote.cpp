@@ -5,15 +5,19 @@
 
 #include <Windows.h>
 
-unsigned Za::Remote::_remoteDataAddr;
-unsigned Za::Remote::_remoteDataSize;
+static unsigned _remoteDataAddr;
+static unsigned _remoteDataSize;
+
+static HWND _hWnd = 0;
+static HANDLE _hProcess = 0;
+static int _gameId = GAMEID_INVALID;
+
+static bool _openProcess();
+static bool _injectRemoteCode(int hWnd_this, unsigned bMsg);
+static bool _cleanRemoteData();
 
 const unsigned &Za::Remote::RemoteDataAddr = _remoteDataAddr;
 const unsigned &Za::Remote::RemoteDataSize = _remoteDataSize;
-
-int Za::Remote::_hWnd = 0;
-int Za::Remote::_hProcess = 0;
-int Za::Remote::_gameId = GAMEID_INVALID;
 
 static const unsigned z_rOldJctoList[] = { Z_OLD_JCTO_LOADSCENA, Z_OLD_JCTO_LOADSCENA1, Z_OLD_JCTO_LOADBLOCK , Z_OLD_JCTO_SHOWTEXT };
 static const unsigned z_rAddrJcList[] = { Z_ADD_JC_LOADSCENA, Z_ADD_JC_LOADSCENA1, Z_ADD_JC_LOADBLOCK, Z_ADD_JC_SHOWTEXT };
@@ -80,12 +84,11 @@ int Za::Remote::WaitGameStart(int mode)
 	else return GAMEID_ZERO;
 }
 
-
 int Za::Remote::CheckGameStart(int numTitles, const char* titles[]) {
 	_hWnd = NULL;
 	int index;
 	for (index = numTitles - 1; index >= 0; --index) {
-		_hWnd = (int)::FindWindowA(NULL, titles[index]);
+		_hWnd = ::FindWindowA(NULL, titles[index]);
 		if (_hWnd) break;
 	}
 	return index;
@@ -93,27 +96,26 @@ int Za::Remote::CheckGameStart(int numTitles, const char* titles[]) {
 
 bool Za::Remote::CheckGameEnd() {
 	DWORD code;
-	if (!GetExitCodeProcess((HANDLE)_hProcess, &code) || code != STILL_ACTIVE)
+	if (!GetExitCodeProcess(_hProcess, &code) || code != STILL_ACTIVE)
 		return true;
 	return false;
 }
 
 
-
 bool Za::Remote::RemoteRead(unsigned rAdd, void *buff, unsigned size) {
-	return ReadProcessMemory((HANDLE)_hProcess, (LPVOID)rAdd, buff, size, NULL) == TRUE;
+	return ReadProcessMemory(_hProcess, (LPVOID)rAdd, buff, size, NULL) == TRUE;
 }
 
 bool Za::Remote::RemoteWrite(unsigned rAdd, const void *buff, unsigned size) {
-	return WriteProcessMemory((HANDLE)_hProcess, (LPVOID)rAdd, buff, size, NULL) == TRUE;
+	return WriteProcessMemory(_hProcess, (LPVOID)rAdd, buff, size, NULL) == TRUE;
 }
 
 unsigned Za::Remote::RemoteAlloc(unsigned size) {
-	return (unsigned)VirtualAllocEx((HANDLE)_hProcess, NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	return (unsigned)VirtualAllocEx(_hProcess, NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 }
 
 bool Za::Remote::RemoteFree(unsigned rAdd, unsigned size) {
-	return VirtualFreeEx((HANDLE)_hProcess, (LPVOID)rAdd, size, MEM_DECOMMIT) == TRUE;
+	return VirtualFreeEx(_hProcess, (LPVOID)rAdd, size, MEM_DECOMMIT) == TRUE;
 }
 
 
@@ -162,21 +164,21 @@ void Za::Remote::End()
 		}
 	}
 
-	CloseHandle((HANDLE)_hProcess);
+	CloseHandle(_hProcess);
 	_hProcess = NULL;
 	_hWnd = NULL;
 }
 
 
-bool Za::Remote::_openProcess() {
+bool _openProcess() {
 	DWORD pid;
-	GetWindowThreadProcessId((HWND)_hWnd, &pid);
+	GetWindowThreadProcessId(_hWnd, &pid);
 
-	_hProcess = (int)OpenProcess(PROCESS_ALL_ACCESS, false, pid);
+	_hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
 	return _hProcess != NULL;
 }
 
-bool Za::Remote::_cleanRemoteData()
+bool _cleanRemoteData()
 {
 	if (!_hProcess) return true;
 
@@ -192,10 +194,10 @@ bool Za::Remote::_cleanRemoteData()
 	}
 
 	::Sleep(5);
-	return Za::Remote::RemoteFree(RemoteDataAddr, RemoteDataSize);
+	return Za::Remote::RemoteFree(_remoteDataAddr, _remoteDataSize);
 }
 
-bool Za::Remote::_injectRemoteCode(int hWnd_this, unsigned bMsg) {
+bool _injectRemoteCode(int hWnd_this, unsigned bMsg) {
 	const unsigned ptr_apipmsg = _gameId == GAMEID_AO ? a_ptr_apipmsg : z_ptr_apipmsg;
 	const unsigned *rOldJctoList = _gameId == GAMEID_AO ? a_rOldJctoList : z_rOldJctoList;
 	const unsigned *rAddrJcList = _gameId == GAMEID_AO ? a_rAddrJcList : z_rAddrJcList;
@@ -205,7 +207,7 @@ bool Za::Remote::_injectRemoteCode(int hWnd_this, unsigned bMsg) {
 	unsigned char buff[MAX_REMOTE_DADA_SIZE];
 	memset(buff, INIT_CODE, sizeof(buff));
 
-	unsigned p = sizeof(RemoteData); PACK(p, REMOTE_DATA_PACK);
+	unsigned p = sizeof(Za::Remote::RemoteData); PACK(p, REMOTE_DATA_PACK);
 	for (int i = 0; i < numJc; ++i) {
 		rAddrNewJc[i] = p;
 		unsigned char *t = (unsigned char *)NewCJList[i];
@@ -233,14 +235,14 @@ bool Za::Remote::_injectRemoteCode(int hWnd_this, unsigned bMsg) {
 		ZALOG_ERROR("分配远程数据空间失败！");
 		return false;
 	}
-	ZALOG_DEBUG("分配远程数据空间成功。地址：0x%08X, 大小：0x%04X", RemoteDataAddr, RemoteDataSize);
+	ZALOG_DEBUG("分配远程数据空间成功。地址：0x%08X, 大小：0x%04X", _remoteDataAddr, _remoteDataSize);
 
 	//将占位指令修改为本来的指令
 	for (int i = 0; i < numJc; ++i) {
 		p = rAddrNewJc[i];
 		for (;;) {
 			if (*(unsigned *)(buff + p) == FAKE_RAZADATA) {
-				*(unsigned *)(buff + p) = RemoteDataAddr; p += 4;
+				*(unsigned *)(buff + p) = _remoteDataAddr; p += 4;
 			}
 			else if (*(unsigned *)(buff + p) == FAKE_MESSAGE_ID) {
 				*(unsigned *)(buff + p) = msgId_add[i] + bMsg; p += 4;
@@ -256,24 +258,24 @@ bool Za::Remote::_injectRemoteCode(int hWnd_this, unsigned bMsg) {
 				&& buff[p + 1] == FAKE_CODE2 && buff[p + 2] == FAKE_CODE2
 				&& buff[p + 3] == FAKE_CODE2 && buff[p + 4] == FAKE_CODE2) {
 				buff[p] = JMP_CODE; p++;
-				*(unsigned *)(buff + p) = rOldJctoList[i] - (RemoteDataAddr + p + 4); p += 4;
+				*(unsigned *)(buff + p) = rOldJctoList[i] - (_remoteDataAddr + p + 4); p += 4;
 				break;
 			}
 			else
 				++p;
 		}
 	}
-	memset(buff, 0, sizeof(RemoteData));
-	((RemoteData*)buff)->disableOriVoice = _gameId == GAMEID_AO && Za::Config::MainConfig->Ao->DisableOriginalVoice;
+	memset(buff, 0, sizeof(Za::Remote::RemoteData));
+	((Za::Remote::RemoteData*)buff)->disableOriVoice = _gameId == GAMEID_AO && Za::Config::MainConfig->Ao->DisableOriginalVoice;
 
 	ZALOG_DEBUG("写入远程数据...");
-	if (!Za::Remote::RemoteWrite(RemoteDataAddr, buff, RemoteDataSize)) {
-		Za::Remote::RemoteFree(RemoteDataAddr, RemoteDataSize);
+	if (!Za::Remote::RemoteWrite(_remoteDataAddr, buff, _remoteDataSize)) {
+		Za::Remote::RemoteFree(_remoteDataAddr, _remoteDataSize);
 		ZALOG_ERROR("写入远程远程数据失败！");
 		return false;
 	}
 	for (int i = 0; i < numJc; ++i) {
-		rAddrNewJc[i] += RemoteDataAddr;
+		rAddrNewJc[i] += _remoteDataAddr;
 		unsigned ljmp = rAddrNewJc[i] - rAddrJcList[i] - 5;
 		if (!Za::Remote::RemoteWrite(rAddrJcList[i] + 1, &ljmp, sizeof(ljmp))) {
 			ZALOG_ERROR("写入远程远程数据失败！");

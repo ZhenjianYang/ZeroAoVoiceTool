@@ -9,26 +9,40 @@
 #include <string>
 #include <vector>
 
-Za::ScenaAnalyzer::ScenaData Za::ScenaAnalyzer::_scenas[3];
-unsigned Za::ScenaAnalyzer::_raBlock;
-unsigned Za::ScenaAnalyzer::_raFirstText;
-unsigned Za::ScenaAnalyzer::_raCurText;
+struct ScenaData {
+	unsigned aScenaX;
+	char* pScneaNameX;
 
-ZaVoiceTablesGroup Za::ScenaAnalyzer::_zaVoiceTablesGroup;
-const ZaVoiceTable *Za::ScenaAnalyzer::_zaVoiceTable;
-
-char Za::ScenaAnalyzer::_scenaNameX[3][MAX_SCENANAME_LENGTH + 1];
-
+	bool operator<(const ScenaData& b) { return aScenaX < b.aScenaX; }
+};
+static ScenaData _scenas[3];
+static char _scenaNameX[3][MAX_SCENANAME_LENGTH + 1];
 #define NAME_BUFF_SIZE (sizeof(_scenaNameX[0]) / sizeof(*_scenaNameX[0]))
-
-char* Za::ScenaAnalyzer::_pScenaName;
-unsigned Za::ScenaAnalyzer::_offset1;
 
 #define BUFF_TEXT_SIZE 1024
 static unsigned char buffText[BUFF_TEXT_SIZE];
 static unsigned char buffTextSrc[BUFF_TEXT_SIZE];
 
-bool Za::ScenaAnalyzer::_checkScenaName(const char *scenaName) {
+static unsigned _raBlock;
+static unsigned _raFirstText;
+static unsigned _raCurText;
+
+static ZaVoiceTablesGroup _zaVoiceTablesGroup;
+static const ZaVoiceTable *_zaVoiceTable;
+
+static char* _pScenaName;
+static unsigned _offset1;
+
+static bool _checkScenaName(const char *scenaName);
+static int _textAnalysisCN(unsigned char *dst, const unsigned char* src);
+static const unsigned char* _textAnalysisJP(const unsigned char* buff);
+static void _loadNewVoiceTable(const char* scenaName);
+static void _clearAllVoiceTable();
+static void _reLoadAllVoiceTables(void * data);
+
+static int LoadScenaX(unsigned raScena, int X);
+
+bool _checkScenaName(const char *scenaName) {
 	int count = 0;
 	while (*scenaName != 0) {
 		if (*scenaName < 0x20 || *scenaName >= 0x80) return false;
@@ -38,7 +52,7 @@ bool Za::ScenaAnalyzer::_checkScenaName(const char *scenaName) {
 	}
 	return count >= MIN_SCENANAME_LENGTH && count <= MAX_SCENANAME_LENGTH;
 }
-int Za::ScenaAnalyzer::_textAnalysisCN(unsigned char *dst, const unsigned char* src) {
+int _textAnalysisCN(unsigned char *dst, const unsigned char* src) {
 	int first = 0;
 	while (*src < 0x20 || *src == 0xFF) {
 		src++; first++;
@@ -66,7 +80,7 @@ int Za::ScenaAnalyzer::_textAnalysisCN(unsigned char *dst, const unsigned char* 
 	*dst = 0;
 	return first;
 }
-const unsigned char* Za::ScenaAnalyzer::_textAnalysisJP(const unsigned char* buff) {
+const unsigned char* _textAnalysisJP(const unsigned char* buff) {
 	const unsigned char* abuff = buff;
 	if (Za::Config::MainConfig->General->RemoveFwdCtrlCh) {
 		while (*abuff == '#') {
@@ -78,16 +92,16 @@ const unsigned char* Za::ScenaAnalyzer::_textAnalysisJP(const unsigned char* buf
 	return abuff;
 }
 
-void Za::ScenaAnalyzer::_loadNewVoiceTable(const char* scenaName) {
+void _loadNewVoiceTable(const char* scenaName) {
 	_zaVoiceTable = _zaVoiceTablesGroup.GetVoiceTable(scenaName);
 	if (_zaVoiceTable == nullptr)
 		_zaVoiceTable = &InvalidVoiceTable;
 }
 
-void Za::ScenaAnalyzer::_clearAllVoiceTable() {
+void _clearAllVoiceTable() {
 	_zaVoiceTablesGroup.Clear();
 }
-void Za::ScenaAnalyzer::_reLoadAllVoiceTables(void * data) {
+void _reLoadAllVoiceTables(void * data) {
 	_clearAllVoiceTable();
 
 	std::vector<std::string> subs;
@@ -101,6 +115,22 @@ void Za::ScenaAnalyzer::_reLoadAllVoiceTables(void * data) {
 		std::string _scenaNameX = sub.substr(0, sub.rfind('.'));
 		_zaVoiceTablesGroup.AddVoiceTable(_scenaNameX, dir + '\\' + sub);
 	}
+}
+
+int LoadScenaX(unsigned raScena, int X) {
+	unsigned addScenaName;
+	char * nameBuff = _scenaNameX[X];
+	if (!Za::Remote::RemoteRead(raScena + OFF_OFF_SCENANAME, &addScenaName, sizeof(addScenaName))
+		|| !Za::Remote::RemoteRead(raScena + addScenaName, nameBuff, NAME_BUFF_SIZE)) {
+		ZALOG_ERROR("访问远程数据失败: zaData.aScena");
+		return 1;
+	}
+	nameBuff[NAME_BUFF_SIZE - 1] = 0;
+	if (!_checkScenaName(nameBuff)) {
+		nameBuff[0] = 0;
+	}
+
+	return 0;
 }
 
 int Za::ScenaAnalyzer::Init(void* data /*= 0*/)
@@ -122,22 +152,6 @@ int Za::ScenaAnalyzer::End()
 	_pScenaName = NULL;
 	_scenaNameX[0][0] = 0;
 	_zaVoiceTable = &InvalidVoiceTable;
-
-	return 0;
-}
-
-int Za::ScenaAnalyzer::LoadScenaX(unsigned raScena, int X) {
-	unsigned addScenaName;
-	char * nameBuff = _scenaNameX[X];
-	if (!Za::Remote::RemoteRead(raScena + OFF_OFF_SCENANAME, &addScenaName, sizeof(addScenaName))
-		|| !Za::Remote::RemoteRead(raScena + addScenaName, nameBuff, NAME_BUFF_SIZE)) {
-		ZALOG_ERROR("访问远程数据失败: zaData.aScena");
-		return 1;
-	}
-	nameBuff[NAME_BUFF_SIZE - 1] = 0;
-	if (!_checkScenaName(nameBuff)) {
-		nameBuff[0] = 0;
-	}
 
 	return 0;
 }
@@ -288,7 +302,4 @@ int Za::ScenaAnalyzer::DShowText(unsigned raText, int & out_voiceID, bool & out_
 
 	return 0;
 }
-
-
-
 
