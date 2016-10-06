@@ -25,7 +25,7 @@ static int VoicePlayerLoopMain()
 	int errc = 0;
 	
 	const char* _scenaNameX = nullptr;
-	int voiceID = InValidVoiceId;
+	int voiceID = INVAILD_VOICE_ID;
 	bool wait = false;
 
 	if (Za::VoicePlayer::GetWaitingNum() && Za::Sound::GetStatus() == Za::Sound::Status::Stop) {
@@ -67,7 +67,7 @@ static int VoicePlayerLoopMain()
 		if (errc) return errc;
 	}
 
-	if (voiceID != InValidVoiceId) {
+	if (voiceID != INVAILD_VOICE_ID) {
 		if (!wait) {
 			Za::VoicePlayer::ClearWait();
 			if (Za::VoicePlayer::PlayVoice(voiceID, buff_voiceFileName)) {
@@ -121,7 +121,7 @@ int Za::VoicePlayer::PlayWait() {
 }
 
 bool Za::VoicePlayer::PlayVoice(int voiceId, char *out_filename /*= nullptr*/) {
-	if (voiceId == InValidVoiceId) return false;
+	if (voiceId == INVAILD_VOICE_ID) return false;
 	
 	char* buff_filename = out_filename == nullptr ? buff_voiceFileName : out_filename;
 

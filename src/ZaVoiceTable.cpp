@@ -2,16 +2,141 @@
 #include "ZaConst.h"
 
 #include <fstream>
+#include <map>
+#include <string>
+
+using namespace std;
 
 #define MAXCH_ONE_LINE 1024
 
-const VoiceInfo InvaildVoiceInfo = { INVAILD_VOICE_ID, std::string("") };
-const ZaVoiceTable ZaVoiceTablesGroup::_InvalidVoiceTable;
-const ZaVoiceTable & InvalidVoiceTable = ZaVoiceTablesGroup::_InvalidVoiceTable;
+typedef Za::VoiceTable::VoiceInfo VoiceInfo;
+typedef map<int, VoiceInfo> _TableType;
+typedef map<string, const _TableType*> _GroupType;
 
-static bool GetAndFormat(char* buff, int &offset, int &voiceid, const char* &jpText) {
+static _GroupType _group;
+
+static const _TableType _emptyTable;
+static const _GroupType _emptyGroup = { {"",  &_emptyTable} };
+
+static _GroupType::const_iterator _cur = _emptyGroup.begin();
+#define _curTable _cur->second 
+#define _curName _cur->first
+
+static bool _getAndFormat(char* buff, int &offset, int &voiceid, const char* &jpText, int &jpLen);
+static const _TableType* _creatTable(const char* vtblFile);
+static void _destoryTable(const _TableType* &table);
+
+int Za::VoiceTable::Num()
+{
+	return _cur->second->size();
+}
+
+const VoiceInfo* Za::VoiceTable::GetVoiceInfo(int offset)
+{
+	auto it = _curTable->find(offset);
+	if (it != _curTable->end()) {
+		return &it->second;
+	}
+	else {
+		return nullptr;
+	}
+}
+
+const char * Za::VoiceTable::Name()
+{
+	return _curName.c_str();
+}
+
+int Za::VoiceTable::AllGroups::GroupsNum()
+{
+	return _group.size();
+}
+
+void Za::VoiceTable::AllGroups::Clear()
+{
+	for (auto &it : _group) {
+		_destoryTable(it.second);
+	}
+	_group.clear();
+	_cur = _emptyGroup.begin();
+}
+
+bool Za::VoiceTable::AllGroups::AddGroup(const char * scenaName, const char * vtblFile)
+{
+	if (scenaName == nullptr || scenaName[0] == 0) return false;
+
+	auto it = _group.find(scenaName);
+	if (it != _group.end()) return false;
+
+	auto newTable = _creatTable(vtblFile);
+	if (!newTable) return false;
+
+	_group[scenaName] = newTable;
+	return true;
+}
+
+bool Za::VoiceTable::AllGroups::SetCurGroup(const char * scenaName)
+{
+	auto it = _group.find(scenaName);
+	if (it == _group.end()) _cur = _emptyGroup.begin();
+	else _cur = it;
+
+	return true;
+}
+
+const _TableType* _creatTable(const char* vtblFile) {
+	std::ifstream ifs(vtblFile, std::ifstream::in);
+	if (!ifs) return nullptr;
+
+	char buff[MAXCH_ONE_LINE + 1];
+	_TableType* newTable = new _TableType;
+
+	while (ifs.getline(buff, MAXCH_ONE_LINE))
+	{
+		if (buff[0] == '\0' || buff[0] == '#' || buff[0] == ';')
+			continue;
+
+		int offset, voiceid, jpLen;
+		const char* jpText;
+
+		if (!_getAndFormat(buff, offset, voiceid, jpText, jpLen)) {
+			continue;
+		}
+
+		if (offset == INVALID_OFFSET) continue;
+		if (newTable->find(offset) != newTable->end()) continue;
+
+		VoiceInfo vinf;
+		vinf.voiceId = voiceid;
+
+		if (jpLen) {
+			char* tjpText = new char[jpLen + 1];
+			for (int i = 0; jpText[i]; ++i) tjpText[i] = jpText[i];
+			tjpText[jpLen] = 0;
+			vinf.jpText = tjpText;
+		}
+		else {
+			vinf.jpText = nullptr;
+		}
+
+		(*newTable)[offset] = vinf;
+	}
+
+	ifs.close();
+	return newTable;
+}
+void _destoryTable(const _TableType* &table) {
+	if (!table) return;
+	for (auto &it : *table) {
+		delete it.second.jpText;
+	}
+	delete table;
+	table = nullptr;
+}
+bool _getAndFormat(char* buff, int &offset, int &voiceid, const char* &jpText, int &jpLen) {
 	offset = voiceid = 0;
 	jpText = NULL;
+	jpLen = 0;
 
 	while (*buff == 0x20 || *buff == '\t') ++buff;
 	while (*buff != 0x20 && *buff != '\t') {
@@ -25,7 +150,7 @@ static bool GetAndFormat(char* buff, int &offset, int &voiceid, const char* &jpT
 
 	while (*buff == 0x20 || *buff == '\t') ++buff;
 	if (*buff == 0) return false;
- 	while (*buff != 0x20 && *buff != '\t' && *buff != '\0') {
+	while (*buff != 0x20 && *buff != '\t' && *buff != '\0') {
 		voiceid *= 10;
 		if (*buff >= '0' && *buff <= '9') voiceid += *buff - '0';
 		else return false;
@@ -36,86 +161,8 @@ static bool GetAndFormat(char* buff, int &offset, int &voiceid, const char* &jpT
 	jpText = buff;
 	while (*buff != 0) {
 		if (*buff == '\\' && *(buff + 1) == 'n') { *buff = ' '; *(buff + 1) = '\n'; }
-		++buff;
+		++buff; ++jpLen;
 	}
 	return true;
 }
 
-bool ZaVoiceTable::LoadTblFile(const std::string& vtblFile)
-{
-	destory();
-
-	std::ifstream ifs(vtblFile, std::ifstream::in);
-	if (!ifs) return false;
-
-	char buff[MAXCH_ONE_LINE + 1];
-
-	while (ifs.getline(buff, MAXCH_ONE_LINE))
-	{
-		if (buff[0] == '\0' || buff[0] == '#' || buff[0] == ';')
-			continue;
-
-		int offset, voiceid;
-		const char* jpText;
-		
-		if (!GetAndFormat(buff, offset, voiceid, jpText)) {
-			continue;
-		}
-
-		if (map_off_vinf.find(offset) != map_off_vinf.end()) continue;
-		
-		VoiceInfo* vinf = new VoiceInfo;
-		vinf->voiceID = voiceid;
-		vinf->jpText = jpText;
-
-		map_off_vinf[offset] = vinf;
-	}
-
-	ifs.close();
-	return true;
-}
-
-const VoiceInfo * ZaVoiceTable::GetVoiceInfo(int offset) const
-{
-	auto tvif = map_off_vinf.find(offset);
-	if (tvif == map_off_vinf.end()) return nullptr;
-
-	return tvif->second;
-}
-
-void ZaVoiceTable::destory()
-{
-	for (auto ovi : map_off_vinf) {
-		delete ovi.second;
-	}
-	map_off_vinf.clear();
-}
-
-const ZaVoiceTable * ZaVoiceTablesGroup::GetVoiceTable(const std::string & name) const
-{
-	auto nvtbl = map_name_vtbl.find(name);
-	if (nvtbl == map_name_vtbl.end()) return nullptr;
-	return nvtbl->second;
-}
-
-const ZaVoiceTable * ZaVoiceTablesGroup::AddVoiceTable(const std::string & name, const std::string & vtblFile)
-{
-	if(map_name_vtbl.find(name) != map_name_vtbl.end())
-		return nullptr;
-
-	ZaVoiceTable *vt = new ZaVoiceTable(vtblFile);
-	if (vt == nullptr || vt->Num() == 0) {
-		delete vt;
-		return nullptr;
-	}
-
-	map_name_vtbl[name] = vt;
-	return vt;
-}
-
-void ZaVoiceTablesGroup::destory()
-{
-	for (auto mnv : map_name_vtbl)
-		delete mnv.second;
-	map_name_vtbl.clear();
-}

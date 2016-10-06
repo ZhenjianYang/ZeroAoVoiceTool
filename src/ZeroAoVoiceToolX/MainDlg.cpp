@@ -405,7 +405,7 @@ LRESULT CMainDlg::OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 		int errc = Za::ScenaAnalyzer::DShowText(m_zadata.aCurText, voiceID, wait);
 		if (errc) ::SendMessage(m_hWnd, WM_MSG_ERROR, (WPARAM)ErrorType::ReadRemoteDataFailedRunning, 0);
 
-		if (voiceID != InValidVoiceId) {
+		if (voiceID != INVAILD_VOICE_ID) {
 			if (Za::Sound::GetStatus() == Za::Sound::Status::Stop
 				&& Za::VoicePlayer::GetWaitingNum() == 0) {
 				wait = false;
@@ -574,8 +574,6 @@ void CMainDlg::LoadConfig()
 
 void CMainDlg::SaveConfig()
 {
-	Za::Config::LoadDefault();
-
 	Za::Config::ConfigData::GameConfig aoConfig = *Za::Config::MainConfig->Ao;
 	Za::Config::ConfigData::GameConfig zeroConfig = *Za::Config::MainConfig->Zero;
 	Za::Config::ConfigData::GeneralConfig generalConfig = *Za::Config::MainConfig->General;

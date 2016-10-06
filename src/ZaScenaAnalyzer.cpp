@@ -27,9 +27,6 @@ static unsigned _raBlock;
 static unsigned _raFirstText;
 static unsigned _raCurText;
 
-static ZaVoiceTablesGroup _zaVoiceTablesGroup;
-static const ZaVoiceTable *_zaVoiceTable;
-
 static char* _pScenaName;
 static unsigned _offset1;
 
@@ -81,6 +78,7 @@ int _textAnalysisCN(unsigned char *dst, const unsigned char* src) {
 	return first;
 }
 const unsigned char* _textAnalysisJP(const unsigned char* buff) {
+	if (!buff) return buff;
 	const unsigned char* abuff = buff;
 	if (Za::Config::MainConfig->General->RemoveFwdCtrlCh) {
 		while (*abuff == '#') {
@@ -93,13 +91,11 @@ const unsigned char* _textAnalysisJP(const unsigned char* buff) {
 }
 
 void _loadNewVoiceTable(const char* scenaName) {
-	_zaVoiceTable = _zaVoiceTablesGroup.GetVoiceTable(scenaName);
-	if (_zaVoiceTable == nullptr)
-		_zaVoiceTable = &InvalidVoiceTable;
+	Za::VoiceTable::AllGroups::SetCurGroup(scenaName);
 }
 
 void _clearAllVoiceTable() {
-	_zaVoiceTablesGroup.Clear();
+	Za::VoiceTable::AllGroups::Clear();
 }
 void _reLoadAllVoiceTables(void * data) {
 	_clearAllVoiceTable();
@@ -113,7 +109,7 @@ void _reLoadAllVoiceTables(void * data) {
 		if (data && *(unsigned*)data) break;
 
 		std::string _scenaNameX = sub.substr(0, sub.rfind('.'));
-		_zaVoiceTablesGroup.AddVoiceTable(_scenaNameX, dir + '\\' + sub);
+		Za::VoiceTable::AllGroups::AddGroup(_scenaNameX.c_str(), (dir + '\\' + sub).c_str());
 	}
 }
 
@@ -137,11 +133,10 @@ int Za::ScenaAnalyzer::Init(void* data /*= 0*/)
 {
 	_pScenaName = NULL;
 	_scenaNameX[0][0] = 0;
-	_zaVoiceTable = &InvalidVoiceTable;
 
 	ZALOG_DEBUG("加载语音表...");
 	_reLoadAllVoiceTables(data);
-	ZALOG_DEBUG("已加载的语音表数: %d", _zaVoiceTablesGroup.Num());
+	ZALOG_DEBUG("已加载的语音表数: %d", Za::VoiceTable::AllGroups::GroupsNum());
 
 	return 0;
 }
@@ -151,7 +146,6 @@ int Za::ScenaAnalyzer::End()
 
 	_pScenaName = NULL;
 	_scenaNameX[0][0] = 0;
-	_zaVoiceTable = &InvalidVoiceTable;
 
 	return 0;
 }
@@ -232,7 +226,7 @@ int Za::ScenaAnalyzer::DLoadBlock(unsigned raBlock, const char* &out_scenaName)
 
 				ZALOG_DEBUG("Scena:%s, Loading Voice Table...", _pScenaName);
 				_loadNewVoiceTable(_pScenaName);
-				ZALOG_DEBUG("Voice Table Records：%d", _zaVoiceTable->Num());
+				ZALOG_DEBUG("Voice Table Records：%d", Za::VoiceTable::Num());
 			}
 
 			out_scenaName = _scenas[i].pScneaNameX;
@@ -244,7 +238,7 @@ int Za::ScenaAnalyzer::DLoadBlock(unsigned raBlock, const char* &out_scenaName)
 }
 int Za::ScenaAnalyzer::DShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 {
-	out_voiceID = InValidVoiceId; out_wait = false;
+	out_voiceID = INVAILD_VOICE_ID; out_wait = false;
 
 	if (_scenaNameX[0] == 0 || _raBlock == 0) return 0;
 
@@ -264,23 +258,22 @@ int Za::ScenaAnalyzer::DShowText(unsigned raText, int & out_voiceID, bool & out_
 	offset += _textAnalysisCN(buffText, buffTextSrc);
 
 	if (buffText[0] != 0) {
-		const VoiceInfo* pvinf = _zaVoiceTable->GetVoiceInfo(offset);
-		if (pvinf == nullptr) {
-			pvinf = _zaVoiceTable->GetVoiceInfo(offset + FAKE_OFFSET);
-			if (pvinf != nullptr) {
+		auto vinf = Za::VoiceTable::GetVoiceInfo(offset);
+		if (vinf == nullptr) {
+			vinf = Za::VoiceTable::GetVoiceInfo(offset + FAKE_OFFSET);
+			if (vinf != nullptr) {
 				offset += FAKE_OFFSET;
 				out_wait = true;
 			}
 		}
-		const VoiceInfo& vinf = pvinf == nullptr ? InvaildVoiceInfo : *pvinf;
-		out_voiceID = vinf.voiceID;
+		out_voiceID = vinf ? vinf->voiceId : INVAILD_VOICE_ID;
 
-		const unsigned char* buffTextJP = (const unsigned char*)vinf.jpText.c_str();
+		const unsigned char* buffTextJP = vinf ? (const unsigned char*)vinf->jpText : nullptr;
 		const unsigned char* buffTextJPFixed = _textAnalysisJP(buffTextJP);
 		char buffStrVoiceId[MAX_LENGTH_VOICE_ID + 1];
-		GetStrVoiceID(vinf.voiceID, Za::Config::MainConfig->ActiveGame->VoiceIdLength, buffStrVoiceId);
+		GetStrVoiceID(out_voiceID, Za::Config::MainConfig->ActiveGame->VoiceIdLength, buffStrVoiceId);
 
-		if (buffTextJPFixed[0] != 0) {
+		if (buffTextJPFixed && buffTextJPFixed[0] != 0) {
 			ZALOG_DEBUG("\nScena:%s,Offset:0x%06X,VoiceID:%s\n"
 				"------------------------------------\n"
 				"%s\n"

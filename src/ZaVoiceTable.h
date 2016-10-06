@@ -1,70 +1,35 @@
 #ifndef __ZAVOICETABLE_H__
 #define __ZAVOICETABLE_H__
 
-#include "ZaConst.h"
+namespace Za {
+	class VoiceTable {
+	public:
+		struct VoiceInfo
+		{
+			int voiceId;
+			const char* jpText;
+		};
 
-#include <string>
-#include <map>
+		class AllGroups {
 
-const int InValidVoiceId = INVAILD_VOICE_ID;
+		public:
+			static int GroupsNum();
+			static void Clear();
+			static bool AddGroup(const char* scenaName, const char* vtblFile);
 
-struct VoiceInfo
-{
-	int voiceID;
-	std::string jpText;
-};
-extern const VoiceInfo InvaildVoiceInfo; 
+			static bool SetCurGroup(const char* scenaName);
 
-class ZaVoiceTablesGroup;
-class ZaVoiceTable
-{
-	friend ZaVoiceTablesGroup;
-	typedef std::map<int, VoiceInfo*> MapOffVInfo;
+		private:
+			virtual ~AllGroups() = 0;
+		};
 
-private:
-	MapOffVInfo map_off_vinf;
+		static int Num();
+		static const VoiceInfo* GetVoiceInfo(int offset);
+		static const char* Name();
 
-public:
-	const int Num() const { return map_off_vinf.size(); }
-
-	const VoiceInfo* GetVoiceInfo(int offset) const;
-
-private:
-	ZaVoiceTable(const std::string& vtblFile) {
-		LoadTblFile(vtblFile);
-	}
-	bool LoadTblFile(const std::string& vtblFile);
-	ZaVoiceTable() {}
-	~ZaVoiceTable() { destory(); }
-	void destory();
-
-private:
-	ZaVoiceTable(const ZaVoiceTable&);
-	ZaVoiceTable& operator=(const ZaVoiceTable&);
-};
-
-class ZaVoiceTablesGroup {
-	typedef std::map<std::string, ZaVoiceTable*> MapNameVoiceTable;
-public:
-	static const ZaVoiceTable _InvalidVoiceTable;
-
-public:
-	const int Num() const { return map_name_vtbl.size(); }
-	const ZaVoiceTable* GetVoiceTable(const std::string& name) const;
-	const ZaVoiceTable* AddVoiceTable(const std::string& name, const std::string& vtblFile);
-	void Clear() { destory(); }
-	ZaVoiceTablesGroup() {}
-	~ZaVoiceTablesGroup() { destory(); }
-
-private:
-	MapNameVoiceTable map_name_vtbl;
-	void destory();
-
-private:
-	ZaVoiceTablesGroup(const ZaVoiceTablesGroup&);
-	ZaVoiceTablesGroup& operator=(const ZaVoiceTablesGroup&);
-};
-
-extern const ZaVoiceTable & InvalidVoiceTable;
+	private:
+		virtual ~VoiceTable() = 0;
+	};
+}
 
 #endif // !__ZAVTBL_H__
