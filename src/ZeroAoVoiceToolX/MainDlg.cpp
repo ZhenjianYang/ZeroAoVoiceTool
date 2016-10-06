@@ -160,7 +160,7 @@ LRESULT CMainDlg::OnClose(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 			!= IDYES) {
 			return 0;
 		}
-		ZaVoicePlayerEnd();
+		Za::VoicePlayer::End();
 		ZALOG_DEBUG("已终止语音系统初试化");
 		Za::Remote::End();
 		ZALOG_DEBUG("已关闭远程进程句柄");
@@ -242,7 +242,7 @@ LRESULT CMainDlg::OnStop(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 		ZALOG_DEBUG("终止语音系统初试化...");
 		break;
 	case Status::Running:
-		ZaVoicePlayerEnd();
+		Za::VoicePlayer::End();
 		ZALOG_DEBUG("已退出语音播放系统");
 		Za::Remote::End();
 		ZALOG_DEBUG("已关闭远程进程句柄");
@@ -284,7 +284,7 @@ LRESULT CMainDlg::OnGameExit(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 	RemoveMonitorFunc(CMainDlg::Monitor_GameExit);
 	ZALOG_DEBUG("游戏已退出！");
 
-	ZaVoicePlayerEnd();
+	Za::VoicePlayer::End();
 	Za::Remote::End();
 
 	m_button_start.SetWindowTextA("Start");
@@ -293,8 +293,8 @@ LRESULT CMainDlg::OnGameExit(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 }
 LRESULT CMainDlg::OnPlayEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	ZaPlayWait();
-	if (ZaWaitingNum() == 0) Za::Sound::SetStopCallBack();
+	Za::VoicePlayer::PlayWait();
+	if (Za::VoicePlayer::GetWaitingNum() == 0) Za::Sound::SetStopCallBack();
 	return 0;
 }
 LRESULT CMainDlg::OnInitPlayerEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -324,7 +324,7 @@ LRESULT CMainDlg::OnInitPlayerEnd(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& 
 }
 LRESULT CMainDlg::OnInitPlayerStoped(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
 {
-	ZaVoicePlayerEnd();
+	Za::VoicePlayer::End();
 	ZALOG_DEBUG("已终止语音系统初试化");
 	Za::Remote::End();
 	ZALOG_DEBUG("已关闭远程进程句柄");
@@ -407,12 +407,12 @@ LRESULT CMainDlg::OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 
 		if (voiceID != InValidVoiceId) {
 			if (Za::Sound::GetStatus() == Za::Sound::Status::Stop
-				&& ZaWaitingNum() == 0) {
+				&& Za::VoicePlayer::GetWaitingNum() == 0) {
 				wait = false;
 			}
 			if (!wait) {
-				ZaClearWait();
-				if (ZaPlayVoice(voiceID, voiceFileName)) {
+				Za::VoicePlayer::ClearWait();
+				if (Za::VoicePlayer::PlayVoice(voiceID, voiceFileName)) {
 					ZALOG_DEBUG("Playing %s ...", voiceFileName);
 				}
 				else {
@@ -421,7 +421,7 @@ LRESULT CMainDlg::OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 			}
 			else
 			{
-				ZaAddToWait(voiceID);
+				Za::VoicePlayer::AddToWait(voiceID);
 				Za::Sound::SetStopCallBack(CMainDlg::PlayEndCallBack);
 			}
 		}
@@ -689,7 +689,7 @@ DWORD WINAPI CMainDlg::Thread_Monitor(LPVOID lpParmeter) {
 }
 
 DWORD WINAPI CMainDlg::Thread_InitVoicePlayer(LPVOID lpParmeter) {
-	int errc = ZaVoicePlayerInit(lpParmeter);
+	int errc = Za::VoicePlayer::Init(lpParmeter);
 	::SendMessage(s_hWnd_main,
 		WM_MSG_INITPLAYEREND,
 		errc,

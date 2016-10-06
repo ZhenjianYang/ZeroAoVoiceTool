@@ -61,7 +61,7 @@ void ZaMain() {
 	Za::Sound::SetVolumn(Za::Config::MainConfig->ActiveGame->Volume);
 	ZALOG("就绪");
 
-	ZaVoicePlayerInit();
+	Za::VoicePlayer::Init();
 	ZALOG("已进入语音播放系统");
 	
 	ZALOG("语音文件目录为: %s", Za::Config::MainConfig->ActiveGame->VoiceDir.c_str());
@@ -74,12 +74,12 @@ void ZaMain() {
 
 	while (!Za::Remote::CheckGameEnd())
 	{
-		errc = ZaVoicePlayerLoopOne();
+		errc = Za::VoicePlayer::LoopOne();
 		Sleep(Za::Config::MainConfig->General->SleepTime);
 	}
 	ZALOG("游戏已退出！");
 	
-	ZaVoicePlayerEnd();
+	Za::VoicePlayer::End();
 	ZALOG("已退出语音播放系统");
 	Za::Remote::End();
 	ZALOG_DEBUG("已关闭远程进程句柄");

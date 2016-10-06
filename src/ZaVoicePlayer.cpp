@@ -18,16 +18,18 @@
 static std::queue<int> _waitList;
 static Za::Remote::RemoteData _zaData, _zaData_old;
 
+static char buff_voiceFileName[MAX_LENGTH_VOICE_ID * 2 + 1];
+
 static int VoicePlayerLoopMain()
 {
 	int errc = 0;
-	char voiceFileName[MAX_LENGTH_VOICE_ID * 2 + 1];
+	
 	const char* _scenaNameX = nullptr;
 	int voiceID = InValidVoiceId;
 	bool wait = false;
 
-	if (ZaWaitingNum() && Za::Sound::GetStatus() == Za::Sound::Status::Stop) {
-		ZaPlayWait();
+	if (Za::VoicePlayer::GetWaitingNum() && Za::Sound::GetStatus() == Za::Sound::Status::Stop) {
+		Za::VoicePlayer::PlayWait();
 	}
 
 	if (!Za::Remote::RemoteRead(Za::Remote::RemoteDataAddr, &_zaData, sizeof(_zaData))) {
@@ -67,17 +69,17 @@ static int VoicePlayerLoopMain()
 
 	if (voiceID != InValidVoiceId) {
 		if (!wait) {
-			ZaClearWait();
-			if (ZaPlayVoice(voiceID, voiceFileName)) {
-				ZALOG_DEBUG("Playing %s ...", voiceFileName);
+			Za::VoicePlayer::ClearWait();
+			if (Za::VoicePlayer::PlayVoice(voiceID, buff_voiceFileName)) {
+				ZALOG_DEBUG("Playing %s ...", buff_voiceFileName);
 			}
 			else {
-				ZALOG_ERROR("Play %s failed.", voiceFileName);
+				ZALOG_ERROR("Play %s failed.", buff_voiceFileName);
 			}
 		}
 		else 
 		{
-			ZaAddToWait(voiceID);
+			Za::VoicePlayer::AddToWait(voiceID);
 		}
 	}
 
@@ -89,81 +91,83 @@ static int VoicePlayerLoopAfterOneLoop() {
 	return 0;
 }
 
-void ZaAddToWait(int voiceId) {
+void Za::VoicePlayer::AddToWait(int voiceId) {
 	_waitList.push(voiceId);
 }
 
-void ZaClearWait() {
+void Za::VoicePlayer::ClearWait() {
 	while (!_waitList.empty()) _waitList.pop();
 }
 
-int ZaWaitingNum() {
+int Za::VoicePlayer::GetWaitingNum() {
 	return _waitList.size();
 }
 
-int ZaPlayWait() {
+int Za::VoicePlayer::PlayWait() {
 	if (_waitList.empty()) return 1;
 
-	char voiceFileName[MAX_LENGTH_VOICE_ID * 2 + 1];
+	char buff_voiceFileName[MAX_LENGTH_VOICE_ID * 2 + 1];
 	int voiceId = _waitList.front();
 	_waitList.pop();
 
-	if (ZaPlayVoice(voiceId, voiceFileName)) {
-		ZALOG("Playing %s ...", voiceFileName);
+	if (Za::VoicePlayer::PlayVoice(voiceId, buff_voiceFileName)) {
+		ZALOG("Playing %s ...", buff_voiceFileName);
 		return 0;
 	}
 	else {
-		ZALOG_ERROR("Play %s Failed.", voiceFileName);
+		ZALOG_ERROR("Play %s Failed.", buff_voiceFileName);
 		return 1;
 	}
 }
 
-bool ZaPlayVoice(int voiceID, char *out_filename) {
-	if (voiceID == InValidVoiceId) return false;
+bool Za::VoicePlayer::PlayVoice(int voiceId, char *out_filename /*= nullptr*/) {
+	if (voiceId == InValidVoiceId) return false;
+	
+	char* buff_filename = out_filename == nullptr ? buff_voiceFileName : out_filename;
 
 	const std::string& dir = Za::Config::MainConfig->ActiveGame->VoiceDir;
 	const std::string& preName = Za::Config::MainConfig->ActiveGame->VoiceName;
 	int index = 0;
-	for (; index < (int)preName.size(); ++index) out_filename[index] = preName[index];
+	for (; index < (int)preName.size(); ++index) buff_filename[index] = preName[index];
 
-	GetStrVoiceID(voiceID, Za::Config::MainConfig->ActiveGame->VoiceIdLength, out_filename + index);
+	GetStrVoiceID(voiceId, Za::Config::MainConfig->ActiveGame->VoiceIdLength, buff_filename + index);
 	index += Za::Config::MainConfig->ActiveGame->VoiceIdLength;
-	out_filename[index++] = '.';
+	buff_filename[index++] = '.';
 
 	for (auto ext : Za::Config::MainConfig->ActiveGame->VoiceExt)
 	{
-		for (int i = 0; i < (int)ext.size(); ++i) out_filename[index + i] = ext[i];
-		out_filename[index + ext.size()] = 0;
+		for (int i = 0; i < (int)ext.size(); ++i) buff_filename[index + i] = ext[i];
+		buff_filename[index + ext.size()] = 0;
 
-		std::string filePath = dir + '\\' + out_filename;
+		std::string filePath = dir + '\\' + buff_filename;
 
 		if (_access(filePath.c_str(), 4) == 0)
 			return Za::Sound::Play(filePath.c_str());
 	}
-	out_filename[index - 1] = 0;
+	buff_filename[index - 1] = 0;
 
 	return false;
 }
 
-int ZaVoicePlayerInit(void* data /*= 0*/){
+int Za::VoicePlayer::Init(void* data /*= 0*/){
 	memset(&_zaData, 0, sizeof(_zaData));
 	memset(&_zaData_old, 0, sizeof(_zaData_old));
-	ZaClearWait();
+	Za::VoicePlayer::ClearWait();
 
 	Za::ScenaAnalyzer::Init(data);
 
 	return 0;
 }
 
-int ZaVoicePlayerEnd()
+int Za::VoicePlayer::End()
 {
 	Za::ScenaAnalyzer::End();
-	ZaClearWait();
+	Za::VoicePlayer::ClearWait();
 
 	return 0;
 }
 
-int ZaVoicePlayerLoopOne()
+int Za::VoicePlayer::LoopOne()
 {
 	int errc = 0;
 	errc |= VoicePlayerLoopMain();

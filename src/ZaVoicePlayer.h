@@ -1,20 +1,29 @@
 #ifndef __ZAVOICEPLAYER_H__
 #define __ZAVOICEPLAYER_H__
 
-//语音播放循环初始化
-int ZaVoicePlayerInit(void* data = 0);
+namespace Za {
 
-int ZaVoicePlayerEnd();
+	class VoicePlayer {
+	public:
+		//语音播放循环初始化
+		static int Init(void* data = nullptr);
 
-//进行一次语音播放循环
-int ZaVoicePlayerLoopOne();
+		static int End();
 
-bool ZaPlayVoice(int voiceID, char *out_filename);
+		//进行一次语音播放循环
+		static int LoopOne();
 
-void ZaAddToWait(int voiceId);
-void ZaClearWait();
-int ZaWaitingNum();
-int ZaPlayWait();
+		//当out_filename非空时，将文件名写到out_filename
+		static bool PlayVoice(int voiceId, char *out_filename = nullptr);
 
+		static void AddToWait(int voiceId);
+		static void ClearWait();
+		static int GetWaitingNum();
+		static int PlayWait();
+
+	private:
+		virtual ~VoicePlayer() = 0;
+	};
+}
 
 #endif // !__ZAVOICEPLAYER_H__
