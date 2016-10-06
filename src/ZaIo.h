@@ -20,5 +20,21 @@ static void ZaGetSubFiles(const std::string& dir, const std::string& searchName,
 	}
 }
 
+static char* GetStrVoiceID(int voiceId, int voiceIdLength, char* buff_strVoiceId) {
+	if (voiceId == INVAILD_VOICE_ID) {
+		for (int i = 0; i < voiceIdLength; ++i)
+			buff_strVoiceId[i] = '-';
+	}
+	else {
+		for (int i = voiceIdLength - 1; i >= 0; --i) {
+			buff_strVoiceId[i] = voiceId % 10 + '0';
+			voiceId /= 10;
+		}
+	}
+	buff_strVoiceId[voiceIdLength] = 0;
+
+	return buff_strVoiceId;
+}
+
 
 #endif

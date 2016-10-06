@@ -8,6 +8,8 @@
 #include "ZaRemote.h"
 #include "ZaScenaAnalyzer.h"
 
+#include "ZaIo.h"
+
 #include <io.h>
 #include <Windows.h>
 #include <string>
@@ -20,7 +22,7 @@ static int VoicePlayerLoopMain()
 {
 	int errc = 0;
 	char voiceFileName[MAX_LENGTH_VOICE_ID * 2 + 1];
-	const char* _scenaName = nullptr;
+	const char* _scenaNameX = nullptr;
 	int voiceID = InValidVoiceId;
 	bool wait = false;
 
@@ -39,27 +41,27 @@ static int VoicePlayerLoopMain()
 		
 		_zaData_old.aScena1 = _zaData_old.aScena2 = 0;
 		_zaData_old.cBlock = 0;
-		errc = ZaDetected_LoadScena(_zaData.aScena, _scenaName);
+		errc = Za::ScenaAnalyzer::DLoadScena(_zaData.aScena, _scenaNameX);
 		if (errc) return errc;
 	}
 
 	if (_zaData.aScena1 && _zaData.aScena1 != _zaData_old.aScena1) {
-		errc = ZaDetected_LoadScena1(_zaData.aScena1, _scenaName);
+		errc = Za::ScenaAnalyzer::DLoadScena1(_zaData.aScena1, _scenaNameX);
 		if (errc) return errc;
 	}
 	if (_zaData.aScena2 && _zaData.aScena2 != _zaData_old.aScena2) {
-		errc = ZaDetected_LoadScena1(_zaData.aScena2, _scenaName);
+		errc = Za::ScenaAnalyzer::DLoadScena1(_zaData.aScena2, _scenaNameX);
 		if (errc) return errc;
 	}
 
 	if (_zaData.cBlock && _zaData.cBlock != _zaData_old.cBlock) {
 		_zaData_old.cText = 0;
-		errc = ZaDetected_LoadBlock(_zaData.aCurBlock, _scenaName);
+		errc = Za::ScenaAnalyzer::DLoadBlock(_zaData.aCurBlock, _scenaNameX);
 		if (errc) return errc;
 	}
 
 	if (_zaData.cText && _zaData.cText != _zaData_old.cText) {
-		errc = ZaDetected_ShowText(_zaData.aCurText, voiceID, wait);
+		errc = Za::ScenaAnalyzer::DShowText(_zaData.aCurText, voiceID, wait);
 		if (errc) return errc;
 	}
 
@@ -124,7 +126,8 @@ bool ZaPlayVoice(int voiceID, char *out_filename) {
 	int index = 0;
 	for (; index < (int)preName.size(); ++index) out_filename[index] = preName[index];
 
-	index += GetStrVoiceID(voiceID, out_filename + index);
+	GetStrVoiceID(voiceID, Za::Config::MainConfig->ActiveGame->VoiceIdLength, out_filename + index);
+	index += Za::Config::MainConfig->ActiveGame->VoiceIdLength;
 	out_filename[index++] = '.';
 
 	for (auto ext : Za::Config::MainConfig->ActiveGame->VoiceExt)
@@ -147,14 +150,14 @@ int ZaVoicePlayerInit(void* data /*= 0*/){
 	memset(&_zaData_old, 0, sizeof(_zaData_old));
 	ZaClearWait();
 
-	ZaScenaAnalyzerInit(data);
+	Za::ScenaAnalyzer::Init(data);
 
 	return 0;
 }
 
 int ZaVoicePlayerEnd()
 {
-	ZaScenaAnalyzerEnd();
+	Za::ScenaAnalyzer::End();
 	ZaClearWait();
 
 	return 0;

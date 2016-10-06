@@ -371,23 +371,23 @@ LRESULT CMainDlg::OnRLoadBlock(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 		const char* pScenaName;
 
 		if (!m_zadata.flag) {
-			int errc = ZaDetected_LoadScena(m_zadata.aScena, pScenaName);
+			int errc = Za::ScenaAnalyzer::DLoadScena(m_zadata.aScena, pScenaName);
 			if (errc) ::SendMessage(m_hWnd, WM_MSG_ERROR, (WPARAM)ErrorType::ReadRemoteDataFailedRunning, 0);
 
 			if (m_zadata.aScena1) {
-				errc = ZaDetected_LoadScena1(m_zadata.aScena1, pScenaName);
+				errc = Za::ScenaAnalyzer::DLoadScena1(m_zadata.aScena1, pScenaName);
 				if (errc) ::SendMessage(m_hWnd, WM_MSG_ERROR, (WPARAM)ErrorType::ReadRemoteDataFailedRunning, 0);
 			}
 
 			if (m_zadata.aScena2) {
-				errc = ZaDetected_LoadScena1(m_zadata.aScena2, pScenaName);
+				errc = Za::ScenaAnalyzer::DLoadScena1(m_zadata.aScena2, pScenaName);
 				if (errc) ::SendMessage(m_hWnd, WM_MSG_ERROR, (WPARAM)ErrorType::ReadRemoteDataFailedRunning, 0);
 			}
 
 			m_zadata.flag = 1;
 		}
 
-		errc = ZaDetected_LoadBlock(m_zadata.aCurBlock, pScenaName);
+		errc = Za::ScenaAnalyzer::DLoadBlock(m_zadata.aCurBlock, pScenaName);
 		if (errc) ::SendMessage(m_hWnd, WM_MSG_ERROR, (WPARAM)ErrorType::ReadRemoteDataFailedRunning, 0);
 	}
 	return 0;
@@ -402,7 +402,7 @@ LRESULT CMainDlg::OnRShowText(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 		m_zadata.aCurText = (unsigned)wParam;
 		int voiceID;
 		bool wait;
-		int errc = ZaDetected_ShowText(m_zadata.aCurText, voiceID, wait);
+		int errc = Za::ScenaAnalyzer::DShowText(m_zadata.aCurText, voiceID, wait);
 		if (errc) ::SendMessage(m_hWnd, WM_MSG_ERROR, (WPARAM)ErrorType::ReadRemoteDataFailedRunning, 0);
 
 		if (voiceID != InValidVoiceId) {

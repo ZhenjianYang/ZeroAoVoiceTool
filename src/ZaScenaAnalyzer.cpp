@@ -9,43 +9,36 @@
 #include <string>
 #include <vector>
 
-struct ScenaData {
-	unsigned aScenaX;
-	char* pScneaNameX;
+Za::ScenaAnalyzer::ScenaData Za::ScenaAnalyzer::_scenas[3];
+unsigned Za::ScenaAnalyzer::_raBlock;
+unsigned Za::ScenaAnalyzer::_raFirstText;
+unsigned Za::ScenaAnalyzer::_raCurText;
 
-	bool operator<(const ScenaData& b) { return aScenaX < b.aScenaX; }
-};
-static ScenaData _scenas[3];
-static unsigned _raBlock;
-static unsigned _raFirstText;
-static unsigned _raCurText;
+ZaVoiceTablesGroup Za::ScenaAnalyzer::_zaVoiceTablesGroup;
+const ZaVoiceTable *Za::ScenaAnalyzer::_zaVoiceTable;
 
-static ZaVoiceTablesGroup _zaVoiceTablesGroup;
-static const ZaVoiceTable *_zaVoiceTable;
+char Za::ScenaAnalyzer::_scenaNameX[3][MAX_SCENANAME_LENGTH + 1];
 
-#define NAME_BUFF_SIZE (MAX_SCENANAME_LENGTH + 1)
-static char _scenaName[NAME_BUFF_SIZE];
-static char _scenaName1[NAME_BUFF_SIZE];
-static char _scenaName2[NAME_BUFF_SIZE];
+#define NAME_BUFF_SIZE (sizeof(_scenaNameX[0]) / sizeof(*_scenaNameX[0]))
 
-static char* _pScenaName;
-static unsigned _offset1;
+char* Za::ScenaAnalyzer::_pScenaName;
+unsigned Za::ScenaAnalyzer::_offset1;
 
 #define BUFF_TEXT_SIZE 1024
 static unsigned char buffText[BUFF_TEXT_SIZE];
 static unsigned char buffTextSrc[BUFF_TEXT_SIZE];
 
-static bool CheckScenaName(const char *_scenaName) {
+bool Za::ScenaAnalyzer::_checkScenaName(const char *scenaName) {
 	int count = 0;
-	while (*_scenaName != 0) {
-		if (*_scenaName < 0x20 || *_scenaName >= 0x80) return false;
-		++_scenaName;
+	while (*scenaName != 0) {
+		if (*scenaName < 0x20 || *scenaName >= 0x80) return false;
+		++scenaName;
 		++count;
 		if (count > MAX_SCENANAME_LENGTH) break;
 	}
 	return count >= MIN_SCENANAME_LENGTH && count <= MAX_SCENANAME_LENGTH;
 }
-static int TextAnalysisCN(unsigned char *dst, const unsigned char* src) {
+int Za::ScenaAnalyzer::_textAnalysisCN(unsigned char *dst, const unsigned char* src) {
 	int first = 0;
 	while (*src < 0x20 || *src == 0xFF) {
 		src++; first++;
@@ -73,7 +66,7 @@ static int TextAnalysisCN(unsigned char *dst, const unsigned char* src) {
 	*dst = 0;
 	return first;
 }
-static const unsigned char* TextAnalysisJP(const unsigned char* buff) {
+const unsigned char* Za::ScenaAnalyzer::_textAnalysisJP(const unsigned char* buff) {
 	const unsigned char* abuff = buff;
 	if (Za::Config::MainConfig->General->RemoveFwdCtrlCh) {
 		while (*abuff == '#') {
@@ -85,17 +78,17 @@ static const unsigned char* TextAnalysisJP(const unsigned char* buff) {
 	return abuff;
 }
 
-static void LoadNewVoiceTable(const std::string& name) {
-	_zaVoiceTable = _zaVoiceTablesGroup.GetVoiceTable(name);
+void Za::ScenaAnalyzer::_loadNewVoiceTable(const char* scenaName) {
+	_zaVoiceTable = _zaVoiceTablesGroup.GetVoiceTable(scenaName);
 	if (_zaVoiceTable == nullptr)
 		_zaVoiceTable = &InvalidVoiceTable;
 }
 
-static void ClearAllVoiceTable() {
+void Za::ScenaAnalyzer::_clearAllVoiceTable() {
 	_zaVoiceTablesGroup.Clear();
 }
-static void ReLoadAllVoiceTables(void * data) {
-	ClearAllVoiceTable();
+void Za::ScenaAnalyzer::_reLoadAllVoiceTables(void * data) {
+	_clearAllVoiceTable();
 
 	std::vector<std::string> subs;
 	const std::string& dir = Za::Config::MainConfig->ActiveGame->VoiceTableDir;
@@ -105,107 +98,108 @@ static void ReLoadAllVoiceTables(void * data) {
 	for (auto sub : subs) {
 		if (data && *(unsigned*)data) break;
 
-		std::string _scenaName = sub.substr(0, sub.rfind('.'));
-		_zaVoiceTablesGroup.AddVoiceTable(_scenaName, dir + '\\' + sub);
+		std::string _scenaNameX = sub.substr(0, sub.rfind('.'));
+		_zaVoiceTablesGroup.AddVoiceTable(_scenaNameX, dir + '\\' + sub);
 	}
 }
 
-int ZaScenaAnalyzerInit(void* data /*= 0*/)
+int Za::ScenaAnalyzer::Init(void* data /*= 0*/)
 {
 	_pScenaName = NULL;
-	_scenaName[0] = 0;
+	_scenaNameX[0][0] = 0;
 	_zaVoiceTable = &InvalidVoiceTable;
 
 	ZALOG_DEBUG("加载语音表...");
-	ReLoadAllVoiceTables(data);
+	_reLoadAllVoiceTables(data);
 	ZALOG_DEBUG("已加载的语音表数: %d", _zaVoiceTablesGroup.Num());
 
 	return 0;
 }
-int ZaScenaAnalyzerEnd()
+int Za::ScenaAnalyzer::End()
 {
-	ClearAllVoiceTable();
+	_clearAllVoiceTable();
 
 	_pScenaName = NULL;
-	_scenaName[0] = 0;
+	_scenaNameX[0][0] = 0;
 	_zaVoiceTable = &InvalidVoiceTable;
 
 	return 0;
 }
 
-static int LoadScenaX(unsigned raScena, char* nameBuff) {
+int Za::ScenaAnalyzer::LoadScenaX(unsigned raScena, int X) {
 	unsigned addScenaName;
+	char * nameBuff = _scenaNameX[X];
 	if (!Za::Remote::RemoteRead(raScena + OFF_OFF_SCENANAME, &addScenaName, sizeof(addScenaName))
 		|| !Za::Remote::RemoteRead(raScena + addScenaName, nameBuff, NAME_BUFF_SIZE)) {
 		ZALOG_ERROR("访问远程数据失败: zaData.aScena");
 		return 1;
 	}
 	nameBuff[NAME_BUFF_SIZE - 1] = 0;
-	if (!CheckScenaName(nameBuff)) {
+	if (!_checkScenaName(nameBuff)) {
 		nameBuff[0] = 0;
 	}
 
 	return 0;
 }
 
-int ZaDetected_LoadScena(unsigned raScena, const char* &out_scenaName)
+int Za::ScenaAnalyzer::DLoadScena(unsigned raScena, const char* &out_scenaName)
 {
 	out_scenaName = nullptr;
 	_pScenaName = nullptr;
 	memset(_scenas, 0, sizeof(_scenas));
 
 	int errc;
-	errc = LoadScenaX(raScena, _scenaName);
+	errc = LoadScenaX(raScena, 0);
 	if (errc) return errc;
 
-	if (_scenaName[0] != 0) {
+	if (_scenaNameX[0] != 0) {
 
 		_scenas[0].aScenaX = raScena;
-		_scenas[0].pScneaNameX = _scenaName;
+		_scenas[0].pScneaNameX = _scenaNameX[0];
 
-		out_scenaName = _scenaName;
+		out_scenaName = _scenaNameX[0];
 	}
 
 	return 0;
 }
-int ZaDetected_LoadScena1(unsigned raScena1, const char* &out_scenaName)
+int Za::ScenaAnalyzer::DLoadScena1(unsigned raScena1, const char* &out_scenaName)
 {
 	out_scenaName = nullptr;
 
 	int errc;
 	if (_scenas[1].aScenaX == 0) {
-		errc = LoadScenaX(raScena1, _scenaName1);
+		errc = LoadScenaX(raScena1, 1);
 		if (errc) return errc;
 
 		_scenas[1].aScenaX = raScena1;
-		_scenas[1].pScneaNameX = _scenaName1;
+		_scenas[1].pScneaNameX = _scenaNameX[1];
 
 		if (_scenas[0] < _scenas[1]) std::swap(_scenas[0], _scenas[1]);
 
-		out_scenaName = _scenaName1;
+		out_scenaName = _scenaNameX[1];
 	}
 	else {
-		errc = LoadScenaX(raScena1, _scenaName2);
+		errc = LoadScenaX(raScena1, 2);
 		if (errc) return errc;
 
 		_scenas[2].aScenaX = raScena1;
-		_scenas[2].pScneaNameX = _scenaName2;
+		_scenas[2].pScneaNameX = _scenaNameX[2];
 
 		if (_scenas[1] < _scenas[2]) {
 			std::swap(_scenas[1], _scenas[2]);
 			if (_scenas[0] < _scenas[1]) std::swap(_scenas[0], _scenas[1]);
 		}
 
-		out_scenaName = _scenaName2;
+		out_scenaName = _scenaNameX[2];
 	}
 
 	return 0;
 }
 
-int ZaDetected_LoadBlock(unsigned raBlock, const char* &out_scenaName)
+int Za::ScenaAnalyzer::DLoadBlock(unsigned raBlock, const char* &out_scenaName)
 {
 	out_scenaName = nullptr;
-	if (_scenaName[0] == 0) return 0;
+	if (_scenaNameX[0] == 0) return 0;
 
 	_raFirstText = 0;
 	_raBlock = raBlock;
@@ -223,7 +217,7 @@ int ZaDetected_LoadBlock(unsigned raBlock, const char* &out_scenaName)
 				_pScenaName = _scenas[i].pScneaNameX;
 
 				ZALOG_DEBUG("Scena:%s, Loading Voice Table...", _pScenaName);
-				LoadNewVoiceTable(_pScenaName);
+				_loadNewVoiceTable(_pScenaName);
 				ZALOG_DEBUG("Voice Table Records：%d", _zaVoiceTable->Num());
 			}
 
@@ -234,11 +228,11 @@ int ZaDetected_LoadBlock(unsigned raBlock, const char* &out_scenaName)
 
 	return 0;
 }
-int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
+int Za::ScenaAnalyzer::DShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 {
 	out_voiceID = InValidVoiceId; out_wait = false;
 
-	if (_scenaName[0] == 0 || _raBlock == 0) return 0;
+	if (_scenaNameX[0] == 0 || _raBlock == 0) return 0;
 
 	_raCurText = raText;
 	if (_raFirstText == 0) _raFirstText = raText;
@@ -253,7 +247,7 @@ int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 	}
 
 	buffTextSrc[sizeof(buffTextSrc) - 1] = 0;
-	offset += TextAnalysisCN(buffText, buffTextSrc);
+	offset += _textAnalysisCN(buffText, buffTextSrc);
 
 	if (buffText[0] != 0) {
 		const VoiceInfo* pvinf = _zaVoiceTable->GetVoiceInfo(offset);
@@ -268,9 +262,9 @@ int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 		out_voiceID = vinf.voiceID;
 
 		const unsigned char* buffTextJP = (const unsigned char*)vinf.jpText.c_str();
-		const unsigned char* buffTextJPFixed = TextAnalysisJP(buffTextJP);
+		const unsigned char* buffTextJPFixed = _textAnalysisJP(buffTextJP);
 		char buffStrVoiceId[MAX_LENGTH_VOICE_ID + 1];
-		GetStrVoiceID(vinf.voiceID, buffStrVoiceId);
+		GetStrVoiceID(vinf.voiceID, Za::Config::MainConfig->ActiveGame->VoiceIdLength, buffStrVoiceId);
 
 		if (buffTextJPFixed[0] != 0) {
 			ZALOG_DEBUG("\nScena:%s,Offset:0x%06X,VoiceID:%s\n"
@@ -295,20 +289,6 @@ int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 	return 0;
 }
 
-int GetStrVoiceID(int voiceID, char* buff_strVoiceId) {
-	if (voiceID == InValidVoiceId) {
-		for (int i = 0; i < Za::Config::MainConfig->ActiveGame->VoiceIdLength; ++i)
-			buff_strVoiceId[i] = '-';
-	}
-	else {
-		for (int i = Za::Config::MainConfig->ActiveGame->VoiceIdLength - 1; i >= 0; --i) {
-			buff_strVoiceId[i] = voiceID % 10 + '0';
-			voiceID /= 10;
-		}
-	}
-	buff_strVoiceId[Za::Config::MainConfig->ActiveGame->VoiceIdLength] = 0;
 
-	return Za::Config::MainConfig->ActiveGame->VoiceIdLength;
-}
 
 
