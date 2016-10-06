@@ -162,7 +162,7 @@ LRESULT CMainDlg::OnClose(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 		}
 		ZaVoicePlayerEnd();
 		ZALOG_DEBUG("已终止语音系统初试化");
-		ZaRemoteEnd();
+		Za::Remote::End();
 		ZALOG_DEBUG("已关闭远程进程句柄");
 		break;
 	case Status::Exitting:
@@ -244,7 +244,7 @@ LRESULT CMainDlg::OnStop(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	case Status::Running:
 		ZaVoicePlayerEnd();
 		ZALOG_DEBUG("已退出语音播放系统");
-		ZaRemoteEnd();
+		Za::Remote::End();
 		ZALOG_DEBUG("已关闭远程进程句柄");
 		m_button_start.SetWindowTextA("Start");
 		break;
@@ -265,7 +265,7 @@ LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	ZALOG_DEBUG("游戏已启动,游戏标题为： %s",
 		m_gameID == GAMEID_AO ? A_DFT_WIN_TITLE : Z_DFT_WIN_TITLE);
 
-	if (ZaRemoteInit(m_gameID, (int)m_hWnd, WM_MSG_REMOTEBASE)) {
+	if (Za::Remote::Init(m_gameID, (int)m_hWnd, WM_MSG_REMOTEBASE)) {
 		::SendMessage(m_hWnd, WM_MSG_ERROR, (WPARAM)ErrorType::InitRemoteFailed, 0);
 	}
 	
@@ -285,7 +285,7 @@ LRESULT CMainDlg::OnGameExit(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 	ZALOG_DEBUG("游戏已退出！");
 
 	ZaVoicePlayerEnd();
-	ZaRemoteEnd();
+	Za::Remote::End();
 
 	m_button_start.SetWindowTextA("Start");
 	m_status = Status::Idle;
@@ -326,7 +326,7 @@ LRESULT CMainDlg::OnInitPlayerStoped(UINT Msg, WPARAM wParam, LPARAM lParam, BOO
 {
 	ZaVoicePlayerEnd();
 	ZALOG_DEBUG("已终止语音系统初试化");
-	ZaRemoteEnd();
+	Za::Remote::End();
 	ZALOG_DEBUG("已关闭远程进程句柄");
 
 	m_button_start.SetWindowTextA("Start");
@@ -623,7 +623,7 @@ void CMainDlg::SetWorkPath() {
 void CMainDlg::Monitor_GameStart() {
 	static const char* tbuf[] = { Z_DFT_WIN_TITLE, A_DFT_WIN_TITLE };
 
-	int index = ZaCheckGameStart(sizeof(tbuf) / sizeof(*tbuf), tbuf);
+	int index = Za::Remote::CheckGameStart(sizeof(tbuf) / sizeof(*tbuf), tbuf);
 	if (index < 0) return;
 
 	if (index == 0 && Za::Config::MainConfig->General->Mode != MODE_AO
@@ -635,7 +635,7 @@ void CMainDlg::Monitor_GameStart() {
 		);
 }
 void CMainDlg::Monitor_GameExit() {
-	if (ZaCheckGameEnd()) {
+	if (Za::Remote::CheckGameEnd()) {
 		::SendMessage(s_hWnd_main,
 			WM_MSG_GAMEEXIT,
 			0,

@@ -135,8 +135,8 @@ int ZaScenaAnalyzerEnd()
 
 static int LoadScenaX(unsigned raScena, char* nameBuff) {
 	unsigned addScenaName;
-	if (!ZaRemoteRead(raScena + OFF_OFF_SCENANAME, &addScenaName, sizeof(addScenaName))
-		|| !ZaRemoteRead(raScena + addScenaName, nameBuff, NAME_BUFF_SIZE)) {
+	if (!Za::Remote::RemoteRead(raScena + OFF_OFF_SCENANAME, &addScenaName, sizeof(addScenaName))
+		|| !Za::Remote::RemoteRead(raScena + addScenaName, nameBuff, NAME_BUFF_SIZE)) {
 		ZALOG_ERROR("访问远程数据失败: zaData.aScena");
 		return 1;
 	}
@@ -247,7 +247,7 @@ int ZaDetected_ShowText(unsigned raText, int & out_voiceID, bool & out_wait)
 	if (offset > MAX_SCENA_SIZE)
 		return 0;
 
-	if (!ZaRemoteRead(_raCurText, buffTextSrc, sizeof(buffTextSrc))) {
+	if (!Za::Remote::RemoteRead(_raCurText, buffTextSrc, sizeof(buffTextSrc))) {
 		ZALOG_ERROR("访问远程数据失败: zaData.aCurText");
 		return 1;
 	}

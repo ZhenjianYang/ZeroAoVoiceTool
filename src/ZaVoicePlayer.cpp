@@ -14,7 +14,7 @@
 #include <queue>
 
 static std::queue<int> _waitList;
-static ZAData _zaData, _zaData_old;
+static Za::Remote::RemoteData _zaData, _zaData_old;
 
 static int VoicePlayerLoopMain()
 {
@@ -28,7 +28,7 @@ static int VoicePlayerLoopMain()
 		ZaPlayWait();
 	}
 
-	if (!ZaRemoteRead(g_rAddData, &_zaData, sizeof(_zaData))) {
+	if (!Za::Remote::RemoteRead(Za::Remote::RemoteDataAddr, &_zaData, sizeof(_zaData))) {
 		ZALOG_ERROR("访问远程数据失败: zaData");
 		return 1;
 	}

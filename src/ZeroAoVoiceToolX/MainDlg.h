@@ -134,7 +134,7 @@ public:
 	CButton m_check_adov;
 
 	int m_gameID;
-	ZAData m_zadata;
+	Za::Remote::RemoteData m_zadata;
 
 public:
 	static void SetWorkPath();

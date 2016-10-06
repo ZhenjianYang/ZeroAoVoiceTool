@@ -48,10 +48,10 @@ void ZaMain() {
 	ZALOG("音频系统已启动");
 
 	ZALOG("等待游戏运行...");
-	int gameID = ZaRemoteWaitGameStart(Za::Config::MainConfig->General->Mode);
+	int gameID = Za::Remote::WaitGameStart(Za::Config::MainConfig->General->Mode);
 	ZALOG("游戏已启动！");
 
-	errc = ZaRemoteInit(gameID);
+	errc = Za::Remote::Init(gameID);
 	if (errc) {
 		ZALOG_ERROR("准备活动失败！");
 		return;
@@ -72,7 +72,7 @@ void ZaMain() {
 		ZALOG("启用了禁用原有剧情语音的功能");
 	}
 
-	while (!ZaCheckGameEnd())
+	while (!Za::Remote::CheckGameEnd())
 	{
 		errc = ZaVoicePlayerLoopOne();
 		Sleep(Za::Config::MainConfig->General->SleepTime);
@@ -81,7 +81,7 @@ void ZaMain() {
 	
 	ZaVoicePlayerEnd();
 	ZALOG("已退出语音播放系统");
-	ZaRemoteEnd();
+	Za::Remote::End();
 	ZALOG_DEBUG("已关闭远程进程句柄");
 	ZaSoundEnd();
 	ZALOG("已关闭音频系统");
