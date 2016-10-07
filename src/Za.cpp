@@ -58,7 +58,7 @@ void ZaMain() {
 	}
 
 	Za::Config::SetActiveGame(gameID);
-	Za::Sound::SetVolumn(Za::Config::MainConfig->ActiveGame->Volume);
+	Za::Sound::SetVolume(Za::Config::MainConfig->ActiveGame->Volume);
 	ZALOG("¾ÍÐ÷");
 
 	Za::VoicePlayer::Init();

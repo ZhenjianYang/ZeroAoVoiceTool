@@ -12,13 +12,13 @@ namespace Za {
 		};
 		typedef int(*StopCallBackType)(void*);
 
-		static const int VolumnMax;
+		static const int VolumeMax;
 
-		static int Init(int volumn = VolumnMax);
+		static int Init(int volume = VolumeMax);
 		static int End();
 
-		static void SetVolumn(int volumn);
-		static int GetVolumn();
+		static void SetVolume(int volume);
+		static int GetVolume();
 
 		static Status GetStatus();
 

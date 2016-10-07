@@ -270,7 +270,7 @@ LRESULT CMainDlg::OnGameFound(UINT Msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	}
 	
 	Za::Config::SetActiveGame(m_gameID);
-	Za::Sound::SetVolumn(Za::Config::MainConfig->ActiveGame->Volume);
+	Za::Sound::SetVolume(Za::Config::MainConfig->ActiveGame->Volume);
 	ZALOG_DEBUG("¾ÍÐ÷");
 
 	s_sign_initplayerstop = 0;

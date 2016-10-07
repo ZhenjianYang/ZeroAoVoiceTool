@@ -3,7 +3,7 @@
 #include "ZaConst.h"
 #include <audiere.h>
 
-const int Za::Sound::VolumnMax = VOLUME_MAX;
+const int Za::Sound::VolumeMax = VOLUME_MAX;
 
 static int _volume;
 static Za::Sound::StopCallBackType _callBack;
@@ -30,7 +30,7 @@ int Za::Sound::Init(int volume)
 	Za::Sound::SetStopCallBack(nullptr);
 	Za::Sound::Stop();
 
-	Za::Sound::SetVolumn(volume);
+	Za::Sound::SetVolume(volume);
 	
 	if (!_device.get()) {
 		_device = audiere::OpenDevice();
@@ -52,12 +52,12 @@ int Za::Sound::End()
 	return 0;
 }
 
-void Za::Sound::SetVolumn(int volumn)
+void Za::Sound::SetVolume(int volume)
 {
-	_volume = volumn;
+	_volume = volume;
 }
 
-int Za::Sound::GetVolumn()
+int Za::Sound::GetVolume()
 {
 	return _volume;
 }
@@ -76,7 +76,7 @@ bool Za::Sound::Play(const char* soundFile)
 	_soundStream = audiere::OpenSound(_device, soundFile, true);
 	if (!_soundStream) return false;
 
-	_soundStream->setVolume((float)_volume / VolumnMax);
+	_soundStream->setVolume((float)_volume / VolumeMax);
 	_soundStream->play();
 
 	return true;
