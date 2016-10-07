@@ -1,5 +1,6 @@
 #include "ZaScenaAnalyzer.h"
 
+#include "ZaConst.h"
 #include "ZaLog.h"
 #include "ZaConfig.h"
 #include "ZaVoiceTable.h"

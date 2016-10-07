@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "ZaConst.h"
+
 static void ZaGetSubFiles(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs)
 {
 	WIN32_FIND_DATA wfdp;
