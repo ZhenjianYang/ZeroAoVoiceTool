@@ -158,10 +158,13 @@ bool _getAndFormat(char* buff, int &offset, int &voiceid, const char* &jpText, i
 	}
 
 	while (*buff == 0x20 || *buff == '\t') ++buff;
+
 	jpText = buff;
-	while (*buff != 0) {
-		if (*buff == '\\' && *(buff + 1) == 'n') { *buff = ' '; *(buff + 1) = '\n'; }
-		++buff; ++jpLen;
+	for (char* tjpText = buff;  ; ++tjpText, ++jpLen) {
+		if (*buff == '\\' && *(buff + 1) == 'n') { *tjpText = '\n'; buff += 2; }
+		else { *tjpText = *buff; ++buff; }
+
+		if (*tjpText == '\0') break;
 	}
 	return true;
 }
