@@ -160,7 +160,7 @@ int Za::ScenaAnalyzer::End()
 {
 	_clearAllVoiceTable();
 
-	_curScenaData = NULL;
+	_curScenaData = nullptr;
 	_scenaNameX[0][0] = 0;
 
 	return 0;

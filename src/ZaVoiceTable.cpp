@@ -135,7 +135,7 @@ void _destoryTable(const _TableType* &table) {
 }
 bool _getAndFormat(char* buff, int &offset, int &voiceid, const char* &jpText, int &jpLen) {
 	offset = voiceid = 0;
-	jpText = NULL;
+	jpText = nullptr;
 	jpLen = 0;
 
 	while (*buff == 0x20 || *buff == '\t') ++buff;
