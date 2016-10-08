@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
 
 	ofstream of_rep(dir + ".txt");
 
-	for (auto sub : subs) {
+	for (auto &sub : subs) {
 		cout << "´¦Àí" << sub << "..." << endl;
 
 		ifstream ifs(dir + '\\' + sub, ifstream::binary);

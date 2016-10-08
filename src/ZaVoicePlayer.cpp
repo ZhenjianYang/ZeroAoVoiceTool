@@ -134,7 +134,7 @@ bool Za::VoicePlayer::PlayVoice(int voiceId, char *out_filename /*= nullptr*/) {
 	index += Za::Config::MainConfig->ActiveGame->VoiceIdLength;
 	buff_filename[index++] = '.';
 
-	for (auto ext : Za::Config::MainConfig->ActiveGame->VoiceExt)
+	for (auto &ext : Za::Config::MainConfig->ActiveGame->VoiceExt)
 	{
 		for (int i = 0; i < (int)ext.size(); ++i) buff_filename[index + i] = ext[i];
 		buff_filename[index + ext.size()] = 0;

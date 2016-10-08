@@ -108,7 +108,7 @@ void _reLoadAllVoiceTables(void * data) {
 	std::string searchName = "*." + Za::Config::MainConfig->ActiveGame->VoiceTableExt;
 	ZaGetSubFiles(dir, searchName, subs);
 
-	for (auto sub : subs) {
+	for (auto &sub : subs) {
 		if (data && *(unsigned*)data) break;
 
 		std::string _scenaNameX = sub.substr(0, sub.rfind('.'));

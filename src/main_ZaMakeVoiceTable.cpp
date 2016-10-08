@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
 	vector<string> subs_evo;
 	ZaGetSubFiles(dir_evo, "*.txt", subs_evo);
 
-	for (auto sub : subs_evo) {
+	for (auto &sub : subs_evo) {
 		string sname = GetScenaName(sub);
 		cout << "´¦Àí" << sname << "..." << endl;
 

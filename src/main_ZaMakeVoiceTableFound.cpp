@@ -33,7 +33,7 @@ void static outputmap(ofstream& ofs, const map<int, int>& m, const char* name)
 	ofs << name << " size: " << m.size() << endl;
 	int width = name[2] == '2' ? 4 : 2;
 
-	for (auto it : m)
+	for (auto &it : m)
 	{
 		ofs << std::hex << setfill('0') << setw(width) << setiosflags(ios::uppercase) << setiosflags(ios::right) << it.first << ','
 			<< std::dec << setw(0) << it.second << endl;
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 	map<int, int> mpb, mpa, mna, mnb;
 	map<int, int> mp2, mn2;
 
-	for (auto sub : subs_evo) {
+	for (auto &sub : subs_evo) {
 		ifstream ifs(dir_evo + "\\" + sub, ifstream::binary);
 		if (!ifs) continue;
 		ifs.seekg(0, ios::end);
