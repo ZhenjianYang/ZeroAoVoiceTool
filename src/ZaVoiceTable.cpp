@@ -24,7 +24,7 @@ static _GroupType::const_iterator _cur = _emptyGroup.begin();
 
 static bool _getAndFormat(char* buff, int &offset, int &voiceid, const char* &jpText, int &jpLen);
 static const _TableType* _creatTable(const char* vtblFile);
-static void _destoryTable(const _TableType* &table);
+static void _destoryTable(const _TableType* table);
 
 int Za::VoiceTable::Num()
 {
@@ -125,13 +125,12 @@ const _TableType* _creatTable(const char* vtblFile) {
 	ifs.close();
 	return newTable;
 }
-void _destoryTable(const _TableType* &table) {
+void _destoryTable(const _TableType* table) {
 	if (!table) return;
 	for (auto &it : *table) {
-		delete it.second.jpText;
+		delete [] it.second.jpText;
 	}
 	delete table;
-	table = nullptr;
 }
 bool _getAndFormat(char* buff, int &offset, int &voiceid, const char* &jpText, int &jpLen) {
 	offset = voiceid = 0;
