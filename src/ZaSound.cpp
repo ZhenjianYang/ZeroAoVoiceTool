@@ -5,9 +5,9 @@
 
 const int Za::Sound::VolumeMax = VOLUME_MAX;
 
-static int _volume;
-static Za::Sound::StopCallBackType _callBack;
-static void* _callBackParam;
+static int _volume = Za::Sound::VolumeMax;
+static Za::Sound::StopCallBackType _callBack = nullptr;
+static void* _callBackParam = nullptr;;
 
 static audiere::AudioDevicePtr _device = nullptr;
 static audiere::OutputStreamPtr _soundStream = nullptr;
@@ -16,7 +16,7 @@ class AdrStopCallBack : public audiere::RefImplementation<audiere::StopCallback>
 public:
 	void ADR_CALL streamStopped(audiere::StopEvent* event);
 };
-static audiere::StopCallbackPtr _adrStopCallBack = new AdrStopCallBack;
+static audiere::StopCallbackPtr _adrStopCallBack = nullptr;
 
 void ADR_CALL AdrStopCallBack::streamStopped(audiere::StopEvent * event)
 {
@@ -27,18 +27,15 @@ void ADR_CALL AdrStopCallBack::streamStopped(audiere::StopEvent * event)
 
 int Za::Sound::Init(int volume)
 {
-	Za::Sound::SetStopCallBack(nullptr);
-	Za::Sound::Stop();
+	if (_device.get()) return 1;
 
-	Za::Sound::SetVolume(volume);
-	
-	if (!_device.get()) {
-		_device = audiere::OpenDevice();
-	}
-
+	_device = audiere::OpenDevice();
 	if (!_device.get())
 		return 1;
 
+	_adrStopCallBack = new AdrStopCallBack;
+	Za::Sound::SetVolume(volume);
+	
 	return 0;
 }
 
@@ -48,6 +45,7 @@ int Za::Sound::End()
 	Za::Sound::Stop();
 	_soundStream = nullptr;
 	_device = nullptr;
+	_adrStopCallBack = nullptr;
 
 	return 0;
 }
@@ -55,6 +53,8 @@ int Za::Sound::End()
 void Za::Sound::SetVolume(int volume)
 {
 	_volume = volume;
+	if (_soundStream.get())
+		_soundStream->setVolume(float(_volume) / VolumeMax);
 }
 
 int Za::Sound::GetVolume()
