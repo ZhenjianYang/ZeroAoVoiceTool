@@ -8,12 +8,12 @@
 #include <Windows.h>
 
 #include "ZaConst.h"
-#include "ZaIo.h"
 
 using namespace std;
 
 int length_voiceid = Z_LENGTH_VOICE_ID;
 
+static void ZaGetSubFiles(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs);
 
 bool Check(unsigned char* buf) {
 
@@ -169,3 +169,17 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
+void ZaGetSubFiles(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs)
+{
+	WIN32_FIND_DATA wfdp;
+	HANDLE hFindp = FindFirstFile((dir + '\\' + searchName).c_str(), &wfdp);
+	if (hFindp != NULL) {
+		do
+		{
+			if (!(wfdp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				subs.push_back(wfdp.cFileName);
+			}
+		} while (FindNextFile(hFindp, &wfdp));
+	}
+}
