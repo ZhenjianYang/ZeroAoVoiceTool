@@ -3,32 +3,23 @@
 
 #include "ZaData.h"
 
-namespace Za
-{
-	class Main
-	{
-	public:
-		static bool Init();
-		static bool End();
+namespace Za {
+	namespace Main {
+		bool Init();
+		bool End();
 
-		static bool CheckGameStart(Data::GameOut& gameOut);
-		static bool CheckGameEnd();
+		bool CheckGameEnd();
+		bool OpenGameProcess(Data::GameProcessOut& gpOut, const Data::GameProcessIn& gpIn);
+		bool CloseGameProcess();
 
-		static bool OpenGameThread(const Data::ThreadIn& threadIn);
-		static bool CloseGameThread();
+		bool LoadVoiceTables(Data::VoiceTableOut& vtblOut);
+		bool LoadVoiceTablesAsyn(Data::VoiceTableOut& vtblOut, const Data::VoiceTableIn& vtblIn);
+		bool LoadVoiceTablesAsynCancle(Data::VoiceTableOut& vtblOut, const Data::VoiceTableIn& vtblIn);
 
-		static bool LoadVoiceTables(Data::VoiceTableOut& vtblOut);
-		static bool LoadVoiceTablesAsyn(Data::VoiceTableOut& vtblOut, const Data::VoiceTableIn& vtblIn);
-		static bool LoadVoiceTablesAsynCancle(Data::VoiceTableOut& vtblOut, const Data::VoiceTableIn& vtblIn);
+		bool SetVoicePlayConfig(const Data::PlayConfigIn& playConfigIn);
 
-		static bool SetVoicePlayConfig(const Data::PlayConfigIn& playConfigIn);
-
-		static bool MessageRecived(Data::MessageOut& msgOut, Data::MessageIn& msgIn);
-
-		static const char* LastErr();
-	private:
-		virtual ~Main() = 0;
-	};
+		bool MessageRecived(Data::MessageOut& msgOut, Data::MessageIn& msgIn);
+	}
 }
 
 #endif //__ZA_H__

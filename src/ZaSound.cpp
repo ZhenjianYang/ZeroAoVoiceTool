@@ -1,9 +1,11 @@
 #include "ZaSound.h"
 
 #include "ZaConst.h"
+#include "ZaErrorMsg.h"
+
 #include <audiere.h>
 
-const int Za::Sound::VolumeMax = VOLUME_MAX;
+const int Za::Sound::VolumeMax = MAX_VOLUME;
 
 static int _volume = Za::Sound::VolumeMax;
 static Za::Sound::StopCallBackType _callBack = nullptr;
@@ -25,21 +27,25 @@ void ADR_CALL AdrStopCallBack::streamStopped(audiere::StopEvent * event)
 	}
 }
 
-int Za::Sound::Init(int volume)
+bool Za::Sound::Init(int volume)
 {
-	if (_device.get()) return 1;
+	if (_device.get()) {
+		return true;
+	}
 
 	_device = audiere::OpenDevice();
-	if (!_device.get())
-		return 1;
+	if (!_device.get()) {
+		Za::Error::SetErrMsg("获取音频设备失败！");
+		return false;
+	}
 
 	_adrStopCallBack = new AdrStopCallBack;
 	Za::Sound::SetVolume(volume);
 	
-	return 0;
+	return true;
 }
 
-int Za::Sound::End()
+bool Za::Sound::End()
 {
 	Za::Sound::SetStopCallBack(nullptr);
 	Za::Sound::Stop();
@@ -47,14 +53,15 @@ int Za::Sound::End()
 	_device = nullptr;
 	_adrStopCallBack = nullptr;
 
-	return 0;
+	return true;
 }
 
-void Za::Sound::SetVolume(int volume)
+bool Za::Sound::SetVolume(int volume)
 {
 	_volume = volume;
 	if (_soundStream.get())
 		_soundStream->setVolume(float(_volume) / VolumeMax);
+	return true;
 }
 
 int Za::Sound::GetVolume()
@@ -82,10 +89,11 @@ bool Za::Sound::Play(const char* soundFile)
 	return true;
 }
 
-void Za::Sound::Stop()
+bool Za::Sound::Stop()
 {
 	if(_soundStream)
 		_soundStream->stop();
+	return true;
 }
 
 void Za::Sound::SetStopCallBack(StopCallBackType stopCallBack /*= nullptr*/, void* _param /*= nullptr*/)

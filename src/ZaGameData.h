@@ -4,7 +4,9 @@
 #include <string>
 #include <vector>
 
-#define STR_Enbale "Enable"
+#define STR_Name "Name"
+#define STR_Base "Base"
+#define STR_Enable "Enable"
 #define STR_Title "Title"
 #define STR_Comment "Comment"
 #define STR_FeatureAddr "FeatureAddr"
@@ -24,39 +26,35 @@
 #define STR_VoiceTablesDir "VoiceTablesDir"
 
 namespace Za {
-	class GameData
-	{
-	public:
-		static int AddFromFile(std::vector<GameData> &dataList, const char* dataFileName);
+	namespace Data {
+		class GameData
+		{
+		public:
+			static int GetFromFiles(std::vector<GameData> &dataList, const char* dataFN, const char* dataCustomizedFN = nullptr);
 
-	public:
-		bool Enable;
+		public:
+			std::string Name;
+			std::string Base;
 
-		std::string Title;
-		std::string Comment;
+			int Enable = 0;
 
-		unsigned FeatureAddr;
-		unsigned FeatureValue;
+			std::string Title;
+			std::string Comment;
 
-		unsigned OpAddrJcLoadScena;
-		unsigned AddrLoadScena;
+			unsigned FeatureAddr = 0;
+			unsigned FeatureValue = 0;
 
-		unsigned OpAddrJcLoadScena1;
-		unsigned AddrLoadScena1;
+			unsigned AddrOpJc[4] = { 0 };
+			unsigned AddrFunc[4] = { 0 };
 
-		unsigned OpAddrJcLoadBlock;
-		unsigned AddrLoadBlock;
+			unsigned PtrPostMessageA = 0;
 
-		unsigned OpAddrJcShowText;
-		unsigned AddrShowText;
-
-		unsigned PtrPostMessageA;
-
-		int VoiceIdLegnth;
-		std::string VoiceFileName;
-		std::string VoiceFileDir;
-		std::string VoiceTablesDir;
-	};
+			int VoiceIdLegnth = 0;
+			std::string VoiceFileName;
+			std::string VoiceFileDir;
+			std::string VoiceTablesDir;
+		};
+	}
 }
 
 #endif // !__ZA_GAME_DATA_H__

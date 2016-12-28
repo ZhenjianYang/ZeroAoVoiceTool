@@ -3,19 +3,20 @@
 
 namespace Za
 {
-	class Data
+	namespace Data
 	{
-	public:
-		struct GameOut
-		{
-			const char* Title;
-			const char* Comment;
-		};
-
-		struct ThreadIn
+		struct GameProcessIn
 		{
 			int hMainWindow;
 			int msgId;
+		};
+		struct GameProcessOut
+		{
+			const char* Title;
+			const char* Comment;
+
+			unsigned RemoteDataAddr;
+			unsigned RemoteDataSize;
 		};
 
 		struct VoiceTableIn
@@ -47,8 +48,6 @@ namespace Za
 			int volume;
 			bool disableOriVoice;
 		};
-	private:
-		virtual ~Data() = 0;
 	};
 }
 

@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros">
     <SrcDir>$(SolutionDir)..\src\</SrcDir>
     <ExtlibsHome>$(SolutionDir)..\extlibs\</ExtlibsHome>
-    <ExtIncDirs>$(ExtlibsHome)include</ExtIncDirs>
+    <ExtIncDirs>$(ExtlibsHome)include;$(ExtlibsHome)include\WTL</ExtIncDirs>
     <ExtLibsDirs>$(ExtlibsHome)lib</ExtLibsDirs>
     <ExtBinsDirs>$(ExtlibsHome)bin</ExtBinsDirs>
   </PropertyGroup>
@@ -13,7 +13,11 @@
     <IncludePath>$(ExtIncDirs);$(SrcDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(ExtLibsDirs);$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="SrcDir">
       <Value>$(SrcDir)</Value>

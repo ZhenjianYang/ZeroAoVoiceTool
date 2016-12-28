@@ -2,9 +2,7 @@
 #define __ZASOUND_H__
 
 namespace Za {
-	class Sound {
-
-	public:
+	namespace Sound {
 		enum class Status
 		{
 			Playing = 0,
@@ -12,24 +10,21 @@ namespace Za {
 		};
 		using StopCallBackType = int(*)(void*);
 
-		static const int VolumeMax;
+		extern const int VolumeMax;
 
-		static int Init(int volume = VolumeMax);
-		static int End();
+		bool Init(int volume = VolumeMax);
+		bool End();
 
-		static void SetVolume(int volume);
-		static int GetVolume();
+		bool SetVolume(int volume);
+		int GetVolume();
 
-		static Status GetStatus();
+		Status GetStatus();
 
-		static bool Play(const char* soundFile);
-		static void Stop();
+		bool Play(const char* soundFile);
+		bool Stop();
 
-		static void SetStopCallBack(StopCallBackType stopCallBack = nullptr, void* param = nullptr);
-
-	private:
-		virtual ~Sound() = 0;
-	};
+		void SetStopCallBack(StopCallBackType stopCallBack = nullptr, void* param = nullptr);
+	}
 }
 
 #endif // !__ZASOUND_H__

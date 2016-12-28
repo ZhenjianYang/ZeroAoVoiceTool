@@ -40,6 +40,8 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	UIAddChildWindowContainer(m_hWnd);
 
+	SetWorkPath();
+
 	Za::Main::Init();
 
 	return TRUE;
@@ -80,4 +82,22 @@ void CMainDlg::CloseDialog(int nVal)
 {
 	DestroyWindow();
 	::PostQuitMessage(nVal);
+}
+
+void CMainDlg::SetWorkPath() {
+	char buff[1024];
+	GetModuleFileName(NULL, (LPSTR)buff, sizeof(buff));
+	int p = -1;
+	for (int i = 0; buff[i] != 0; ++i)
+	{
+		if (buff[i] == '\\') p = i;
+	}
+	if (p != -1) {
+		buff[p] = 0;
+	}
+	else {
+		buff[0] = '.'; buff[1] = 0;
+	}
+
+	SetCurrentDirectory(buff);
 }

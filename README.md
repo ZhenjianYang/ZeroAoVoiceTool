@@ -51,6 +51,9 @@ External libraries used in this project
     
 -   [Windows Template Library (WTL)](http://wtl.sourceforge.net/), licensed under the
     [Microsoft Public License (MS-PL)](https://opensource.org/licenses/MS-PL).
+	
+-   [ini-parser](https://github.com/Poordeveloper/ini-parser), licensed under the
+    [MIT](https://tldrlegal.com/license/mit-license) license.
 
 ------------------------------------------------------------------------
 
