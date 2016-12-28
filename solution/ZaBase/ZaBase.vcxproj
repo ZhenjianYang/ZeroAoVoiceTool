@@ -11,19 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}</ProjectGuid>
-    <RootNamespace>ZaMakeVoiceTablePrepare</RootNamespace>
+    <ProjectGuid>{875ECE21-102E-47D3-9845-A4FA78C62C8A}</ProjectGuid>
+    <RootNamespace>ZaBase</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -63,11 +63,18 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\main_ZaMakeVoiceTablePrepare.cpp" />
+    <ClInclude Include="..\..\src\Za.h" />
+    <ClInclude Include="..\..\src\ZaData.h" />
+    <ClInclude Include="..\..\src\ZaGameData.h" />
+    <ClInclude Include="..\..\src\ZaSound.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\Za.cpp" />
+    <ClCompile Include="..\..\src\ZaGameData.cpp" />
+    <ClCompile Include="..\..\src\ZaSound.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,15 +3,32 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <SrcDir>$(SolutionDir)..\src\</SrcDir>
+    <ExtlibsHome>$(SolutionDir)..\extlibs\</ExtlibsHome>
+    <ExtIncDirs>$(ExtlibsHome)include</ExtIncDirs>
+    <ExtLibsDirs>$(ExtlibsHome)lib</ExtLibsDirs>
+    <ExtBinsDirs>$(ExtlibsHome)bin</ExtBinsDirs>
   </PropertyGroup>
   <PropertyGroup>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
-    <IncludePath>$(SrcDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ExtIncDirs);$(SrcDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(ExtLibsDirs);$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>
     <BuildMacro Include="SrcDir">
       <Value>$(SrcDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExtlibsHome">
+      <Value>$(ExtlibsHome)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExtIncDirs">
+      <Value>$(ExtIncDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExtLibsDirs">
+      <Value>$(ExtLibsDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ExtBinsDirs">
+      <Value>$(ExtBinsDirs)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

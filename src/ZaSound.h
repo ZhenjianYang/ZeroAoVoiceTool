@@ -10,7 +10,7 @@ namespace Za {
 			Playing = 0,
 			Stop = 1
 		};
-		typedef int(*StopCallBackType)(void*);
+		using StopCallBackType = int(*)(void*);
 
 		static const int VolumeMax;
 

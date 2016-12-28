@@ -1,108 +1,92 @@
 #include "Za.h"
-
-#include "ZaConst.h"
-#include "ZaLog.h"
-#include "ZaConfig.h"
-#include "ZaRemote.h"
-#include "ZaVoicePlayer.h"
 #include "ZaSound.h"
 
-#include <Windows.h>
+using namespace Za;
 
-static void SetWorkPath(const char* exepath);
-static void ZaMain();
+#define MAX_ERRMSG_LEGNTH 200
 
-void ZaVoiceStartup(int argc, char * argv[])
+#define MAX_TITLE_LENGTH 50
+#define MAX_COMMENT_LEGNTH 200
+
+static char buff_errmsg[MAX_ERRMSG_LEGNTH + 1];
+
+#define CpyStrToArray(dst, src) StrCpyN(dst, src, sizeof(dst) / sizeof(*dst) - 1);
+static char* StrCpyN(char* dst, const char* src, int maxlen) {
+	for (int i = 0; i < maxlen && src[i]; ++i) {
+		dst[i] = src[i];
+	}
+	dst[maxlen] = 0;
+	return dst;
+}
+static void SetErrMsg(const char* errMsg = nullptr) {
+	if (errMsg) { CpyStrToArray(buff_errmsg, errMsg); }
+	else buff_errmsg[0] = '\0';
+}
+
+bool Za::Main::Init()
 {
-	SetWorkPath(argv[0]);
-	Za::Config::LoadFromFile(DFT_CONFIG_FILE);
-
-	int logparam = 0;
-	if (!Za::Config::MainConfig->General->OpenDebugLog) {
-		logparam = ZALOG_OUT_STDOUT | ZALOG_TYPE_INFO | ZALOG_TYPE_ERROR | ZALOG_PARAM_NOPREINFO;
+	if (Za::Sound::Init()) {
+		SetErrMsg("初始化音频系统失败！");
+		return false;
 	}
-	else {
-		logparam = ZALOG_OUT_STDLOG | ZALOG_TYPE_ALL;
-	}
-	if (Za::Config::MainConfig->General->UseLogFile) {
-		logparam |= ZALOG_OUT_FILE;
-		ZALOG_SETLOGFILE(DFT_LOG_FILE);
-	}
-
-	ZALOG_OPEN_WITHPARAM(logparam);
-
-	ZALOG("Zero Ao Voice Tool %s", ZA_VERSION);
-
-	ZaMain();
-
-	ZALOG("Zero Ao Voice Tool End!");
-
-	ZALOG_CLOSE;
+	return true;
 }
 
-void ZaMain() {
-	int errc;
-	ZALOG("准备中...");
-
-	Za::Sound::Init();
-	ZALOG("音频系统已启动");
-
-	ZALOG("等待游戏运行...");
-	int gameID = Za::Remote::WaitGameStart(Za::Config::MainConfig->General->Mode);
-	ZALOG("游戏已启动！");
-
-	errc = Za::Remote::Init(gameID);
-	if (errc) {
-		ZALOG_ERROR("准备活动失败！");
-		return;
-	}
-
-	Za::Config::SetActiveGame(gameID);
-	Za::Sound::SetVolume(Za::Config::MainConfig->ActiveGame->Volume);
-	ZALOG("就绪");
-
-	Za::VoicePlayer::Init();
-	ZALOG("已进入语音播放系统");
-	
-	ZALOG("语音文件目录为: %s", Za::Config::MainConfig->ActiveGame->VoiceDir.c_str());
-	for (int i = 1; i <= (int)Za::Config::MainConfig->ActiveGame->VoiceExt.size(); ++i) {
-		ZALOG("语音文件后缀%d: %s", i, Za::Config::MainConfig->ActiveGame->VoiceExt[i-1].c_str());
-	}
-	if (gameID == GAMEID_AO && Za::Config::MainConfig->ActiveGame->DisableOriginalVoice) {
-		ZALOG("启用了禁用原有剧情语音的功能");
-	}
-
-	while (!Za::Remote::CheckGameEnd())
-	{
-		errc = Za::VoicePlayer::LoopOne();
-		Sleep(Za::Config::MainConfig->General->SleepTime);
-	}
-	ZALOG("游戏已退出！");
-	
-	Za::VoicePlayer::End();
-	ZALOG("已退出语音播放系统");
-	Za::Remote::End();
-	ZALOG_DEBUG("已关闭远程进程句柄");
-	Za::Sound::End();
-	ZALOG("已关闭音频系统");
-}
-
-void SetWorkPath(const char * exepath)
+bool Za::Main::End()
 {
-	char buff[1024];
-	int p = -1;
-	for(int i = 0; exepath[i] != 0; ++i)
-	{
-		if (exepath[i] == '\\') p = i;
-		buff[i] = exepath[i];
+	if (Za::Sound::End()) {
+		SetErrMsg("终止音频系统失败！");
+		return false;
 	}
-	if (p != -1) {
-		buff[p] = 0;
-	}
-	else {
-		buff[0] = '.'; buff[1] = 0;
-	}
-
-	SetCurrentDirectory(buff);
+	return true;
 }
 
+bool Za::Main::CheckGameStart(Data::GameOut & gameOut)
+{
+	return false;
+}
+
+bool Za::Main::CheckGameEnd()
+{
+	return false;
+}
+
+bool Za::Main::OpenGameThread(const Data::ThreadIn & threadIn)
+{
+	return false;
+}
+
+bool Za::Main::CloseGameThread()
+{
+	return false;
+}
+
+bool Za::Main::LoadVoiceTables(Data::VoiceTableOut & vtblOut)
+{
+	return false;
+}
+
+bool Za::Main::LoadVoiceTablesAsyn(Data::VoiceTableOut & vtblOut, const Data::VoiceTableIn & vtblIn)
+{
+	return false;
+}
+
+bool Za::Main::LoadVoiceTablesAsynCancle(Data::VoiceTableOut & vtblOut, const Data::VoiceTableIn & vtblIn)
+{
+	return false;
+}
+
+bool Za::Main::SetVoicePlayConfig(const Data::PlayConfigIn & playConfigIn)
+{
+	return false;
+}
+
+bool Za::Main::MessageRecived(Data::MessageOut & msgOut, Data::MessageIn & msgIn)
+{
+	return false;
+}
+
+const char * Za::Main::LastErr()
+{
+	return buff_errmsg;
+}
