@@ -7,6 +7,7 @@
 namespace Za {
 	namespace Remote {
 		extern const Za::Data::GameData* const &CurGameData;
+		extern const Za::Data::GameProcessIn* const &CurGameProcessIn;
 
 		bool Init();
 		bool End();

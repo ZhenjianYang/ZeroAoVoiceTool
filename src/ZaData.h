@@ -5,6 +5,8 @@ namespace Za
 {
 	namespace Data
 	{
+		using CallBackType = int(*) (void*);
+
 		struct GameProcessIn
 		{
 			int hMainWindow;
@@ -19,12 +21,12 @@ namespace Za
 			unsigned RemoteDataSize;
 		};
 
-		struct VoiceTableIn
+		struct VoicePlayerIn
 		{
-			using CallBackType = int(*) (void*);
+			bool asyn;
 			CallBackType callBack = nullptr;
 		};
-		struct VoiceTableOut
+		struct VoicePlayerOut
 		{
 			int Count;
 			bool Finished;

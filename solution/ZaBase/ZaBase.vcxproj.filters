@@ -36,6 +36,18 @@
     <ClInclude Include="..\..\src\ZaRemoteAsm.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\ZaVoiceTable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ZaScenaAnalyzer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ZaVoicePlayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ZaCommonMethod.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Za.cpp">
@@ -51,6 +63,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ZaRemote.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ZaScenaAnalyzer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ZaVoicePlayer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ZaVoiceTable.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

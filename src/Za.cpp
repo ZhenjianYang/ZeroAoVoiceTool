@@ -1,8 +1,10 @@
 #include "Za.h"
-#include "ZaSound.h"
-#include "ZaRemote.h"
 #include "ZaConst.h"
 #include "ZaErrorMsg.h"
+#include "ZaSound.h"
+#include "ZaRemote.h"
+#include "ZaVoicePlayer.h"
+#include "ZaScenaAnalyzer.h"
 
 using namespace Za;
 
@@ -33,19 +35,14 @@ bool Za::Main::CloseGameProcess()
 	return Za::Remote::CloseGameProcess();
 }
 
-bool Za::Main::LoadVoiceTables(Data::VoiceTableOut & vtblOut)
+bool Za::Main::StartVoiceTables(Data::VoicePlayerOut & vpOut, const Data::VoicePlayerIn & vpIn)
 {
-	return false;
+	return Za::ScenaAnalyzer::Init(vpOut, vpIn);
 }
 
-bool Za::Main::LoadVoiceTablesAsyn(Data::VoiceTableOut & vtblOut, const Data::VoiceTableIn & vtblIn)
+bool Za::Main::EndVoiceTables()
 {
-	return false;
-}
-
-bool Za::Main::LoadVoiceTablesAsynCancle(Data::VoiceTableOut & vtblOut, const Data::VoiceTableIn & vtblIn)
-{
-	return false;
+	return Za::ScenaAnalyzer::End();
 }
 
 bool Za::Main::SetVoicePlayConfig(const Data::PlayConfigIn & playConfigIn)
@@ -56,6 +53,6 @@ bool Za::Main::SetVoicePlayConfig(const Data::PlayConfigIn & playConfigIn)
 
 bool Za::Main::MessageRecived(Data::MessageOut & msgOut, Data::MessageIn & msgIn)
 {
-	return false;
+	return Za::ScenaAnalyzer::MessageRecived(msgOut, msgIn);
 }
 

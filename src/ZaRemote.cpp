@@ -17,6 +17,8 @@
 
 static const Za::Data::GameData* _curGameData = nullptr;
 const Za::Data::GameData* const &Za::Remote::CurGameData = _curGameData;
+static Za::Data::GameProcessIn _gameProcessIn;
+const Za::Data::GameProcessIn* const &CurGameProcessIn = &_gameProcessIn;
 
 static unsigned _remoteDataAddr;
 static unsigned _remoteDataSize;
@@ -30,7 +32,6 @@ static bool _cleanRemoteData();
 
 static HWND _hWnd = 0;
 static HANDLE _hProcess = 0;
-static Za::Data::GameProcessIn _gameProcessIn;
 
 static int _disableOriVoice = 0;
 

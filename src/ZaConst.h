@@ -25,9 +25,19 @@
 #define DFT_VOLUME				MAX_VOLUME
 #define DFT_DISABLE_ORIVOICE	0
 
+#define VOICE_TABLE_ATTR	"tbl"
+#define VOICE_FILE_ATTRS	{"ogg", "wav"}
+
 #define CONFIG_FILENAME		"Config.ini"
 #define DATA_FILENAME		"Data.ini"
 #define DATACSTM_FILENAME	"DataCustomized.ini"
+
+#define MSGTYPE_LOADSCENA	0
+#define MSGTYPE_LOADSCENA1	1
+#define MSGTYPE_LOADBLOCK	2
+#define MSGTYPE_SHOWTEXT	3
+#define MSGTYPE_PLAYWAIT	4
+
 
 #endif // !__ZACONST_H__
 

@@ -5,12 +5,13 @@
 #define CpyStrToArray(dst, src) StrCpyN(dst, src, sizeof(dst) / sizeof(*dst) - 1);
 #endif
 
-static char* StrCpyN(char* dst, const char* src, int maxlen) {
-	for (int i = 0; i < maxlen && src[i]; ++i) {
+static int StrCpyN(char* dst, const char* src, int maxlen) {
+	int i;
+	for (i = 0; i < maxlen && src[i]; ++i) {
 		dst[i] = src[i];
 	}
-	dst[maxlen] = 0;
-	return dst;
+	dst[i] = 0;
+	return i;
 }
 
 #endif

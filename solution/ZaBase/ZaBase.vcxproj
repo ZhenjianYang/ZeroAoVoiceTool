@@ -67,19 +67,26 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Za.h" />
+    <ClInclude Include="..\..\src\ZaCommonMethod.h" />
     <ClInclude Include="..\..\src\ZaData.h" />
     <ClInclude Include="..\..\src\ZaErrorMsg.h" />
     <ClInclude Include="..\..\src\ZaGameData.h" />
     <ClInclude Include="..\..\src\ZaRemote.h" />
     <ClInclude Include="..\..\src\ZaRemoteAsm.h" />
+    <ClInclude Include="..\..\src\ZaScenaAnalyzer.h" />
     <ClInclude Include="..\..\src\ZaSound.h" />
+    <ClInclude Include="..\..\src\ZaVoicePlayer.h" />
+    <ClInclude Include="..\..\src\ZaVoiceTable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Za.cpp" />
     <ClCompile Include="..\..\src\ZaErrorMsg.cpp" />
     <ClCompile Include="..\..\src\ZaGameData.cpp" />
     <ClCompile Include="..\..\src\ZaRemote.cpp" />
+    <ClCompile Include="..\..\src\ZaScenaAnalyzer.cpp" />
     <ClCompile Include="..\..\src\ZaSound.cpp" />
+    <ClCompile Include="..\..\src\ZaVoicePlayer.cpp" />
+    <ClCompile Include="..\..\src\ZaVoiceTable.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

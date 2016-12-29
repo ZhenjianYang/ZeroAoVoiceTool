@@ -2,34 +2,25 @@
 #define __ZAVOICETABLE_H__
 
 namespace Za {
-	class VoiceTable {
-	public:
+	namespace VoiceTable {
 		struct VoiceInfo
 		{
 			int voiceId;
 			const char* jpText;
 		};
 
-		class AllGroups {
+		namespace AllGroups {
+			int GroupsNum();
+			void Clear();
+			bool AddGroup(const char* scenaName, const char* vtblFile);
 
-		public:
-			static int GroupsNum();
-			static void Clear();
-			static bool AddGroup(const char* scenaName, const char* vtblFile);
-
-			static bool SetCurGroup(const char* scenaName);
-
-		private:
-			virtual ~AllGroups() = 0;
+			bool SetCurGroup(const char* scenaName);
 		};
 
-		static int Num();
-		static const VoiceInfo* GetVoiceInfo(int offset);
-		static const char* Name();
-
-	private:
-		virtual ~VoiceTable() = 0;
-	};
+		int Num();
+		const VoiceInfo* GetVoiceInfo(int offset);
+		const char* Name();
+	}
 }
 
 #endif // !__ZAVTBL_H__

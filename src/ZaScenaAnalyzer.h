@@ -1,20 +1,20 @@
 #ifndef __ZASCENAANALYZER_H__
 #define __ZASCENAANALYZER_H__
 
+#include "ZaData.h"
+
 namespace Za {
-	class ScenaAnalyzer {
-	public:
-		static int Init(void* data = nullptr);
-		static int End();
+	namespace ScenaAnalyzer {
+		bool Init(Data::VoicePlayerOut& vpOut, const Data::VoicePlayerIn& vpIn);
+		bool End();
+		bool MessageRecived(Data::MessageOut & msgOut, Data::MessageIn & msgIn);
 
-		static int DLoadScena(unsigned raScena, const char* &out_scenaName);
-		static int DLoadScena1(unsigned raScena1, const char* &out_scenaName);
-		static int DLoadBlock(unsigned raBlock, const char* &out_scenaName);
-		static int DShowText(unsigned raText, int & out_voiceID, bool &out_wait);
-
-	private:
-		virtual ~ScenaAnalyzer() = 0;
-	};
+		bool DLoadScena(unsigned raScena, const char* &out_scenaName);
+		bool DLoadScena1(unsigned raScena1, const char* &out_scenaName);
+		bool DLoadBlock(unsigned raBlock, const char* &out_scenaName);
+		bool DShowText(unsigned raText,
+			int & out_voiceID, const char* &cnText, const char* &jpText, bool & out_wait);
+	}
 }
 
 #endif

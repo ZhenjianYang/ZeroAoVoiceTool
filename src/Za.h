@@ -12,9 +12,9 @@ namespace Za {
 		bool OpenGameProcess(Data::GameProcessOut& gpOut, const Data::GameProcessIn& gpIn);
 		bool CloseGameProcess();
 
-		bool LoadVoiceTables(Data::VoiceTableOut& vtblOut);
-		bool LoadVoiceTablesAsyn(Data::VoiceTableOut& vtblOut, const Data::VoiceTableIn& vtblIn);
-		bool LoadVoiceTablesAsynCancle(Data::VoiceTableOut& vtblOut, const Data::VoiceTableIn& vtblIn);
+
+		bool StartVoiceTables(Data::VoicePlayerOut& vpOut, const Data::VoicePlayerIn& vpIn);
+		bool EndVoiceTables();
 
 		bool SetVoicePlayConfig(const Data::PlayConfigIn& playConfigIn);
 
