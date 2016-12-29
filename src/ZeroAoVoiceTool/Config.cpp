@@ -41,11 +41,11 @@ bool Config::SaveConfig(const char * configFile)
 	std::ofstream ofs(configFile);
 	if (!ofs) return false;
 
-	ofs << STR_Volume << '=' << Volume << '\n'
-		<< STR_DisableOriVoice << '=' << DisableOriVoice << '\n'
-		<< STR_Width << '=' << Width << '\n'
-		<< STR_Height << '=' << Height << '\n'
-		<< STR_MaxLogNum << '=' << MaxLogNum << std::endl;
+	ofs << STR_Volume << " = " << Volume << '\n'
+		<< STR_DisableOriVoice << " = " << DisableOriVoice << '\n'
+		<< STR_Width << " = " << Width << '\n'
+		<< STR_Height << " = " << Height << '\n'
+		<< STR_MaxLogNum << " = " << MaxLogNum << std::endl;
 
 	ofs.close();
 	return true;

@@ -32,6 +32,8 @@ public:
 		MESSAGE_HANDLER(WM_CLOSE, OnClose)
 		MESSAGE_HANDLER(WM_TIMER, OnTimer)
 		MESSAGE_HANDLER(REMOTE_MSG_ID, OnMsgReceived)
+		NOTIFY_HANDLER(IDC_SLIDER_VOLUME, NM_CUSTOMDRAW, OnNMCustomdrawSliderVolume)
+		COMMAND_HANDLER(IDC_EDIT_VOLUME, EN_CHANGE, OnEnChangeEditVolume)
 	END_MSG_MAP()
 
 // Handler prototypes (uncomment arguments if needed):
@@ -48,6 +50,7 @@ public:
 	void CloseDialog(int nVal);
 
 	void SetWorkPath();
+	void SaveConfig();
 
 	Config m_config;
 	Status m_status;
@@ -58,4 +61,16 @@ public:
 	Za::Data::PlayConfigIn m_pcIn;
 	Za::Data::MessageIn m_msgIn;
 	Za::Data::MessageOut m_msgOut;
+
+	CButton m_check_dov;
+	CStatic m_static_volume;
+	CTrackBarCtrl m_slider_volume;
+	CEdit m_edit_volume;
+
+	CButton m_button_st, m_button_pre, m_button_nxt, m_button_lst, m_button_fnt;
+	CStatic m_static_cnt;
+	CStatic m_static_info;
+	CEdit m_edit_text;
+	LRESULT OnNMCustomdrawSliderVolume(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/);
+	LRESULT OnEnChangeEditVolume(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 };

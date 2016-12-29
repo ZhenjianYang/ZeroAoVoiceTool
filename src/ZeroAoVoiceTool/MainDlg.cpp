@@ -45,22 +45,52 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	UIAddChildWindowContainer(m_hWnd);
 
+	m_check_dov = this->GetDlgItem(IDC_CHECK_DOV);
+
+	m_static_volume = this->GetDlgItem(IDC_STATIC_VOLUME);
+	m_slider_volume = this->GetDlgItem(IDC_SLIDER_VOLUME);
+	m_edit_volume = this->GetDlgItem(IDC_EDIT_VOLUME);
+
+	m_button_st = this->GetDlgItem(IDC_BUTTON_ST);
+	m_button_pre = this->GetDlgItem(IDC_BUTTON_PRE);
+	m_button_nxt = this->GetDlgItem(IDC_BUTTON_NEX);
+	m_button_lst = this->GetDlgItem(IDC_BUTTON_LST);
+	m_button_fnt = this->GetDlgItem(IDC_BUTTON_FNT);
+	m_static_cnt = this->GetDlgItem(IDC_STATIC_CNT);
+	m_edit_text = this->GetDlgItem(IDC_EDIT_TEXT);
+
+	m_static_info = this->GetDlgItem(IDC_STATIC_INFO);
+
 	SetWorkPath();
+
+	LOG_OPEN;
+	LOG("初始化...");
+
 	if (!m_config.LoadConfig(CONFIG_FILENAME)) {
 		m_config.Reset();
 	}
-
-	LOG_OPEN;
-
-	LOG("初始化...");
 	if (!Za::Main::Init()) {
 		MessageBox("读取数据出错！退出！", "错误", MB_OK);
 		CloseDialog(-1);
 		return TRUE;
 	}
+	m_pcIn.disableOriVoice = m_config.DisableOriVoice != 0;
+	m_pcIn.volume = m_config.Volume;
+	Za::Main::SetVoicePlayConfig(m_pcIn);
+
 	LOG("初始化成功！");
 	m_status = Status::WaitingGameStart;
 	LOG("等待游戏运行...");
+
+	if (m_config.DisableOriVoice) {
+		LOG("启用了禁用原有语音的功能");
+		m_check_dov.SetCheck(1);
+	} m_check_dov.SetCheck(0);
+
+	m_edit_volume.SetLimitText(3);
+	m_slider_volume.SetRangeMax(MAX_VOLUME);
+	m_slider_volume.SetRangeMin(0);
+	m_slider_volume.SetPos(m_config.Volume);
 
 	m_gpIn.hMainWindow = (int)m_hWnd;
 	m_gpIn.msgId = REMOTE_MSG_ID;
@@ -76,12 +106,17 @@ LRESULT CMainDlg::OnClose(UINT, WPARAM, LPARAM, BOOL &)
 	case Status::InitVoicePlayer:
 	case Status::Running:
 		Za::Main::EndVoiceTables();
+		LOG("已结束语音播放");
 		Za::Main::CloseGameProcess();
+		LOG("已关闭远程访问");
 	default:
 		break;
 	}
 	Za::Main::End();
+	LOG("已退出语音系统");
 	KillTimer(TIMER_ID);
+
+	SaveConfig();
 
 	CloseDialog(0);
 
@@ -128,6 +163,11 @@ LRESULT CMainDlg::OnTimer(UINT, WPARAM nID, LPARAM, BOOL &)
 			break;
 		case Status::Running:
 			if (Za::Main::CheckGameEnd()) {
+				LOG("游戏已退出");
+				Za::Main::EndVoiceTables();
+				LOG("已结束语音播放");
+				Za::Main::CloseGameProcess();
+				LOG("已关闭远程访问");
 				m_status = Status::WaitingGameStart;
 			}
 		default:
@@ -178,4 +218,65 @@ void CMainDlg::SetWorkPath() {
 	}
 
 	SetCurrentDirectory(buff);
+}
+
+void CMainDlg::SaveConfig()
+{
+	m_config.Volume = m_pcIn.volume;
+	m_config.DisableOriVoice = m_pcIn.disableOriVoice ? 1 : 0;
+	RECT rect;
+	this->GetClientRect(&rect);
+	m_config.Width = rect.right - rect.left;
+	m_config.Height = rect.bottom - rect.top;
+
+	m_config.SaveConfig(CONFIG_FILENAME);
+}
+
+
+LRESULT CMainDlg::OnNMCustomdrawSliderVolume(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+
+	static char buff[10];
+	int pos = m_slider_volume.GetPos();
+	m_edit_volume.GetWindowTextA(buff, sizeof(buff) - 1);
+	if (buff[0] == 0 || pos != atoi(buff)) {
+		sprintf(buff, "%d", pos);
+		m_edit_volume.SetWindowTextA(buff);
+	}
+
+	if (pos != m_pcIn.volume) {
+		m_pcIn.volume = pos;
+		Za::Main::SetVoicePlayConfig(m_pcIn);
+	}
+
+	return 0;
+}
+
+
+LRESULT CMainDlg::OnEnChangeEditVolume(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 __super::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+
+	static char buff[10];
+	m_edit_volume.GetWindowTextA(buff, sizeof(buff) - 1);
+	if (buff[0] == 0 || m_slider_volume.GetPos() == atoi(buff)) {
+		return 0;
+	}
+	int pos;
+	sscanf(buff, "%d", &pos);
+	m_slider_volume.SetPos(pos);
+
+	if (pos != m_pcIn.volume) {
+		m_pcIn.volume = pos;
+		Za::Main::SetVoicePlayConfig(m_pcIn);
+	}
+
+	return 0;
 }
