@@ -40,8 +40,11 @@ static void GetFromFile(std::list<Za::Data::GameData>& gdl,
 						const char* dataFN)
 {
 	if (dataFN) {
-		INI::Parser ini(dataFN);
-		auto &sections = ini.top().ordered_sections;
+		INI::Parser* ini = nullptr;
+		try { ini = new INI::Parser(dataFN); }
+		catch (const std::exception&) { delete ini; return; }
+
+		auto &sections = ini->top().ordered_sections;
 
 		for (auto &it : sections) {
 			const string& name = it->first;
@@ -80,8 +83,10 @@ static void GetFromFile(std::list<Za::Data::GameData>& gdl,
 				map_name_data[name] = gdl.end();
 				--map_name_data[name];
 			}
-		}
-	}
+		} //for (auto &it : sections)
+
+		delete ini;
+	} //if(dataFN)
 }
 
 int Za::Data::GameData::GetFromFiles(std::vector<GameData>& dataList, const char * dataFN, const char * dataCustomizedFN)

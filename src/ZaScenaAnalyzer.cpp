@@ -2,6 +2,7 @@
 
 #include "ZaConst.h"
 #include "ZaVoiceTable.h"
+#include "ZaSound.h"
 #include "ZaRemote.h"
 #include "ZaErrorMsg.h"
 #include "ZaData.h"
@@ -52,6 +53,12 @@ static void _reLoadAllVoiceTables(bool* cancle, int* count);
 
 static bool LoadScenaX(unsigned raScena, int X);
 
+static int _playEndCallBack(void*) {
+	::PostMessageA((HWND)Za::Remote::CurGameProcessIn->hMainWindow, (UINT)Za::Remote::CurGameProcessIn->msgId,
+		(WPARAM)MSGTYPE_PLAYWAIT, (LPARAM)0);
+	return 0;
+}
+
 static void _getSubFiles(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs)
 {
 	WIN32_FIND_DATA wfdp;
@@ -79,7 +86,7 @@ bool _checkScenaName(const char *scenaName) {
 }
 int _textAnalysisCN(char *dst, const char* src, int max_length) {
 	int first = 0;
-	while (*src < 0x20 || *src == 0xFF) {
+	while ((unsigned char)*src < 0x20 || *src == 0xFF) {
 		src++; first++;
 	}
 	if (RM_FWD_CTRL_CH) {
@@ -193,6 +200,9 @@ bool Za::ScenaAnalyzer::Init(Data::VoicePlayerOut & vpOut, const Data::VoicePlay
 	_stop = true;
 	if (fut.valid()) fut.get();
 	_stop = false;
+	vpOut.Count = 0;
+	vpOut.Finished = false;
+
 	if (vpIn.asyn) {
 		fut = std::async(_reload_thread, &_stop, &vpOut.Count, &vpOut.Finished, vpIn.callBack);
 	}
@@ -215,7 +225,7 @@ bool Za::ScenaAnalyzer::End()
 	return true;
 }
 
-bool Za::ScenaAnalyzer::MessageRecived(Data::MessageOut & msgOut, Data::MessageIn & msgIn)
+bool Za::ScenaAnalyzer::MessageReceived(Data::MessageOut & msgOut, Data::MessageIn & msgIn)
 {
 	const char* out_scenaName;
 	int out_voiceID;
@@ -226,22 +236,22 @@ bool Za::ScenaAnalyzer::MessageRecived(Data::MessageOut & msgOut, Data::MessageI
 	msgOut.VoiceFileName = buff_voicefile;
 	buff_voicefile[0] = 0;
 	cnText = jpText = nullptr;
-	msgOut.Type = msgIn.lparam;
+	msgOut.Type = msgIn.wparam;
 
-	switch (msgIn.lparam)
+	switch (msgIn.wparam)
 	{
 	case MSGTYPE_LOADSCENA:
-		_messageData.raScena[0] = msgIn.wparam;
+		_messageData.raScena[0] = msgIn.lparam;
 		_messageData.raScena[1] = _messageData.raScena[2] = _messageData.raBloack = _messageData.raText = 0;
 		return true;
 	case MSGTYPE_LOADSCENA1:
 		if (!_messageData.raScena[0]) return false;;
-		if (_messageData.raScena[1]) _messageData.raScena[2] = msgIn.wparam;
-		else  _messageData.raScena[1] = msgIn.wparam;
+		if (_messageData.raScena[1]) _messageData.raScena[2] = msgIn.lparam;
+		else  _messageData.raScena[1] = msgIn.lparam;
 		return true;
 	case MSGTYPE_LOADBLOCK:
 		if (!_messageData.raScena[0]) return false;;
-		_messageData.raBloack = msgIn.wparam;
+		_messageData.raBloack = msgIn.lparam;
 		_messageData.raText = 0;
 		if (!DLoadScena(_messageData.raScena[0], out_scenaName)) {
 			_messageData.raScena[0] = 0;
@@ -259,17 +269,19 @@ bool Za::ScenaAnalyzer::MessageRecived(Data::MessageOut & msgOut, Data::MessageI
 		}
 		return true;
 	case MSGTYPE_SHOWTEXT:
-		if (!_messageData.raScena || !_messageData.raBloack) return false;
-		_messageData.raText = msgIn.wparam;
+		if (!_messageData.raScena[0] || !_messageData.raBloack) return false;
+		_messageData.raText = msgIn.lparam;
 		if (!DShowText(_messageData.raText, out_voiceID, cnText, jpText, wait)) {
 			return false;
 		}
 		if (out_voiceID != INVAILD_VOICE_ID) {
-			if (!wait) {
+			if (!wait || Za::Sound::Status() == Za::Sound::Status::Stop) {
+				Za::Sound::SetStopCallBack();
 				Za::VoicePlayer::ClearWait();
 				return Za::VoicePlayer::PlayVoice(out_voiceID, buff_voicefile);
 			}
 			else {
+				Za::Sound::SetStopCallBack(_playEndCallBack);
 				Za::VoicePlayer::AddToWait(out_voiceID);
 			}
 		}
@@ -298,7 +310,7 @@ bool Za::ScenaAnalyzer::DLoadScena(unsigned raScena, const char* &out_scenaName)
 		out_scenaName = _scenaNameX[0];
 	}
 
-	return 0;
+	return true;
 }
 bool Za::ScenaAnalyzer::DLoadScena1(unsigned raScena1, const char* &out_scenaName)
 {

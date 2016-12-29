@@ -157,8 +157,8 @@ namespace Za {
 			rNewShowTextOK :
 				//PostMessage(hwnd, msgId, param, 0)
 				mov eax, [esp + OFF_FIRSTPARAM]
-				push 0
 				push eax
+				push FAKE_TYPE
 				push FAKE_MESSAGE_ID
 				push FAKE_HWND
 				mov eax, FAKE_PTR_API

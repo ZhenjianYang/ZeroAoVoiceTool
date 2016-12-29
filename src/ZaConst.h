@@ -21,14 +21,9 @@
 
 #define MAX_VOLUME 100
 
-#define DFT_MAX_LOGNUM			200
-#define DFT_VOLUME				MAX_VOLUME
-#define DFT_DISABLE_ORIVOICE	0
-
 #define VOICE_TABLE_ATTR	"tbl"
 #define VOICE_FILE_ATTRS	{"ogg", "wav"}
 
-#define CONFIG_FILENAME		"Config.ini"
 #define DATA_FILENAME		"Data.ini"
 #define DATACSTM_FILENAME	"DataCustomized.ini"
 

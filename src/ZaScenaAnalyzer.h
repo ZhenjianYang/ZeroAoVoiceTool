@@ -7,7 +7,7 @@ namespace Za {
 	namespace ScenaAnalyzer {
 		bool Init(Data::VoicePlayerOut& vpOut, const Data::VoicePlayerIn& vpIn);
 		bool End();
-		bool MessageRecived(Data::MessageOut & msgOut, Data::MessageIn & msgIn);
+		bool MessageReceived(Data::MessageOut & msgOut, Data::MessageIn & msgIn);
 
 		bool DLoadScena(unsigned raScena, const char* &out_scenaName);
 		bool DLoadScena1(unsigned raScena1, const char* &out_scenaName);

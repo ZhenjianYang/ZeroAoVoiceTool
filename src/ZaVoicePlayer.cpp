@@ -59,13 +59,13 @@ bool Za::VoicePlayer::PlayVoice(int voiceId, char *out_filename /*= nullptr*/) {
 	static const char* attrs[] = VOICE_FILE_ATTRS;
 	for (int j = 0; j < sizeof(attrs) / sizeof(*attrs); ++j)
 	{
-		CpyStrToArray(buff_filename + index, attrs[j]);
+		StrCpyN(buff_filename + index, attrs[j], MAX_LENGTH_VOICE_ID);
 		std::string filePath = dir + '\\' + buff_filename;
 
 		if (_access(filePath.c_str(), 4) == 0)
 			return Za::Sound::Play(filePath.c_str());
 	}
-	buff_filename[index - 1] = 0;
+	buff_filename[0] = 0;
 
 	Za::Error::SetErrMsg("语音文件不存在！");
 	return false;

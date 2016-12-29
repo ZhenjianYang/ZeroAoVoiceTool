@@ -18,7 +18,7 @@
 static const Za::Data::GameData* _curGameData = nullptr;
 const Za::Data::GameData* const &Za::Remote::CurGameData = _curGameData;
 static Za::Data::GameProcessIn _gameProcessIn;
-const Za::Data::GameProcessIn* const &CurGameProcessIn = &_gameProcessIn;
+const Za::Data::GameProcessIn* const &Za::Remote::CurGameProcessIn = &_gameProcessIn;
 
 static unsigned _remoteDataAddr;
 static unsigned _remoteDataSize;
@@ -44,7 +44,7 @@ bool Za::Remote::Init()
 	_mTitleIdx.clear();
 	for(int i = 0; i < (int)_gameDataList.size(); ++i) {
 		if (_gameDataList[i].Enable) {
-			_mTitleIdx[_gameDataList[i].Name].push_back(i);
+			_mTitleIdx[_gameDataList[i].Title].push_back(i);
 		}
 	}
 
@@ -192,7 +192,8 @@ bool _openProcess()
 				unsigned fv;
 
 				for (auto idx : idxlist) {
-					if (ReadProcessMemory(_hProcess, (LPVOID)_gameDataList[idx].FeatureAddr, &fv, sizeof(fv), NULL) == TRUE
+					if (_gameDataList[idx].FeatureAddr == 0
+						|| ReadProcessMemory(_hProcess, (LPVOID)_gameDataList[idx].FeatureAddr, &fv, sizeof(fv), NULL) == TRUE
 						&& fv == _gameDataList[idx].FeatureValue){
 						_curGameData = &_gameDataList[idx];
 						return true;
@@ -274,7 +275,7 @@ bool _injectRemoteCode()
 				&& buff[p + 1] == FAKE_CODE2 && buff[p + 2] == FAKE_CODE2
 				&& buff[p + 3] == FAKE_CODE2 && buff[p + 4] == FAKE_CODE2) {
 				buff[p] = JMP_CODE; p++;
-				*(unsigned *)(buff + p) = AddrOpJcList[i] - (_remoteDataAddr + p + 4); p += 4;
+				*(unsigned *)(buff + p) = AddrFuncList[i] - (_remoteDataAddr + p + 4); p += 4;
 				break;
 			}
 			else
@@ -291,8 +292,8 @@ bool _injectRemoteCode()
 	}
 	for (int i = 0; i < cnt; ++i) {
 		AddrNewFuncList[i] += _remoteDataAddr;
-		unsigned ljmp = AddrNewFuncList[i] - AddrFuncList[i] - 5;
-		if (!Za::Remote::RemoteWrite(AddrFuncList[i] + 1, &ljmp, sizeof(ljmp))) {
+		unsigned ljmp = AddrNewFuncList[i] - AddrOpJcList[i] - 5;
+		if (!Za::Remote::RemoteWrite(AddrOpJcList[i] + 1, &ljmp, sizeof(ljmp))) {
 			Za::Error::SetErrMsg("写入远程数据失败！");
 			return false;
 		}

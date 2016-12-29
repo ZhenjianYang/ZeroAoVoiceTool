@@ -51,8 +51,8 @@ bool Za::Main::SetVoicePlayConfig(const Data::PlayConfigIn & playConfigIn)
 		&& Za::Sound::SetVolume(playConfigIn.volume);
 }
 
-bool Za::Main::MessageRecived(Data::MessageOut & msgOut, Data::MessageIn & msgIn)
+bool Za::Main::MessageReceived(Data::MessageOut & msgOut, Data::MessageIn & msgIn)
 {
-	return Za::ScenaAnalyzer::MessageRecived(msgOut, msgIn);
+	return Za::ScenaAnalyzer::MessageReceived(msgOut, msgIn);
 }
 

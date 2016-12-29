@@ -27,6 +27,12 @@
     <ClCompile Include="..\..\src\ZeroAoVoiceTool\ZeroAoVoiceTool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ZeroAoVoiceTool\Config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ZeroAoVoiceTool\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ZeroAoVoiceTool\AboutDlg.h">
@@ -39,6 +45,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\ZeroAoVoiceTool\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ZeroAoVoiceTool\Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ZeroAoVoiceTool\Const.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ZeroAoVoiceTool\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

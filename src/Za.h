@@ -18,7 +18,7 @@ namespace Za {
 
 		bool SetVoicePlayConfig(const Data::PlayConfigIn& playConfigIn);
 
-		bool MessageRecived(Data::MessageOut& msgOut, Data::MessageIn& msgIn);
+		bool MessageReceived(Data::MessageOut& msgOut, Data::MessageIn& msgIn);
 	}
 }
 

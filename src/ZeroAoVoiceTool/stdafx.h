@@ -21,3 +21,6 @@ extern CAppModule _Module;
 #include <atlframe.h>
 #include <atlctrls.h>
 #include <atldlgs.h>
+
+#include <Za.h>
+#include <ZaConst.h>
