@@ -16,7 +16,7 @@ namespace Za {
 		bool OpenGameProcess(Data::GameProcessOut& gpOut, const Data::GameProcessIn& gpIn);
 		bool CloseGameProcess();
 
-		bool DisableOriVoice(bool op = true);
+		bool DisableOriVoice(int op = 0);
 
 		bool RemoteRead(unsigned rAdd, void *buff, unsigned size);
 		bool RemoteWrite(unsigned rAdd, const void *buff, unsigned size);

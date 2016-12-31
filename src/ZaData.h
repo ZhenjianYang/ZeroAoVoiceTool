@@ -48,7 +48,7 @@ namespace Za
 		struct PlayConfigIn
 		{
 			int volume;
-			bool disableOriVoice;
+			int disableOriVoice;
 		};
 	};
 }

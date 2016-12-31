@@ -116,12 +116,11 @@ bool Za::Remote::CloseGameProcess()
 	return ret;
 }
 
-bool Za::Remote::DisableOriVoice(bool op)
+bool Za::Remote::DisableOriVoice(int op)
 {
-	int t = op ? 1 : 0;
-	if (_disableOriVoice == t) return true;
+	if (_disableOriVoice == op) return true;
 	
-	_disableOriVoice = t;
+	_disableOriVoice = op;
 	if (!_hProcess) return true;
 
 	return Za::Remote::RemoteWrite(_remoteDataAddr + OFF_disableOriVoice, &_disableOriVoice, sizeof(_disableOriVoice));
@@ -307,7 +306,7 @@ bool _cleanRemoteData()
 	if (!_hProcess) return true;
 
 	for (int i = 0; i < sizeof(_curGameData->AddrOpJc) / sizeof(*_curGameData->AddrOpJc); ++i) {
-		unsigned ljmp = _curGameData->AddrOpJc[i] - _curGameData->AddrOpJc[i] - 5;
+		unsigned ljmp = _curGameData->AddrFunc[i] - _curGameData->AddrOpJc[i] - 5;
 		if (!Za::Remote::RemoteWrite(_curGameData->AddrOpJc[i] + 1, &ljmp, sizeof(ljmp))) {
 			Za::Error::SetErrMsg("清理远程代码失败！");
 			return false;
