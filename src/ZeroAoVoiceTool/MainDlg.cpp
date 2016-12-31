@@ -118,8 +118,8 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	tlog.Set(m_config.MaxLogNum);
 	tlog.Jump(0);
 
-	//tlog.Add("中文文本样例01\n中文文本样例02\n中文文本样例03\n中文文本样例04\n中文文本样例05\n中文文本样例06\n中文文本样例07\n中文文本样例08",
-	//	"日文文本样例01\n日文文本样例02\n日文文本样例03\n日文文本样例04\n日文文本样例05\n日文文本样例06\n日文文本样例07\n日文文本样例08");
+	//tlog.Add("中文文本样例01\n 中文文本样例02\n  中文文本样例03\n   中文文本样例04\n    中文文本样例05\n     中文文本样例06\n      中文文本样例07\n       中文文本样例08",
+	//	"日文文本样例01\n 日文文本样例02\n  日文文本样例03\n   日文文本样例04\n    日文文本样例05\n     日文文本样例06\n      日文文本样例07\n       日文文本样例08");
 
 	RECT rect_main, rect_edit, rect_info;
 
@@ -256,7 +256,7 @@ LRESULT CMainDlg::OnCtrlColorEdit(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL 
 	if (hwnd == m_edit_text)
 	{
 		SetTextColor(hdc, m_fontcolor);
-		SetBkMode(hdc, TRANSPARENT);
+		SetBkMode(hdc, OPAQUE);
 	}
 	else
 	{

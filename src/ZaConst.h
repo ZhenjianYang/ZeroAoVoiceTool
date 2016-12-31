@@ -24,8 +24,8 @@
 #define VOICE_TABLE_ATTR	"tbl"
 #define VOICE_FILE_ATTRS	{"ogg", "wav"}
 
-#define DATA_FILENAME		"Data.ini"
-#define DATACSTM_FILENAME	"DataCustomized.ini"
+#define DATA_FILENAME		"ZaData.ini"
+#define DATACSTM_FILENAME	"ZaDataEx.ini"
 
 #define MSGTYPE_LOADSCENA	0
 #define MSGTYPE_LOADSCENA1	1

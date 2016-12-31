@@ -1,7 +1,7 @@
 #ifndef __CONST_H__
 #define __CONST_H__
 
-#define CONFIG_FILENAME		"Config.ini"
+#define CONFIG_FILENAME		"ZaConfig.ini"
 
 #define DFT_MAX_LOGNUM			500
 #define DFT_VOLUME				100
