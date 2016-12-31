@@ -45,6 +45,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	UIAddChildWindowContainer(m_hWnd);
 
+	m_check_rem = this->GetDlgItem(IDC_CHECK_REM);
 	m_check_dov = this->GetDlgItem(IDC_CHECK_DOV);
 
 	m_static_volume = this->GetDlgItem(IDC_STATIC_VOLUME);
@@ -143,6 +144,8 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	if (m_config.Width && m_config.Height) {
 		MoveWindow(m_config.PosX, m_config.PosY, m_config.Width, m_config.Height);
 	}
+
+	m_check_rem.SetCheck(m_config.RemembeWinInfo);
 
 	SetTextCtrl();
 
@@ -484,6 +487,9 @@ void CMainDlg::SaveConfig()
 		if (m_lf.lfStrikeOut) m_config.FontStyle |= FONTSTYLE_DELLINE;
 		if (m_lf.lfUnderline) m_config.FontStyle |= FONTSTYLE_UNDERLINE;
 	}
+
+	m_config.RemembeWinInfo = m_check_rem.GetCheck();
+
 	m_config.SaveConfig(CONFIG_FILENAME);
 }
 

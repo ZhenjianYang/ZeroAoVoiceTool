@@ -113,6 +113,7 @@ public:
 	Config m_config;
 	bool m_changed_font;
 
+	CButton m_check_rem;
 	CButton m_check_dov;
 	CStatic m_static_volume;
 	CTrackBarCtrl m_slider_volume;
