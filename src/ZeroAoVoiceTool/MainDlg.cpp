@@ -5,15 +5,15 @@
 #include "stdafx.h"
 #include "resource.h"
 
-#include "aboutdlg.h"
 #include "MainDlg.h"
+
+#include <sstream>
 
 #if !_DEBUG
 #define LOG_NOLOG 1
 #endif
 
 #include "Log.h"
-
 
 BOOL CMainDlg::PreTranslateMessage(MSG* pMsg)
 {
@@ -66,6 +66,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	LOG_OPEN;
 	LOG("初始化...");
 
+	m_changed_font = false;
 	if (!m_config.LoadConfig(CONFIG_FILENAME)) {
 		m_config.Reset();
 	}
@@ -82,19 +83,70 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_status = Status::WaitingGameStart;
 	LOG("等待游戏运行...");
 
+	m_gpIn.hMainWindow = (int)m_hWnd;
+	m_gpIn.msgId = REMOTE_MSG_ID;
+	SetTimer(TIMER_ID, TIMER_TIME);
+
 	if (m_config.DisableOriVoice) {
 		LOG("启用了禁用原有语音的功能");
-		m_check_dov.SetCheck(1);
-	} m_check_dov.SetCheck(0);
+	}
+	m_check_dov.SetCheck(m_config.DisableOriVoice);
 
 	m_edit_volume.SetLimitText(3);
 	m_slider_volume.SetRangeMax(MAX_VOLUME);
 	m_slider_volume.SetRangeMin(0);
 	m_slider_volume.SetPos(m_config.Volume);
 
-	m_gpIn.hMainWindow = (int)m_hWnd;
-	m_gpIn.msgId = REMOTE_MSG_ID;
-	SetTimer(TIMER_ID, TIMER_TIME);
+	HFONT hf = m_edit_text.GetFont();
+	GetObject(hf, sizeof(m_lf), &m_lf);
+	m_fontcolor = m_config.FontColor;
+	//memset(&m_lf, 0, sizeof(m_lf));
+	if (m_config.FontName[0]) {
+		strcpy(m_lf.lfFaceName, m_config.FontName);
+	}
+	if (m_config.FontSize) {
+		m_lf.lfHeight = -m_config.FontSize;
+	}
+	if (m_config.FontStyle & FONTSTYLE_ITALIC) m_lf.lfItalic = 1;
+	if (m_config.FontStyle & FONTSTYLE_UNDERLINE) m_lf.lfUnderline = 1;
+	if (m_config.FontStyle & FONTSTYLE_DELLINE) m_lf.lfStrikeOut = 1;
+	if (m_config.FontStyle & FONTSTYLE_WEIGHT) m_lf.lfWeight = m_config.FontStyle & FONTSTYLE_WEIGHT;
+
+	hf = CreateFontIndirect(&m_lf);
+	m_edit_text.SetFont(hf);
+
+	tlog.Set(m_config.MaxLogNum);
+	tlog.Jump(0);
+
+	//tlog.Add("中文文本样例01\n中文文本样例02\n中文文本样例03\n中文文本样例04\n中文文本样例05\n中文文本样例06\n中文文本样例07\n中文文本样例08",
+	//	"日文文本样例01\n日文文本样例02\n日文文本样例03\n日文文本样例04\n日文文本样例05\n日文文本样例06\n日文文本样例07\n日文文本样例08");
+
+	RECT rect_main, rect_edit, rect_info;
+
+	GetWindowRect(&rect_main);
+	m_minh = rect_main.bottom - rect_main.top;
+	m_minw = rect_main.right - rect_main.left;
+
+	GetClientRect(&rect_main);
+	m_edit_text.GetClientRect(&rect_edit);
+	m_static_info.GetClientRect(&rect_info);
+
+	m_dy_edit = rect_main.bottom - rect_edit.bottom;
+
+	m_edit_text.GetWindowRect(&rect_edit);
+	ScreenToClient(&rect_edit);
+	m_x_edit = rect_edit.left;
+	m_y_edit = rect_edit.top;
+
+	m_h_info = rect_info.bottom;
+
+	if (m_config.Width && m_config.Height) {
+		MoveWindow(m_config.PosX, m_config.PosY, m_config.Width, m_config.Height);
+	}
+
+	SetTextCtrl();
+
+	m_static_info.SetWindowTextA("等待游戏运行...");
 
 	return TRUE;
 }
@@ -150,6 +202,8 @@ LRESULT CMainDlg::OnTimer(UINT, WPARAM nID, LPARAM, BOOL &)
 				LOG("远程数据地址：0x%08X， 大小：0x%04X", m_gpOut.RemoteDataAddr, m_gpOut.RemoteDataSize);
 
 				LOG("加载语音表...");
+
+				m_static_info.SetWindowTextA("加载语音表...");
 				Za::Main::StartVoiceTables(m_vpOut, m_vpIn);
 			}
 			break;
@@ -159,6 +213,17 @@ LRESULT CMainDlg::OnTimer(UINT, WPARAM nID, LPARAM, BOOL &)
 				LOG("语音表总数：%d", m_vpOut.Count);
 				LOG("开始播放语音...");
 				m_status = Status::Running;
+
+				std::stringstream ss;
+				ss << "正在播放语音..."
+					<< " | " << "语音表数：" << m_vpOut.Count
+					<< " | " << m_gpOut.Comment;
+
+				m_static_info.SetWindowTextA(ss.str().c_str());
+
+				ss.str("");
+				ss << TITLE << " - " << m_gpOut.Title;
+				this->SetWindowTextA(ss.str().c_str());
 			}
 			break;
 		case Status::Running:
@@ -169,6 +234,9 @@ LRESULT CMainDlg::OnTimer(UINT, WPARAM nID, LPARAM, BOOL &)
 				Za::Main::CloseGameProcess();
 				LOG("已关闭远程访问");
 				m_status = Status::WaitingGameStart;
+
+				m_static_info.SetWindowTextA("终止，重新等待游戏运行...");
+				this->SetWindowTextA(TITLE);
 			}
 		default:
 			break;
@@ -177,21 +245,197 @@ LRESULT CMainDlg::OnTimer(UINT, WPARAM nID, LPARAM, BOOL &)
 	return 0;
 }
 
+LRESULT CMainDlg::OnCtrlColorEdit(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
+{
+	HBRUSH hbr;
+	HDC  hdc = (HDC)wParam;
+	HWND  hwnd = (HWND)lParam;
+
+	hbr = (HBRUSH)GetCurrentObject(hdc, OBJ_BRUSH);
+
+	if (hwnd == m_edit_text)
+	{
+		SetTextColor(hdc, m_fontcolor);
+		SetBkMode(hdc, TRANSPARENT);
+	}
+	else
+	{
+		hbr = (HBRUSH)GetCurrentObject(NULL, OBJ_BRUSH);
+	}
+	return (LRESULT)hbr;
+}
+
+LRESULT CMainDlg::OnSize(UINT, WPARAM, LPARAM, BOOL &)
+{
+	RECT rect_main;
+	GetClientRect(&rect_main);
+
+	m_edit_text.MoveWindow(m_x_edit, m_y_edit, rect_main.right - m_x_edit * 2, rect_main.bottom - m_dy_edit);
+	m_static_info.MoveWindow(0, rect_main.bottom - m_h_info, rect_main.right, m_h_info);
+
+	return 0;
+}
+
+LRESULT CMainDlg::OnGetMinMaxInfo(UINT, WPARAM wParam, LPARAM lParam, BOOL &)
+{
+	MINMAXINFO * info = (MINMAXINFO *)lParam;
+	info->ptMinTrackSize.x = m_minw;
+	info->ptMinTrackSize.y = m_minh;
+	return LRESULT();
+}
+
 LRESULT CMainDlg::OnMsgReceived(UINT, WPARAM wParam, LPARAM lParam, BOOL &)
 {
+	if (m_status != Status::Running) return 0;
+
 	m_msgIn.lparam = lParam;
 	m_msgIn.wparam = wParam;
 	LOG("收到消息，type=%d, addr=0x%0X", wParam, lParam);
 	Za::Main::MessageReceived(m_msgOut, m_msgIn);
+
+	if (m_msgOut.Type != MSGTYPE_SHOWTEXT && m_msgOut.Type != MSGTYPE_PLAYWAIT && m_msgOut.Type != MSGTYPE_LOADSCENA)
+		return 0;
+
+	std::stringstream ss;
+	ss << "正在播放语音..."
+		<< " | " << "语音表数：" << m_vpOut.Count
+		<< " | " << m_gpOut.Comment;
 	if (m_msgOut.VoiceFileName && m_msgOut.VoiceFileName[0]) {
 		LOG("播放语音文件：%s", m_msgOut.VoiceFileName);
+
+		ss << " | " << m_msgOut.VoiceFileName;
 	}
+	
 	if (m_msgOut.CnText && m_msgOut.CnText[0]) {
 		LOG("中文对白：\n%s", m_msgOut.CnText);
+
+		tlog.Add(m_msgOut.CnText, m_msgOut.JpText);
+		SetTextCtrl();
 	}
 	if (m_msgOut.JpText && m_msgOut.JpText[0]) {
 		LOG("日文对白：\n%s", m_msgOut.JpText);
 	}
+
+	m_static_info.SetWindowTextA(ss.str().c_str());
+
+	return 0;
+}
+
+LRESULT CMainDlg::OnNMCustomdrawSliderVolume(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+
+	static char buff[10];
+	int pos = m_slider_volume.GetPos();
+	m_edit_volume.GetWindowTextA(buff, sizeof(buff) - 1);
+	if (buff[0] == 0 || pos != atoi(buff)) {
+		sprintf(buff, "%d", pos);
+		m_edit_volume.SetWindowTextA(buff);
+	}
+
+	if (pos != m_pcIn.volume) {
+		m_pcIn.volume = pos;
+		Za::Main::SetVoicePlayConfig(m_pcIn);
+	}
+
+	return 0;
+}
+
+LRESULT CMainDlg::OnEnChangeEditVolume(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 __super::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+
+	static char buff[10];
+	m_edit_volume.GetWindowTextA(buff, sizeof(buff) - 1);
+	if (buff[0] == 0 || m_slider_volume.GetPos() == atoi(buff)) {
+		return 0;
+	}
+	int pos;
+	sscanf(buff, "%d", &pos);
+	m_slider_volume.SetPos(pos);
+
+	if (pos != m_pcIn.volume) {
+		m_pcIn.volume = pos;
+		Za::Main::SetVoicePlayConfig(m_pcIn);
+	}
+
+	return 0;
+}
+
+LRESULT CMainDlg::OnBnClickedButtonSt(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	tlog.Jump(1);
+	SetTextCtrl();
+	return 0;
+}
+
+LRESULT CMainDlg::OnBnClickedButtonPre(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	tlog.Jump(tlog.CurIdx() - 1);
+	SetTextCtrl();
+	return 0;
+}
+
+LRESULT CMainDlg::OnBnClickedButtonNex(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	tlog.Jump(tlog.CurIdx() + 1);
+	SetTextCtrl();
+	return 0;
+}
+
+LRESULT CMainDlg::OnBnClickedButtonLst(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	tlog.Jump(tlog.Count());
+	SetTextCtrl();
+	return 0;
+}
+
+LRESULT CMainDlg::OnBnClickedCheckDov(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_pcIn.disableOriVoice = m_check_dov.GetCheck();
+	Za::Main::SetVoicePlayConfig(m_pcIn);
+
+	return 0;
+}
+
+LRESULT CMainDlg::OnBnClickedButtonFnt(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CFontDialog fd(&m_lf);
+	fd.m_cf.rgbColors = m_fontcolor;
+
+	if (fd.DoModal() == IDOK) {
+		HFONT hf = m_edit_text.GetFont();
+		DeleteObject(hf);
+		hf = CreateFontIndirect(&m_lf);
+
+		m_edit_text.SetFont(hf);
+		m_fontcolor = fd.GetColor();
+		//DeleteObject(hf);
+
+		m_changed_font = true;
+	}
+
+	return 0;
+}
+
+LRESULT CMainDlg::OnBnClickedButtonClear(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	tlog.Clear();
+	SetTextCtrl();
 
 	return 0;
 }
@@ -225,58 +469,109 @@ void CMainDlg::SaveConfig()
 	m_config.Volume = m_pcIn.volume;
 	m_config.DisableOriVoice = m_pcIn.disableOriVoice ? 1 : 0;
 	RECT rect;
-	this->GetClientRect(&rect);
+	this->GetWindowRect(&rect);
 	m_config.Width = rect.right - rect.left;
 	m_config.Height = rect.bottom - rect.top;
+	m_config.PosX = rect.left;
+	m_config.PosY = rect.top;
 
+	if (m_changed_font) {
+		strcpy(m_config.FontName, m_lf.lfFaceName);
+		m_config.FontSize = m_lf.lfHeight; if (m_config.FontSize < 0) m_config.FontSize = -m_config.FontSize;
+		m_config.FontColor = m_fontcolor;
+		m_config.FontStyle = m_lf.lfWeight;
+		if (m_lf.lfItalic) m_config.FontStyle |= FONTSTYLE_ITALIC;
+		if (m_lf.lfStrikeOut) m_config.FontStyle |= FONTSTYLE_DELLINE;
+		if (m_lf.lfUnderline) m_config.FontStyle |= FONTSTYLE_UNDERLINE;
+	}
 	m_config.SaveConfig(CONFIG_FILENAME);
 }
 
-
-LRESULT CMainDlg::OnNMCustomdrawSliderVolume(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/)
+void CMainDlg::SetTextCtrl()
 {
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
-
-	static char buff[10];
-	int pos = m_slider_volume.GetPos();
-	m_edit_volume.GetWindowTextA(buff, sizeof(buff) - 1);
-	if (buff[0] == 0 || pos != atoi(buff)) {
-		sprintf(buff, "%d", pos);
-		m_edit_volume.SetWindowTextA(buff);
+	if (tlog.CurIdx() <= 1) {
+		m_button_st.EnableWindow(FALSE);
+		m_button_pre.EnableWindow(FALSE);
+	}
+	else {
+		m_button_st.EnableWindow(TRUE);
+		m_button_pre.EnableWindow(TRUE);
 	}
 
-	if (pos != m_pcIn.volume) {
-		m_pcIn.volume = pos;
-		Za::Main::SetVoicePlayConfig(m_pcIn);
+	if (tlog.CurIdx() >= tlog.Count()) {
+		m_button_lst.EnableWindow(FALSE);
+		m_button_nxt.EnableWindow(FALSE);
 	}
+	else {
+		m_button_lst.EnableWindow(TRUE);
+		m_button_nxt.EnableWindow(TRUE);
+	}
+	m_edit_text.SetWindowTextA(tlog.CurText());
 
-	return 0;
+	std::stringstream ss;
+	ss << tlog.CurIdx() << '/' << tlog.Count();
+	m_static_cnt.SetWindowTextA(ss.str().c_str());
 }
 
-
-LRESULT CMainDlg::OnEnChangeEditVolume(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+void CMainDlg::TextLog::Clear()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，它将不
-	// 发送此通知，除非重写 __super::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
-
-	// TODO:  在此添加控件通知处理程序代码
-
-	static char buff[10];
-	m_edit_volume.GetWindowTextA(buff, sizeof(buff) - 1);
-	if (buff[0] == 0 || m_slider_volume.GetPos() == atoi(buff)) {
-		return 0;
-	}
-	int pos;
-	sscanf(buff, "%d", &pos);
-	m_slider_volume.SetPos(pos);
-
-	if (pos != m_pcIn.volume) {
-		m_pcIn.volume = pos;
-		Za::Main::SetVoicePlayConfig(m_pcIn);
-	}
-
-	return 0;
+	_cur = 0;
+	_first_idx = 0;
+	_logs.clear();
 }
+
+void CMainDlg::TextLog::Add(const char * cnText, const char * jpText)
+{
+	std::stringstream ss;
+
+	int cnt_line = 1;
+	if (cnText && cnText[0]) {
+		while (*cnText)
+		{
+			if (*cnText == '\n') {
+				ss << "\r";
+				cnt_line++;
+			}
+				
+			ss << *cnText;
+			++cnText;
+		}
+		for (int j = cnt_line; j < DFT_LINES_NUM; ++j) {
+			ss << "\r\n";
+		}
+		ss << "\r\n\r\n";
+	}
+	if (jpText && jpText[0]) {
+		while (*jpText)
+		{
+			if (*jpText == '\n') ss << "\r";
+
+			ss << *jpText;
+			++jpText;
+		}
+	}
+
+	if (_max == 0 || (int)_logs.size() < _max) {
+		_logs.push_back(ss.str());
+	}
+	else {
+		_logs[_first_idx] = ss.str();
+		++_first_idx;
+		if (_first_idx == _max) _first_idx = 0;
+	}
+	Jump(this->Count());
+}
+
+void CMainDlg::TextLog::Jump(int idx)
+{
+	if (idx > _max) idx = _max;
+
+	_cur = idx;
+}
+
+const char * CMainDlg::TextLog::CurText() const
+{
+	if (_cur == 0) return "";
+	return _logs[(_cur - 1 + _first_idx) % _max].c_str();
+}
+

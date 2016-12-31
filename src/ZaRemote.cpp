@@ -35,6 +35,35 @@ static HANDLE _hProcess = 0;
 
 static int _disableOriVoice = 0;
 
+#if !_DEBUG
+static bool enableDebugPriv()
+{
+	HANDLE hToken;
+	LUID sedebugnameValue;
+	TOKEN_PRIVILEGES tkp;
+
+	if (!OpenProcessToken(GetCurrentProcess(),
+		TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+		return false;
+	}
+	if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &sedebugnameValue))
+	{
+		CloseHandle(hToken);
+		return false;
+	}
+	tkp.PrivilegeCount = 1;
+	tkp.Privileges[0].Luid = sedebugnameValue;
+	tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+	if (!AdjustTokenPrivileges(hToken, FALSE, &tkp, sizeof(tkp), NULL, NULL))
+	{
+		CloseHandle(hToken);
+		return false;
+	}
+	return true;
+}
+#endif // if !_DEBUG
+
+
 bool Za::Remote::Init()
 {
 	if (Za::Data::GameData::GetFromFiles(_gameDataList, DATA_FILENAME, DATACSTM_FILENAME) == 0) {
@@ -141,34 +170,6 @@ unsigned Za::Remote::RemoteAlloc(unsigned size) {
 bool Za::Remote::RemoteFree(unsigned rAdd, unsigned size) {
 	return VirtualFreeEx(_hProcess, (LPVOID)rAdd, size, MEM_DECOMMIT) == TRUE;
 }
-
-#if !_DEBUG
-static bool enableDebugPriv()
-{
-	HANDLE hToken;
-	LUID sedebugnameValue;
-	TOKEN_PRIVILEGES tkp;
-
-	if (!OpenProcessToken(GetCurrentProcess(),
-		TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
-		return false;
-	}
-	if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &sedebugnameValue))
-	{
-		CloseHandle(hToken);
-		return false;
-	}
-	tkp.PrivilegeCount = 1;
-	tkp.Privileges[0].Luid = sedebugnameValue;
-	tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-	if (!AdjustTokenPrivileges(hToken, FALSE, &tkp, sizeof(tkp), NULL, NULL))
-	{
-		CloseHandle(hToken);
-		return false;
-	}
-	return true;
-}
-#endif // if !_DEBUG
 
 bool _openProcess()
 {

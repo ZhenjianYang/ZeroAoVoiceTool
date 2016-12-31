@@ -68,6 +68,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\Za.h" />
     <ClInclude Include="..\..\src\ZaCommonMethod.h" />
+    <ClInclude Include="..\..\src\ZaConst.h" />
     <ClInclude Include="..\..\src\ZaData.h" />
     <ClInclude Include="..\..\src\ZaErrorMsg.h" />
     <ClInclude Include="..\..\src\ZaGameData.h" />

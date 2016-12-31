@@ -73,12 +73,14 @@ bool Za::VoicePlayer::PlayVoice(int voiceId, char *out_filename /*= nullptr*/) {
 
 bool Za::VoicePlayer::Init(){
 	Za::VoicePlayer::ClearWait();
+	Za::Sound::Stop();
 	return true;
 }
 
 bool Za::VoicePlayer::End()
 {
 	Za::VoicePlayer::ClearWait();
+	Za::Sound::Stop();
 	return true;
 }
 

@@ -210,7 +210,7 @@ bool Za::ScenaAnalyzer::Init(Data::VoicePlayerOut & vpOut, const Data::VoicePlay
 		_reload_thread(&_stop, &vpOut.Count, &vpOut.Finished, vpIn.callBack);
 	}
 
-	return true;
+	return Za::VoicePlayer::Init();
 }
 
 bool Za::ScenaAnalyzer::End()
@@ -222,7 +222,7 @@ bool Za::ScenaAnalyzer::End()
 	if (fut.valid()) fut.get();
 
 	_clearAllVoiceTable();
-	return true;
+	return Za::VoicePlayer::End();
 }
 
 bool Za::ScenaAnalyzer::MessageReceived(Data::MessageOut & msgOut, Data::MessageIn & msgIn)
@@ -288,7 +288,9 @@ bool Za::ScenaAnalyzer::MessageReceived(Data::MessageOut & msgOut, Data::Message
 		return true;
 	case MSGTYPE_PLAYWAIT:
 	default:
-		return Za::VoicePlayer::PlayWait(buff_voicefile);
+		bool ret = Za::VoicePlayer::PlayWait(buff_voicefile);
+		if(Za::VoicePlayer::GetWaitingNum() == 0) Za::Sound::SetStopCallBack();
+		return ret;
 	}
 }
 
