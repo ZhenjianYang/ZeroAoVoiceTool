@@ -17,7 +17,7 @@ static bool _setValue(int& var, INI::Level& level, const char* name) {
 		rad = 16;
 	}
 	char *p;
-	var = std::strtol(it->second.c_str(), &p, rad);
+	var = (int)std::strtoll(it->second.c_str(), &p, rad);
 	return true;
 }
 

@@ -18,7 +18,7 @@ static bool SetValue(Type &var, const INI::Level& level, const string& name) {
 		radix = 16;
 	}
 
-	long t = std::strtol(val.c_str(), &p, radix);
+	long long t = std::strtoll(val.c_str(), &p, radix);
 	var = (Type)t;
 
 	return true;
@@ -53,12 +53,13 @@ static void GetFromFile(std::list<Za::Data::GameData>& gdl,
 
 				if (SetValue(gd.Base, it->second, STR_Base)) {
 					auto it_base = map_name_data.find(gd.Base);
-					if (it_base == map_name_data.end()) {
-						continue;
+					if (it_base != map_name_data.end()) {
+						gd = *it_base->second;
 					}
-					gd = *it_base->second;
 				}
 				gd.Name = name;
+				gd.Enable = false;
+				gd.Comment = "";
 
 				SetValue(gd.Enable, it->second, STR_Enable);
 				SetValue(gd.Title, it->second, STR_Title);
