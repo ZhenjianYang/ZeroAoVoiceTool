@@ -294,32 +294,22 @@ LRESULT CMainDlg::OnMsgReceived(UINT, WPARAM wParam, LPARAM lParam, BOOL &)
 	m_msgIn.lparam = lParam;
 	m_msgIn.wparam = wParam;
 	LOG("收到消息，type=%d, addr=0x%0X", wParam, lParam);
-	Za::Main::MessageReceived(m_msgOut, m_msgIn);
-
-	if (m_msgOut.Type != MSGTYPE_SHOWTEXT && m_msgOut.Type != MSGTYPE_PLAYWAIT && m_msgOut.Type != MSGTYPE_LOADSCENA)
+	if (!Za::Main::MessageReceived(m_msgOut, m_msgIn))
 		return 0;
 
-	std::stringstream ss;
-	ss << "正在播放语音..."
-		<< " | " << "语音表数：" << m_vpOut.Count
-		<< " | " << m_gpOut.Comment;
 	if (m_msgOut.VoiceFileName && m_msgOut.VoiceFileName[0]) {
 		LOG("播放语音文件：%s", m_msgOut.VoiceFileName);
-
-		ss << " | " << m_msgOut.VoiceFileName;
 	}
 	
 	if (m_msgOut.CnText && m_msgOut.CnText[0]) {
 		LOG("中文对白：\n%s", m_msgOut.CnText);
 
-		tlog.Add(m_msgOut.CnText, m_msgOut.JpText);
+		tlog.Add(m_msgOut.VoiceFileName, m_msgOut.CnText, m_msgOut.JpText);
 		SetTextCtrl();
 	}
 	if (m_msgOut.JpText && m_msgOut.JpText[0]) {
 		LOG("日文对白：\n%s", m_msgOut.JpText);
 	}
-
-	m_static_info.SetWindowTextA(ss.str().c_str());
 
 	return 0;
 }
@@ -526,9 +516,14 @@ void CMainDlg::TextLog::Clear()
 	_logs.clear();
 }
 
-void CMainDlg::TextLog::Add(const char * cnText, const char * jpText)
+void CMainDlg::TextLog::Add(const char* voiceFile, const char* cnText, const char* jpText)
 {
 	std::stringstream ss;
+
+	ss << "语音：";
+	if (voiceFile && voiceFile[0]) ss << voiceFile;
+	else ss << "---------";
+	ss << "\r\n\r\n";
 
 	int cnt_line = 1;
 	if (cnText && cnText[0]) {

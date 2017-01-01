@@ -33,7 +33,7 @@ public:
 		TextLog(int max = 0) : _first_idx(0), _cur(0) {  }
 		void Set(int max = 0) { _max = max; }
 		void Clear();
-		void Add(const char* cnText, const char* jpText);
+		void Add(const char* voiceFile, const char* cnText, const char* jpText);
 		void Jump(int idx);
 		int Count() const { return _logs.size(); }
 		int CurIdx() const { return _cur; }
