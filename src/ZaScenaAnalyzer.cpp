@@ -18,6 +18,7 @@ struct MessageData {
 	unsigned raScena[3];
 	unsigned raBloack;
 	unsigned raText;
+	bool scena_loaded;
 };
 static MessageData _messageData;
 
@@ -243,6 +244,10 @@ bool Za::ScenaAnalyzer::MessageReceived(Data::MessageOut & msgOut, Data::Message
 	case MSGTYPE_LOADSCENA:
 		_messageData.raScena[0] = msgIn.lparam;
 		_messageData.raScena[1] = _messageData.raScena[2] = _messageData.raBloack = _messageData.raText = 0;
+		_messageData.scena_loaded = false;
+		Za::VoicePlayer::ClearWait();
+		Za::Sound::SetStopCallBack();
+		Za::Sound::Stop();
 		return true;
 	case MSGTYPE_LOADSCENA1:
 		if (!_messageData.raScena[0]) return false;;
@@ -253,15 +258,19 @@ bool Za::ScenaAnalyzer::MessageReceived(Data::MessageOut & msgOut, Data::Message
 		if (!_messageData.raScena[0]) return false;;
 		_messageData.raBloack = msgIn.lparam;
 		_messageData.raText = 0;
-		if (!DLoadScena(_messageData.raScena[0], out_scenaName)) {
-			_messageData.raScena[0] = 0;
-			return false;
-		}
-		if (_messageData.raScena[1]) {
-			if(!DLoadScena1(_messageData.raScena[1], out_scenaName)) return false;
-		}
-		if (_messageData.raScena[2]) {
-			if(!DLoadScena1(_messageData.raScena[2], out_scenaName)) return false;
+
+		if (!_messageData.scena_loaded) {
+			if (!DLoadScena(_messageData.raScena[0], out_scenaName)) {
+				_messageData.raScena[0] = 0;
+				return false;
+			}
+			if (_messageData.raScena[1]) {
+				if (!DLoadScena1(_messageData.raScena[1], out_scenaName)) return false;
+			}
+			if (_messageData.raScena[2]) {
+				if (!DLoadScena1(_messageData.raScena[2], out_scenaName)) return false;
+			}
+			_messageData.scena_loaded = true;
 		}
 		if (!DLoadBlock(_messageData.raBloack, out_scenaName)) {
 			_messageData.raBloack = 0;
