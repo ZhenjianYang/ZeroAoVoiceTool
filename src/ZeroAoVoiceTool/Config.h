@@ -4,7 +4,7 @@
 #define STR_Volume			"Volume"
 #define STR_DisableOriVoice	"DisableOriVoice"
 #define STR_MaxLogNum		"MaxLogNum"
-#define STR_RemembeWinInfo	"RemembeWinInfo"
+#define STR_RememberWinInfo	"RememberWinInfo"
 #define STR_PosX			"PosX"
 #define STR_PosY			"PosY"
 #define STR_Width			"Width"
@@ -27,7 +27,7 @@ struct Config {
 	int Volume;
 	int DisableOriVoice;
 	int MaxLogNum;
-	int RemembeWinInfo;
+	int RememberWinInfo;
 
 	int PosX;
 	int PosY;

@@ -145,7 +145,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 		MoveWindow(m_config.PosX, m_config.PosY, m_config.Width, m_config.Height);
 	}
 
-	m_check_rem.SetCheck(m_config.RemembeWinInfo);
+	m_check_rem.SetCheck(m_config.RememberWinInfo);
 
 	SetTextCtrl();
 
@@ -478,7 +478,7 @@ void CMainDlg::SaveConfig()
 		if (m_lf.lfUnderline) m_config.FontStyle |= FONTSTYLE_UNDERLINE;
 	}
 
-	m_config.RemembeWinInfo = m_check_rem.GetCheck();
+	m_config.RememberWinInfo = m_check_rem.GetCheck();
 
 	m_config.SaveConfig(CONFIG_FILENAME);
 }

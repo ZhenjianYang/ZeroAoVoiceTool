@@ -48,7 +48,7 @@ bool Config::LoadConfig(const char * configFile)
 	_setValue(Volume, ini->top(), STR_Volume);
 	_setValue(DisableOriVoice, ini->top(), STR_DisableOriVoice);
 	_setValue(MaxLogNum, ini->top(), STR_MaxLogNum);
-	_setValue(RemembeWinInfo, ini->top(), STR_RemembeWinInfo);
+	_setValue(RememberWinInfo, ini->top(), STR_RememberWinInfo);
 
 	_setValue(PosX, ini->top(), STR_PosX);
 	_setValue(PosY, ini->top(), STR_PosY);
@@ -72,9 +72,9 @@ bool Config::SaveConfig(const char * configFile)
 	ofs << STR_Volume << " = " << Volume << '\n'
 		<< STR_DisableOriVoice << " = " << DisableOriVoice << '\n'
 		<< STR_MaxLogNum << " = " << MaxLogNum << '\n'
-		<< STR_RemembeWinInfo << " = " << RemembeWinInfo << '\n';
+		<< STR_RememberWinInfo << " = " << RememberWinInfo << '\n';
 
-	if (RemembeWinInfo) {
+	if (RememberWinInfo) {
 		ofs << STR_Width << " = " << Width << '\n'
 			<< STR_Height << " = " << Height << '\n'
 			<< STR_PosX << " = " << PosX << '\n'
@@ -104,7 +104,7 @@ void Config::Reset()
 	DisableOriVoice = DFT_DISABLE_ORIVOICE;
 	MaxLogNum = DFT_MAX_LOGNUM;
 
-	RemembeWinInfo = 0;
+	RememberWinInfo = 0;
 
 	Width = Height = 0;
 	PosX = PosY = 0;
