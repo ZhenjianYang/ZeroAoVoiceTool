@@ -24,6 +24,7 @@
 #define STR_VoiceFileName "VoiceFileName"
 #define STR_VoiceFileDir "VoiceFileDir"
 #define STR_VoiceTablesDir "VoiceTablesDir"
+#define STR_VoiceTablesDirEx "VoiceTablesDirEx"
 
 namespace Za {
 	namespace Data {
@@ -53,6 +54,7 @@ namespace Za {
 			std::string VoiceFileName;
 			std::string VoiceFileDir;
 			std::string VoiceTablesDir;
+			std::string VoiceTablesDirEx;
 		};
 	}
 }

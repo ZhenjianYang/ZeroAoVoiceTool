@@ -79,6 +79,7 @@ static void GetFromFile(std::list<Za::Data::GameData>& gdl,
 				SetValue(gd.VoiceFileName, it->second, STR_VoiceFileName);
 				SetValue(gd.VoiceFileDir, it->second, STR_VoiceFileDir);
 				SetValue(gd.VoiceTablesDir, it->second, STR_VoiceTablesDir);
+				SetValue(gd.VoiceTablesDirEx, it->second, STR_VoiceTablesDirEx);
 
 				gdl.emplace_back(gd);
 				map_name_data[name] = gdl.end();

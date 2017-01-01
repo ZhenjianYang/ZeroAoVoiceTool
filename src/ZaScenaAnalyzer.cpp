@@ -69,10 +69,11 @@ static void _getSubFiles(const std::string& dir, const std::string& searchName, 
 		{
 			if (!(wfdp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				subs.push_back(wfdp.cFileName);
+				subs.push_back(dir + '\\' + wfdp.cFileName);
 			}
 		} while (FindNextFile(hFindp, &wfdp));
 	}
+	FindClose(hFindp);
 }
 
 bool _checkScenaName(const char *scenaName) {
@@ -138,15 +139,20 @@ void _reLoadAllVoiceTables(bool* cancle, int* count) {
 
 	std::vector<std::string> subs;
 	const std::string& dir = Za::Remote::CurGameData->VoiceTablesDir;
+	const std::string& direx = Za::Remote::CurGameData->VoiceTablesDirEx;
 	std::string searchName = "*." VOICE_TABLE_ATTR;
-	_getSubFiles(dir, searchName, subs);
+	if(!direx.empty()) _getSubFiles(direx, searchName, subs);
+	if (!dir.empty())_getSubFiles(dir, searchName, subs);
 
 	*count = 0;
 	for (auto &sub : subs) {
 		if (cancle && *cancle) break;
 
-		std::string _scenaNameX = sub.substr(0, sub.rfind('.'));
-		Za::VoiceTable::AllGroups::AddGroup(_scenaNameX.c_str(), (dir + '\\' + sub).c_str());
+		int st = sub.rfind('\\') + 1;
+		int en = sub.rfind('.');
+
+		std::string _scenaNameX = sub.substr(st, en - st);
+		Za::VoiceTable::AllGroups::AddGroup(_scenaNameX.c_str(), sub.c_str());
 
 		*count = Za::VoiceTable::AllGroups::GroupsNum();
 	}
