@@ -284,7 +284,7 @@ bool Za::ScenaAnalyzer::MessageReceived(Data::MessageOut & msgOut, Data::Message
 			return false;
 		}
 		if (out_voiceID != INVAILD_VOICE_ID) {
-			if (!wait || Za::Sound::Status() == Za::Sound::Status::Stop) {
+			if (!wait || Za::Sound::GetStatus() == Za::Sound::Status::Stop) {
 				Za::Sound::SetStopCallBack();
 				Za::VoicePlayer::ClearWait();
 				return Za::VoicePlayer::PlayVoice(out_voiceID, buff_voicefile);
