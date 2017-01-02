@@ -1,7 +1,7 @@
 ZeroAoVoiceTool
 ===============
 
-A tool which can add scene voice for the PC games *The Legend of Heroes:
+A tool which can add scene voice for PC games *The Legend of Heroes:
 Zero no Kiseki* & *The Legend of Heroes: Ao no Kiseki*
 
 **NOTE:**This projcet is licensed under the GPLv3. You MUST copy,
@@ -17,27 +17,19 @@ etc.) or anything modified from them.
 By now, this tool can only work for:
 
 -   *The Legend of Heroes: Zero no Kiseki* , Chinese Simplified,
-    version 1.1 (version 1.1 has 1000 save slots while version 1.0 has
-    only 100)
+    1.0, 1.1 & JOYO Platform Edition
 
 -   *The Legend of Heroes: Ao no Kiseki*, Chinese Simplified,
-    version 1.0
+    1.0 & JOYO Platform Edition
 
-To let it work, you need three things done before:
+To let it work, you need these things done before:
 
--   First, you need to extact the voice files(\*.at9) from the PS Vita
-    games *Zero no Kiseki Evolution* & *Ao no Kiseki Evolution* (no
+-   Extact the voice files(\*.at9) from the PS Vita games
+    *Zero no Kiseki Evolution* & *Ao no Kiseki Evolution* (no
     mater they are card or downloaded games) and convert them to
     supported files(\*.wav or \*.ogg).
 
--   Second, you need to make voice table files for each scena file(a
-    scena file means a file under the folder "scena").This project also
-    provide tools to make voice table files -- if you can get the
-    decrypted scena files of the PC version games and the original scena
-    files of the PS Vita version games -- and two sets of voice table
-    files, one for *Zero no Kiseki* and the other for *Ao no kiseki*.
-
--   Third, get legal copies of the games (both PC & PS Vita version).
+-   Get legal copies of the games (both PC & PS Vita games).
 
 See
 [doc/使用说明.md](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/doc/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)
@@ -71,20 +63,16 @@ ZeroAoVoiceTool
 
 目前，本工具仅适用于：
 
--   《英雄传说：零之轨迹》，简体中文版，版本1.1（1.1版有1000个存档位，而1.0版仅有100个）
+-   《英雄传说：零之轨迹》，简体中文版，1.0、1.1及JOYO平台版
 
--   《英雄传说：碧之轨迹》，简体中文版，版本1.0
+-   《英雄传说：碧之轨迹》，简体中文版，1.0及JOYO平台版
 
 为了能让其正常工作，您需要事先：
 
-1.  导出PS Vita游戏《零の軌跡 Evolution》及《碧の軌跡
-    Evolution》（卡带或下载版游戏均可）中的语音文件(\*.at9），并将其转换为本工具支持的文件格式(\*.wav或\*.ogg)。
+1.  导出PS Vita游戏《零の軌跡 Evolution》及《碧の軌跡 Evolution》（卡带或下载版游戏均可）
+    中的语音文件(\*.at9），并将其转换为本工具支持的文件格式(\*.wav或\*.ogg)。
 
-2.  为每个scena文件（即在scena文件夹下的文件）制作一个语音表。本项目提供了制作语音表的工具
-    （需要解密之后的PC版的scena文件和原始的PS
-    Vita版的scena文件），以及两套（零、碧各一套）完整的语音表文件。
-
-3.  通过合法的途径获取游戏(PC及PS Vita版)。
+2.  通过合法的途径获取游戏(PC及PS Vita版)。
 
 关于工具的详细使用说明请参考
 [doc/使用说明.md](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/doc/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)
@@ -97,14 +85,16 @@ ZeroAoVoiceTool
     
 -   [Windows Template Library (WTL)](http://wtl.sourceforge.net/), 基于
     [Microsoft Public License (MS-PL)](https://opensource.org/licenses/MS-PL).
+    
+-   [ini-parser](https://github.com/Poordeveloper/ini-parser), 基于
+    [MIT](https://tldrlegal.com/license/mit-license) 协议.
 
 各目录说明
 ----------
 
 -   **doc** 这里放的是项目相关文档，如工具的使用说明、原理说明等
 
--   **example**
-    这里放置了一个配置文件样例，以及零、碧各一套的语音表文件样例
+-   **example** 这里放置配置文件及语音表的样例
 
 -   **extlibs** 外部库目录（源码或二进制文件）
 
@@ -112,12 +102,11 @@ ZeroAoVoiceTool
 
 -   **solution** 用VS2015建立的工程，各项目分述如下
 
--   -   **ZeroAoVoiceTool** 即为前文提及的外挂语音程序，为控制台程序
+-   -   **ZaBase** 静态库，实现语音工具的基础逻辑部分
 
--   -   **ZeroAoVoiceToolX** 同样为前文提及的外挂语音程序，为窗口程序
+-   -   **ZeroAoVoiceTool** 窗口程序，实现语音工具的界面部分
 
--   -   **ZaMakeVoiceTableFound**
-        测试程序，用于寻找scena文件文本的特征。已无用。
+-   -   **ZaMakeVoiceTableFound** 测试程序，用于寻找scena文件文本的特征。已无用。
         
 -   -   **ZaMakeVoiceTablePrepare** 导出scena文件的文本，用于建立语音表
 
@@ -126,12 +115,6 @@ ZeroAoVoiceTool
 TODO
 ----
 
--   解决原理说明中尚未解决的问题，已解决的问题是否有更好的方案？
-
--   简陋的界面...
-
--   简陋的音频播放系统——现在，使用Audiere作为音频播放系统，至少已经支持了ogg音频的播放
-
--   ...
+-   [doc/解决原理说明](https://github.com/ZhenjianYang/ZeroAoVoiceTool/blob/master/doc/%E5%8E%9F%E7%90%86%26%E9%97%AE%E9%A2%98%26%E8%A7%A3%E5%86%B3.md)中还有尚未解决的问题
 
 
