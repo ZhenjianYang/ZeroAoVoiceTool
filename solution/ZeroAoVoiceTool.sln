@@ -3,15 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZeroAoVoiceTool", "ZeroAoVoiceTool\ZeroAoVoiceTool.vcxproj", "{19FCF4E3-76EB-4A78-B30F-E74872CAB258}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaMakeVoiceTable", "ZaMakeVoiceTable\ZaMakeVoiceTable.vcxproj", "{C9FF2570-AF04-4168-9F35-C235AD65579A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaMakeVoiceTableFound", "ZaMakeVoiceTableFound\ZaMakeVoiceTableFound.vcxproj", "{24B97ACE-2C6E-4297-AFB4-6A87E69FBCCB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaMakeVoiceTablePrepare", "ZaMakeVoiceTablePrepare\ZaMakeVoiceTablePrepare.vcxproj", "{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZeroAoVoiceToolX", "ZeroAoVoiceToolX\ZeroAoVoiceToolX.vcxproj", "{019373AE-347E-4B7A-930F-B5B7F5343C93}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZeroAoVoiceTool", "ZeroAoVoiceTool\ZeroAoVoiceTool.vcxproj", "{F4FBBF0B-4979-4B66-94BC-58F2C5B89C68}"
+	ProjectSection(ProjectDependencies) = postProject
+		{875ECE21-102E-47D3-9845-A4FA78C62C8A} = {875ECE21-102E-47D3-9845-A4FA78C62C8A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZaBase", "ZaBase\ZaBase.vcxproj", "{875ECE21-102E-47D3-9845-A4FA78C62C8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +22,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Debug|x86.ActiveCfg = Debug|Win32
-		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Debug|x86.Build.0 = Debug|Win32
-		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Release|x86.ActiveCfg = Release|Win32
-		{19FCF4E3-76EB-4A78-B30F-E74872CAB258}.Release|x86.Build.0 = Release|Win32
 		{C9FF2570-AF04-4168-9F35-C235AD65579A}.Debug|x86.ActiveCfg = Debug|Win32
 		{C9FF2570-AF04-4168-9F35-C235AD65579A}.Debug|x86.Build.0 = Debug|Win32
 		{C9FF2570-AF04-4168-9F35-C235AD65579A}.Release|x86.ActiveCfg = Release|Win32
@@ -35,10 +34,14 @@ Global
 		{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}.Debug|x86.Build.0 = Debug|Win32
 		{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}.Release|x86.ActiveCfg = Release|Win32
 		{8CB46F12-ECDB-4D3B-87A8-08B9CAA1C63A}.Release|x86.Build.0 = Release|Win32
-		{019373AE-347E-4B7A-930F-B5B7F5343C93}.Debug|x86.ActiveCfg = Debug|Win32
-		{019373AE-347E-4B7A-930F-B5B7F5343C93}.Debug|x86.Build.0 = Debug|Win32
-		{019373AE-347E-4B7A-930F-B5B7F5343C93}.Release|x86.ActiveCfg = Release|Win32
-		{019373AE-347E-4B7A-930F-B5B7F5343C93}.Release|x86.Build.0 = Release|Win32
+		{F4FBBF0B-4979-4B66-94BC-58F2C5B89C68}.Debug|x86.ActiveCfg = Debug|Win32
+		{F4FBBF0B-4979-4B66-94BC-58F2C5B89C68}.Debug|x86.Build.0 = Debug|Win32
+		{F4FBBF0B-4979-4B66-94BC-58F2C5B89C68}.Release|x86.ActiveCfg = Release|Win32
+		{F4FBBF0B-4979-4B66-94BC-58F2C5B89C68}.Release|x86.Build.0 = Release|Win32
+		{875ECE21-102E-47D3-9845-A4FA78C62C8A}.Debug|x86.ActiveCfg = Debug|Win32
+		{875ECE21-102E-47D3-9845-A4FA78C62C8A}.Debug|x86.Build.0 = Debug|Win32
+		{875ECE21-102E-47D3-9845-A4FA78C62C8A}.Release|x86.ActiveCfg = Release|Win32
+		{875ECE21-102E-47D3-9845-A4FA78C62C8A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

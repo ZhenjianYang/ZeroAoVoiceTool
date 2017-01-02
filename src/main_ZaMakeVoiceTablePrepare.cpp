@@ -9,7 +9,14 @@
 #include <set>
 
 #include "ZaConst.h"
-#include "ZaIo.h"
+
+#define Z_SET_PRE_ONEBYTE { 0x00, 0x01, 0x02, 0x03, 0x05, 0x0b, 0x0c, 0x0d, 0x18 }
+#define Z_SET_NEXT_TWOBYTE { 0x0200, 0x0201, 0x0203, 0x0502, 0x0700 }
+
+#define A_SET_PRE_ONEBYTE { 0x00, 0x01, 0x02, 0x03, 0x05, 0x0a, 0x0b, 0x0c, 0x0d, 0x14, 0x15 }
+#define A_SET_NEXT_TWOBYTE { 0x0200, 0x0201, 0x0203, 0x0502, 0x0700 }
+
+#define NOT_ALLOWED_ASCII { '\\', '^', '|', '{', '}' , 0x7F}
 
 using namespace std;
 
@@ -27,6 +34,8 @@ set<int> next2;
 set<int> notallowed_ascii = NOT_ALLOWED_ASCII;
 
 const int MinLength = 4;
+
+static void ZaGetSubFiles(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs);
 
 int CheckJIS(unsigned char* buf)
 {
@@ -224,4 +233,19 @@ int main(int argc, char* argv[]) {
 	of_rep.close();
 
 	return 0;
+}
+
+void ZaGetSubFiles(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs)
+{
+	WIN32_FIND_DATA wfdp;
+	HANDLE hFindp = FindFirstFile((dir + '\\' + searchName).c_str(), &wfdp);
+	if (hFindp != NULL) {
+		do
+		{
+			if (!(wfdp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				subs.push_back(wfdp.cFileName);
+			}
+		} while (FindNextFile(hFindp, &wfdp));
+	}
 }

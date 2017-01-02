@@ -9,7 +9,9 @@
 #include <iomanip>
 
 #include "ZaConst.h"
-#include "ZaIo.h"
+
+#define A_DFT_VOICETABLE_EXT	"tbl"
+#define Z_DFT_VOICETABLE_EXT	"tbl"	
 
 using namespace std;
 int length_voiceid = Z_LENGTH_VOICE_ID;
@@ -17,6 +19,7 @@ int length_voiceid = Z_LENGTH_VOICE_ID;
 static string GetScenaName(const string& fileName);
 static void GetLines(const string& fileName, vector<string> &strs, vector<int> &offsets);
 static int GetVoiceId(const string& str);
+static void ZaGetSubFiles(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs);
 
 static bool addjp = false;
 static bool addcn = false;
@@ -182,4 +185,19 @@ int GetVoiceId(const string& str) {
 		if (vid != INVAILD_VOICE_ID) break;
 	}
 	return vid;
+}
+
+void ZaGetSubFiles(const std::string& dir, const std::string& searchName, std::vector<std::string> &subs)
+{
+	WIN32_FIND_DATA wfdp;
+	HANDLE hFindp = FindFirstFile((dir + '\\' + searchName).c_str(), &wfdp);
+	if (hFindp != NULL) {
+		do
+		{
+			if (!(wfdp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				subs.push_back(wfdp.cFileName);
+			}
+		} while (FindNextFile(hFindp, &wfdp));
+	}
 }

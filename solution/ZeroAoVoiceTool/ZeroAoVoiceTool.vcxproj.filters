@@ -1,81 +1,64 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b2b11d05-e6f0-4cd7-89a2-de5534a94309}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
     </Filter>
-    <Filter Include="头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{1025f3a1-79b1-4341-92bb-8bf18b4672f5}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
     </Filter>
-    <Filter Include="资源文件">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{0d83aa57-006f-4f51-b827-0b7ca96035d2}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\main_ZaVoice.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\..\src\ZeroAoVoiceTool\MainDlg.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Za.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\..\src\ZeroAoVoiceTool\stdafx.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ZaConfig.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\..\src\ZeroAoVoiceTool\ZeroAoVoiceTool.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ZaLog.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\..\src\ZeroAoVoiceTool\Config.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ZaRemote.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ZaSound.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ZaVoicePlayer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ZaVoiceTable.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ZaScenaAnalyzer.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\..\src\ZeroAoVoiceTool\Log.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\Za.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\..\src\ZeroAoVoiceTool\MainDlg.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\ZaConfig.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\..\src\ZeroAoVoiceTool\resource.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\ZaConst.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\..\src\ZeroAoVoiceTool\stdafx.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\ZaIo.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\..\src\ZeroAoVoiceTool\Config.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\ZaLog.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\..\src\ZeroAoVoiceTool\Const.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\ZaRemote.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\..\src\ZeroAoVoiceTool\Log.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\ZaRemoteAsm.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ZaSound.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ZaVoicePlayer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ZaVoiceTable.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ZaScenaAnalyzer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\src\ZeroAoVoiceTool\ZeroAoVoiceTool.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\src\ZeroAoVoiceTool\res\ZeroAoVoiceTool.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

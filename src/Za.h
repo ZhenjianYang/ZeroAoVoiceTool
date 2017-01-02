@@ -1,7 +1,26 @@
 #ifndef __ZA_H__
 #define __ZA_H__
 
-void ZaVoiceStartup(int argc, char* argv[]);
+#include "ZaData.h"
 
-#endif
+namespace Za {
+	namespace Main {
+		bool Init();
+		bool End();
+
+		bool CheckGameEnd();
+		bool OpenGameProcess(Data::GameProcessOut& gpOut, const Data::GameProcessIn& gpIn);
+		bool CloseGameProcess();
+
+
+		bool StartVoiceTables(Data::VoicePlayerOut& vpOut, const Data::VoicePlayerIn& vpIn);
+		bool EndVoiceTables();
+
+		bool SetVoicePlayConfig(const Data::PlayConfigIn& playConfigIn);
+
+		bool MessageReceived(Data::MessageOut& msgOut, Data::MessageIn& msgIn);
+	}
+}
+
+#endif //__ZA_H__
 
