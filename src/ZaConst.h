@@ -1,8 +1,6 @@
 #ifndef __ZACONST_H__
 #define __ZACONST_H__
 
-#define ZA_VERSION "0.3.0"
-
 #define Z_LENGTH_VOICE_ID		7
 #define A_LENGTH_VOICE_ID		9
 #define MAX_LENGTH_VOICE_ID		10
