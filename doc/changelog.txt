@@ -1,4 +1,13 @@
-ZeroAoVoiceToo 0.2.0
+ZeroAoVoiceTool 0.3.0
+====================
+
+*   支持零之轨迹1.0,1.1及JOYO平台版；支持碧之轨迹1.0及JOYO平台版
+
+*   调整了界面
+
+*   调整了配置文件
+
+ZeroAoVoiceTool 0.2.0
 ====================
 
 *   语音文件格式支持ogg
@@ -7,7 +16,7 @@ ZeroAoVoiceToo 0.2.0
 
 *   全部的语音表文件都会在初始化时载入，游戏进行过程中无需再载入
 
-ZeroAoVoiceToo 0.1.0
+ZeroAoVoiceTool 0.1.0
 ====================
 
 *   初始版本，支持wav格式语音的播放
