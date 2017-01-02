@@ -102,11 +102,11 @@ ZeroAoVoiceTool
 
 -   **solution** 用VS2015建立的工程，各项目分述如下
 
--   -   **ZaBase** 静态库，实现语音工具的基础逻辑部分
+-   -   **ZaBase** 静态库，实现语音工具的基础逻辑部分
 
--   -   **ZeroAoVoiceTool** 窗口程序，实现语音工具的界面部分
+-   -   **ZeroAoVoiceTool** 窗口程序，实现语音工具的界面部分
 
--   -   **ZaMakeVoiceTableFound** 测试程序，用于寻找scena文件文本的特征。已无用。
+-   -   **ZaMakeVoiceTableFound** 测试程序，用于寻找scena文件文本的特征。已无用。
         
 -   -   **ZaMakeVoiceTablePrepare** 导出scena文件的文本，用于建立语音表
 
