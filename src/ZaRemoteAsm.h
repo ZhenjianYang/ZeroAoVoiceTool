@@ -49,7 +49,7 @@ namespace Za {
 				push ebx
 				push ecx
 
-				//PostMessage(hwnd, msgId, param, 0)
+				//PostMessageA(hwnd, msgId, type, param)
 				mov eax, [esp + OFF_FIRSTPARAM]
 				push eax
 				push FAKE_TYPE
@@ -62,7 +62,7 @@ namespace Za {
 				pop ebx
 				pop eax
 
-				//这里应为jmp OLD_JCTO_LOADSCENA，先占位
+				//这里应为jmp AddrLoadScena，先占位
 				FAKE_OP2
 				FAKE_OP2
 				FAKE_OP2
@@ -155,7 +155,7 @@ namespace Za {
 				jne rNewShowTextEnd
 
 			rNewShowTextOK :
-				//PostMessage(hwnd, msgId, param, 0)
+				//PostMessageA(hwnd, msgId, type, param)
 				mov eax, [esp + OFF_FIRSTPARAM]
 				push eax
 				push FAKE_TYPE
@@ -169,7 +169,7 @@ namespace Za {
 				pop ebx
 				pop eax
 
-				//这里应为jmp OLD_JCTO_LOADSCENA，先占位
+				//这里应为jmp AddrShowText，先占位
 				FAKE_OP2
 				FAKE_OP2
 				FAKE_OP2
