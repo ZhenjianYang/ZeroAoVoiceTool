@@ -275,7 +275,9 @@ bool _injectRemoteCode()
 				&& buff[p + 1] == FAKE_CODE2 && buff[p + 2] == FAKE_CODE2
 				&& buff[p + 3] == FAKE_CODE2 && buff[p + 4] == FAKE_CODE2) {
 				buff[p] = JMP_CODE; p++;
-				*(unsigned *)(buff + p) = AddrFuncList[i] - (_remoteDataAddr + p + 4); p += 4;
+				if (AddrFuncList[i]) {
+					*(unsigned *)(buff + p) = AddrFuncList[i] - (_remoteDataAddr + p + 4); p += 4;
+				}
 				break;
 			}
 			else
@@ -292,6 +294,7 @@ bool _injectRemoteCode()
 	}
 	for (int i = 0; i < cnt; ++i) {
 		AddrNewFuncList[i] += _remoteDataAddr;
+		if (AddrOpJcList[i] == 0) continue;
 		unsigned ljmp = AddrNewFuncList[i] - AddrOpJcList[i] - 5;
 		if (!Za::Remote::RemoteWrite(AddrOpJcList[i] + 1, &ljmp, sizeof(ljmp))) {
 			Za::Error::SetErrMsg("写入远程数据失败！");
