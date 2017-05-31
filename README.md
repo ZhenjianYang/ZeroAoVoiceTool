@@ -1,6 +1,10 @@
 ZeroAoVoiceTool
 ===============
 
+***This projcet is deprecated, please refer to [SoraVoice](https://github.com/ZhenjianYang/SoraVoice)(for PC versions)
+or [ZeroAoVoice-PSP](https://github.com/ZhenjianYang/ZeroAoVoice-PSP)
+(for PSP versions)***
+
 A tool which can add scene voice for PC games *The Legend of Heroes:
 Zero no Kiseki* & *The Legend of Heroes: Ao no Kiseki*
 
@@ -53,6 +57,9 @@ External libraries used in this project
 
 ZeroAoVoiceTool
 ===============
+
+***这是个过时的项目，请参考[SoraVoice](https://github.com/ZhenjianYang/SoraVoice)(用于PC版)
+或者[ZeroAoVoice-PSP](https://github.com/ZhenjianYang/ZeroAoVoice-PSP)(用于PSP版)***
 
 这是个可以为PC游戏《英雄传说：零之轨迹》与《英雄传说：碧之轨迹》添加剧情语音的外挂程序
 
